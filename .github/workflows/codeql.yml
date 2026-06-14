@@ -1,0 +1,17 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  analyze:
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    uses: agent-ix/nodejs-actions/.github/workflows/security-scan.yml@main

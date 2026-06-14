@@ -1,0 +1,12 @@
+name: CI
+
+on:
+  push:
+    tags: ["*.*.*"]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: agent-ix/nodejs-actions/.github/workflows/build-test.yml@main
+    secrets:
+      NPM_REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}

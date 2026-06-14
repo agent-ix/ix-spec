@@ -1,0 +1,79 @@
+{
+  "name": "@agent-ix/ix-spec",
+  "description": "Spec workflow and catalog CLI for Agent IX.",
+  "version": "0.1.0",
+  "type": "module",
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ix-spec": "bin/ix-spec.js"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "scripts": {
+    "help": "node scripts/help.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:json": "vitest run --reporter=json --outputFile=report.json || true",
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" && pnpm run format:check",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build": "vite build",
+    "clean": "rm -rf node_modules dist coverage .pnpm-store",
+    "install:frozen": "pnpm install --frozen-lockfile",
+    "update-lock": "pnpm install --lockfile-only",
+    "version": "node scripts/build-tools.js version",
+    "info": "node scripts/build-tools.js info",
+    "docker:build": "docker build -t ghcr.io/agent-ix/ix-spec .",
+    "publish:dry-run": "pnpm publish --dry-run",
+    "prepublishOnly": "pnpm run build",
+    "tags": "npm dist-tag ls @agent-ix/ix-spec --registry http://npm.ix/ || echo '(package not found or registry unavailable)'",
+    "pkg:add": "pnpm add",
+    "pkg:add-dev": "pnpm add -D",
+    "pkg:update": "pnpm update",
+    "pkg:update-latest": "pnpm update --latest",
+    "pkg:use-local": "pnpm dlx @agent-ix/js-deps use-local",
+    "pkg:use-upstream": "pnpm dlx @agent-ix/js-deps use-upstream",
+    "pkg:refresh-local": "pnpm dlx @agent-ix/js-deps refresh-local",
+    "test-results:summary": "./node_modules/.bin/jest-results summary",
+    "test-results:groups": "./node_modules/.bin/jest-results groups",
+    "test-results:detail": "./node_modules/.bin/jest-results detail",
+    "test-results:find": "./node_modules/.bin/jest-results find",
+    "test-results:failed": "./node_modules/.bin/jest-results failed",
+    "test-results:errors": "./node_modules/.bin/jest-results errors",
+    "test-results:warnings": "./node_modules/.bin/jest-results warnings"
+  },
+  "dependencies": {
+    "@agent-ix/ix-cli-core": "0.10.0",
+    "@agent-ix/workflow-cli-plugin": "0.1.6",
+    "@agent-ix/workflow-core": "0.1.6",
+    "yaml": ">=2.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.2",
+    "@typescript-eslint/eslint-plugin": "8.59.2",
+    "@typescript-eslint/parser": "8.59.2",
+    "@vitest/coverage-v8": "3.1.2",
+    "add": "^2.0.6",
+    "eslint": "10.3.0",
+    "eslint-plugin-prettier": "5.5.5",
+    "pnpm": "10.33.4",
+    "prettier": "3.8.3",
+    "ts-node": "^10.9.2",
+    "typescript": "6.0.3",
+    "vite": "6.3.4",
+    "vite-plugin-dts": "4.5.3",
+    "vitest": "3.1.2"
+  },
+  "publishConfig": {
+    "registry": "http://npm.ix/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agent-ix/ix-spec.git"
+  }
+}
