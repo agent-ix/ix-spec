@@ -6,6 +6,15 @@ vocabulary, Quire module resolution, and thin domain launchers for spec flows.
 
 The workflow lifecycle itself is handled by `ix-flow`.
 
+## Install
+
+Install `ix-spec` with `ix-flow` so the spec launcher and workflow lifecycle
+commands are both available:
+
+```bash
+npm install -g @agent-ix/ix-spec@latest @agent-ix/ix-flow@latest --registry https://npm.pkg.github.com
+```
+
 ## Usage
 
 ```bash
