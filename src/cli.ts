@@ -15,6 +15,17 @@ const USAGE = `ix-spec
 
 Spec workflow and catalog CLI for Agent IX.
 
+ix-spec starts spec-domain work. ix-flow resumes, advances, acknowledges gates,
+and inspects workflow runs created by ix-spec.
+
+Built in by default:
+  Artifact modules: spec-artifacts-iso, spec-artifacts-app, spec-artifacts-process
+  Object modules:   spec-objects-business, spec-objects-architecture,
+                    spec-objects-enterprise, spec-objects-operational,
+                    spec-objects-security
+  Workflows:        write-fr, write-us, write-nfr, write-str, write-it,
+                    review, matrix, to-plan
+
 Usage:
   ix-spec catalog list|validate
   ix-spec catalog show <type>
@@ -27,12 +38,107 @@ Usage:
 Global flags:
   --json
   --config-root <dir>     Defaults to ~/.ix
+
+Examples:
+  ix-spec catalog list
+  ix-spec catalog show FR
+  ix-spec plugin install github:agent-ix/spec-objects-custom
+  ix-spec write-fr --target spec/spec.md
+  ix-flow status <run-id>
+`;
+
+const CATALOG_USAGE = `ix-spec catalog
+
+Inspect the active artifact/object catalog.
+
+The catalog is assembled from, in order:
+  1. IX_SPEC_MODULE_PATHS
+  2. user/community modules installed under ~/.ix/modules
+  3. bundled root artifact/object modules shipped with ix-spec
+  4. sibling dev repositories, when present
+
+Bundled artifact modules:
+  spec-artifacts-iso       FR, NFR, StR, US, IT, TC, AC, CON, Spec
+  spec-artifacts-app       app-level artifacts
+  spec-artifacts-process   plans, reviews, matrices, ADRs, tasks, findings
+
+Bundled object modules:
+  spec-objects-business
+  spec-objects-architecture
+  spec-objects-enterprise
+  spec-objects-operational
+  spec-objects-security
+
+Usage:
+  ix-spec catalog list
+  ix-spec catalog show <type>
+  ix-spec catalog validate
+
+Examples:
+  ix-spec catalog show FR
+  ix-spec catalog show entity
+  ix-spec catalog validate --json
+`;
+
+const PLUGIN_USAGE = `ix-spec plugin
+
+Install and manage user/community spec modules.
+
+Root artifact/object modules are already bundled with ix-spec and do not appear
+in "plugin list". Plugins are for additions or overrides stored under ~/.ix.
+
+Supported install sources:
+  path:<dir>             Use a local directory containing manifest.yaml
+  github:<owner>/<repo>  Clone a GitHub repository
+  github:<owner>/<repo>@<ref>
+  package:<name>         Install an npm package containing a spec module
+
+Usage:
+  ix-spec plugin install <path:...|github:...|package:...>
+  ix-spec plugin list
+  ix-spec plugin remove <name>
+
+Examples:
+  ix-spec plugin install path:../spec-objects-custom
+  ix-spec plugin install github:agent-ix/spec-objects-custom
+  ix-spec plugin list
+`;
+
+const FLOW_USAGE = `ix-spec workflows
+
+Start bundled spec workflows. ix-spec creates the workflow run in ~/.ix/flows.
+Use ix-flow to inspect, resume, advance phases, and acknowledge human gates.
+
+Available workflow launchers:
+  write-fr    Create a Functional Requirement artifact
+  write-us    Create a Use Case artifact
+  write-nfr   Create a Non-Functional Requirement artifact
+  write-str   Create a Stakeholder Requirement artifact
+  write-it    Create an Integration Test intent artifact
+  review      Run a composite spec review
+  matrix      Build or update a requirements test matrix
+  to-plan     Convert accepted requirements into an implementation plan
+
+Usage:
+  ix-spec write-fr|write-us|write-nfr|write-str|write-it [--target <ref>...]
+  ix-spec review|matrix|to-plan [--target <ref>...]
+
+Examples:
+  ix-spec write-fr --target spec/spec.md
+  ix-spec review --target spec/
+  ix-spec matrix --target spec/
+  ix-flow status <run-id>
+  ix-flow resume <run-id>
 `;
 
 export async function main(argv: string[]): Promise<void> {
   const parsed = parseArgs(argv);
-  if (!parsed.command || parsed.flags.help || parsed.flags.h) {
+  if (!parsed.command) {
     console.log(USAGE);
+    return;
+  }
+  if (parsed.flags.help || parsed.flags.h) {
+    console.log(helpFor(parsed));
     return;
   }
 
@@ -55,6 +161,13 @@ export async function main(argv: string[]): Promise<void> {
     });
   }
   throw new Error(`unknown command ${parsed.command}\n\n${USAGE}`);
+}
+
+function helpFor(parsed: ParsedArgs): string {
+  if (parsed.command === "catalog") return CATALOG_USAGE;
+  if (parsed.command === "plugin") return PLUGIN_USAGE;
+  if (specFlowNames().includes(parsed.command ?? "")) return FLOW_USAGE;
+  return USAGE;
 }
 
 function runCatalog(parsed: ParsedArgs): void {
