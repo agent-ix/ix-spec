@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
 import {
@@ -75,6 +76,7 @@ function resolveSkillPath(flow: string): string {
   if (!skillName) throw new Error(`unknown spec flow ${flow}`);
   const roots = [
     process.env.IX_SPEC_WORKFLOWS_ROOT,
+    packagedWorkflowRoot(),
     join(dirname(resolve(process.cwd())), "ix-spec-workflows"),
     join(homedir(), ".ix", "plugins", "ix-spec-workflows"),
   ].filter((value): value is string => !!value);
@@ -84,5 +86,12 @@ function resolveSkillPath(flow: string): string {
   }
   throw new Error(
     `could not find ix-spec-workflows skill ${skillName}; set IX_SPEC_WORKFLOWS_ROOT`,
+  );
+}
+
+function packagedWorkflowRoot(): string {
+  return join(
+    dirname(dirname(fileURLToPath(import.meta.url))),
+    "builtin-workflows",
   );
 }

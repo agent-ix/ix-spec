@@ -1,0 +1,178 @@
+manifest_version: 1.0.0
+name: spec-objects-operational
+version: 0.2.0
+description: 'Filament Module: tier-2 operational ObjectTypes (configuration, migration, hook, job, sli, slo)'
+nav:
+  category:
+    slug: operational
+    label: Operational
+    icon: Activity
+    order: 53
+archetypes: []
+grammars: []
+artifact_types: []
+# Advisory lint rules (quire-rs FR-036; format-walkthrough decision #12):
+# Configuration Scope cells use the blessed scope vocabulary. Evaluated
+# by `quire lint`; never blocks validation/extraction/sync.
+lint_rules:
+- type: table_column_values
+  id: configuration-scope
+  section: Configuration
+  column: Scope
+  allowed: [creation, runtime, session]
+  severity: warning
+object_types:
+- name: configuration
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: &id001
+          from: frontmatter_field
+          path:
+          - id
+          required: true
+        title: &id002
+          from: frontmatter_field
+          path:
+          - title
+          required: true
+        artifact_type: &id003
+          from: frontmatter_field
+          path:
+          - artifact_type
+          required: true
+        # Format-walkthrough decision #12 (2026-06-11): Parameters vs
+        # Settings was a near-synonym guessing game. ONE required
+        # `## Configuration` table with an explicit Scope column carries
+        # the semantic as data: Scope ∈ creation | runtime | session
+        # (enforced by the `configuration-scope` lint rule below).
+        configuration_table:
+          from: table_row
+          under_section: Configuration
+          required: true
+          assert:
+            columns:
+            - Name
+            - Scope
+            - Type
+            - Default
+            - Description
+            min_rows: 1
+        behavior:
+          from: section_body
+          after_heading: Behavior
+          required: false
+- name: migration
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        sql:
+          from: code_block
+          after_heading: Migration
+          required: true
+          language: sql
+- name: sli
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: &id004
+          from: frontmatter_field
+          path:
+          - id
+          required: true
+        title: &id005
+          from: frontmatter_field
+          path:
+          - title
+          required: true
+        artifact_type: &id006
+          from: frontmatter_field
+          path:
+          - artifact_type
+          required: true
+        query:
+          from: code_block
+          after_heading: Query
+          required: true
+- name: slo
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id004
+        title: *id005
+        artifact_type: *id006
+        target:
+          from: frontmatter_field
+          path:
+          - target
+          required: true
+        window:
+          from: frontmatter_field
+          path:
+          - window
+          required: true
+- name: alert
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id004
+        title: *id005
+        artifact_type: *id006
+        flow:
+          from: code_block
+          after_heading: Flow
+          required: true
+          language: mermaid
+- name: runbook
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id004
+        title: *id005
+        artifact_type: *id006
+        steps:
+          from: section_body
+          after_heading: Steps
+          required: true
+- name: incident
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id004
+        title: *id005
+        artifact_type: *id006
+        timeline:
+          from: section_body
+          after_heading: Timeline
+          required: true
+- name: deployment
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id004
+        title: *id005
+        artifact_type: *id006
+        topology:
+          from: code_block
+          after_heading: Topology
+          required: true
+          language: mermaid

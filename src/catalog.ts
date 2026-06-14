@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { parse as parseYaml } from "yaml";
 
@@ -62,6 +63,8 @@ export function defaultModuleRoots(
       roots.push(join(installed, name));
   }
 
+  roots.push(...packagedModuleRoots());
+
   const devRoot = dirname(resolve(cwd));
   for (const [repo, pkg] of BASE_MODULE_REPOS) {
     roots.push(join(devRoot, repo, pkg));
@@ -73,6 +76,7 @@ export function loadCatalog(moduleRoots = defaultModuleRoots()): SpecCatalog {
   const modules: SpecModule[] = [];
   const entries: SpecCatalogEntry[] = [];
   const seenRoots = new Set<string>();
+  const seenModuleNames = new Set<string>();
 
   for (const candidate of moduleRoots) {
     const moduleRoot = locateModuleRoot(candidate);
@@ -85,6 +89,9 @@ export function loadCatalog(moduleRoots = defaultModuleRoots()): SpecCatalog {
       unknown
     >;
     const moduleName = stringValue(manifest.name) ?? basename(moduleRoot);
+    if (seenModuleNames.has(moduleName)) continue;
+    seenModuleNames.add(moduleName);
+
     const artifactTypes = arrayObjects(manifest.artifact_types);
     const objectTypes = arrayObjects(manifest.object_types);
 
@@ -120,6 +127,13 @@ export function loadCatalog(moduleRoots = defaultModuleRoots()): SpecCatalog {
   }
 
   return { modules, entries, duplicates: findDuplicates(entries) };
+}
+
+function packagedModuleRoots(): string[] {
+  const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+  return BASE_MODULE_REPOS.map(([, pkg]) =>
+    join(packageRoot, "builtin-modules", pkg),
+  );
 }
 
 export function findCatalogEntry(

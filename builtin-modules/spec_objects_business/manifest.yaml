@@ -1,0 +1,211 @@
+manifest_version: 1.0.0
+name: spec-objects-business
+version: 0.2.0
+description: 'Filament Module: tier-2 business ObjectTypes (DDD: domain, entity, value_object, aggregate_root, repository, event, state_machine, process, enumeration)'
+nav:
+  category:
+    slug: business
+    label: Business
+    icon: Boxes
+    order: 51
+archetypes: []
+grammars: []
+artifact_types: []
+lint_rules: []
+object_types:
+- name: domain
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: &id001
+          from: frontmatter_field
+          path:
+          - id
+          required: true
+        title: &id002
+          from: frontmatter_field
+          path:
+          - title
+          required: true
+        artifact_type: &id003
+          from: frontmatter_field
+          path:
+          - artifact_type
+          required: true
+        # Format-walkthrough decision #18 (2026-06-11): Bounded Context
+        # is the domain object's required kernel (20/20 wild domain FRs
+        # carry it; 0/20 had '## Entities'). `entities` is an OPTIONAL
+        # summary — entities are first-class `entity` FRs linked via
+        # `contains` edges, never duplicated inline. The optional `erd`
+        # extracts the whole-domain mermaid diagram.
+        bounded_context:
+          from: section_body
+          after_heading: Bounded Context
+          required: true
+        entities:
+          from: section_body
+          after_heading: Entities
+          required: false
+        erd:
+          from: code_block
+          after_heading: Entity Relationship Diagram
+          language: mermaid
+          required: false
+        ubiquitous_language:
+          from: section_body
+          after_heading: Ubiquitous Language
+          required: false
+- name: entity
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        properties:
+          from: section_body
+          after_heading: Properties
+          required: true
+- name: value_object
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        properties:
+          from: section_body
+          after_heading: Properties
+          required: true
+        fields:
+          from: section_body
+          after_heading: Fields
+          required: false
+- name: aggregate_root
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        members:
+          from: section_body
+          after_heading: Members
+          required: true
+- name: nested_entity
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        parent:
+          from: section_body
+          after_heading: Parent
+          required: true
+- name: repository
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        operations:
+          from: section_body
+          after_heading: Operations
+          required: true
+- name: event
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        schema_json:
+          from: code_block
+          after_heading: Schema
+          required: true
+          language: json
+- name: state_machine
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        diagram:
+          from: code_block
+          after_heading: States & Transitions
+          required: true
+          language: mermaid
+- name: process
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        # Format-walkthrough decision #13 (2026-06-11): `multiple: true`
+        # keeps EVERY Workflow diagram (complex flows split into several
+        # smaller diagrams instead of one oversized one); the optional
+        # `states` anchor types state diagrams separately.
+        diagram:
+          from: code_block
+          after_heading: Workflow
+          required: true
+          multiple: true
+          language: mermaid
+        states:
+          from: code_block
+          after_heading: States
+          required: false
+          multiple: true
+          language: mermaid
+        specification:
+          from: section_body
+          after_heading: Specification
+          required: false
+        algorithm:
+          from: section_body
+          after_heading: Algorithm
+          required: false
+- name: enumeration
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        # Format-walkthrough decision #7 (2026-06-11): controlled label
+        # vocabularies (codec kinds, surface labels, ISA labels, step
+        # kinds) as first-class extractable objects instead of prose or
+        # values smuggled into data_schema JSON.
+        values_table:
+          from: table_row
+          under_section: Values
+          required: true
+          assert:
+            columns:
+            - Value
+            - Description
+            min_rows: 1

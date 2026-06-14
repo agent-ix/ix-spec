@@ -1,0 +1,458 @@
+manifest_version: 1.0.0
+name: spec-artifacts-iso
+version: 0.1.0
+description: "Filament Module: ISO-style spec artifacts (FR, NFR, StR, US, IT, TC, AC, CON) — unified-shape archetypes (frontmatter schema + body_extraction asserts) validated by quire-rs; per-archetype authoring skeletons are the source of truth (no render templates); iso-spec-core grammar"
+archetypes:
+- kind: spec
+  name: Spec
+  description: Container holding ISO-style requirement artifacts
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - StR
+    - FR
+    - NFR
+    - US
+    - IT
+    - TC
+grammars:
+- name: iso-spec-core
+  version: 0.1.0
+  description: ISO-style requirements spec grammar
+  doc_kinds:
+  - spec
+artifact_types:
+- name: FR
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/fr-frontmatter.schema.json
+  defaults:
+    id_pattern: FR-{next:03d}
+  allowed_links:
+  - calls
+  - publishes
+  - consumes
+  - triggers
+  - reads
+  - writes
+  - requires
+  - implements
+  - depends_on
+  - contains
+  - transitions_to
+  - references
+  - constrains
+  - supersedes
+  - specifies
+  examples: []
+  lint_rules_ref: []
+  # Format-walkthrough decisions #1-#4 (2026-06-11): the `## Specification`
+  # umbrella was never intended — Inputs/Outputs/Behavior are level-2
+  # sections and OPTIONAL (object-kind FRs carry their kind's anchors
+  # instead); Constraints is optional (no filler rows). Description +
+  # AC table + Dependencies remain the required FR core.
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        inputs:
+          from: section_body
+          after_heading: Inputs
+          required: false
+          assert:
+            level: 2
+        outputs:
+          from: section_body
+          after_heading: Outputs
+          required: false
+          assert:
+            level: 2
+        behavior:
+          from: section_body
+          after_heading: Behavior
+          required: false
+          assert:
+            level: 2
+        constraints_table:
+          from: table_row
+          under_section: Constraints
+          required: false
+          assert:
+            columns:
+            - ID
+            - Constraint
+            - Type
+            - Validation
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-CON-\d+$'
+        acceptance_criteria:
+          from: section_body
+          after_heading: Acceptance Criteria
+          required: true
+          assert:
+            level: 2
+        acceptance_criteria_table:
+          from: table_row
+          under_section: Acceptance Criteria
+          required: true
+          assert:
+            columns:
+            - ID
+            - Criteria
+            - Verification
+            min_rows: 1
+            id_column: ID
+            id_pattern: '^{id}-AC-\d+$'
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: NFR
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/nfr-frontmatter.schema.json
+  defaults:
+    id_pattern: NFR-{next:03d}
+  allowed_links:
+  - constrains
+  - references
+  - depends_on
+  examples: []
+  lint_rules_ref: []
+  # Format-walkthrough decision #9 (2026-06-11): required NFR core is
+  # Statement + Measurement and Evaluation table + Verification.
+  # `quality_attribute` moved to FRONTMATTER (enum over ISO 25010
+  # attributes, see schemas/nfr-frontmatter.schema.json) — the old
+  # one-line `## Quality Attribute` section is retired. Scope /
+  # Rationale / Dependencies / Acceptance Criteria are optional.
+  body_extraction:
+    yield_pattern:
+      match:
+        quality_attribute:
+          from: frontmatter_field
+          path:
+          - quality_attribute
+          required: false
+        statement:
+          from: section_body
+          after_heading: Statement
+          required: true
+          assert:
+            level: 2
+        scope:
+          from: section_body
+          after_heading: Scope
+          required: false
+          assert:
+            level: 2
+        rationale:
+          from: section_body
+          after_heading: Rationale
+          required: false
+          assert:
+            level: 2
+        measurement_and_evaluation:
+          from: section_body
+          after_heading: Measurement and Evaluation
+          required: true
+          assert:
+            level: 2
+        measurement_table:
+          from: table_row
+          under_section: Measurement and Evaluation
+          required: true
+          assert:
+            columns:
+            - Metric
+            - Target
+            - Threshold
+            - Method
+            min_rows: 1
+        verification:
+          from: section_body
+          after_heading: Verification
+          required: true
+          assert:
+            level: 2
+        acceptance_criteria:
+          from: section_body
+          after_heading: Acceptance Criteria
+          required: false
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: false
+          assert:
+            level: 2
+- name: StR
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/str-frontmatter.schema.json
+  defaults:
+    id_pattern: StR-{next:03d}
+  allowed_links:
+  - satisfied_by
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: US
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/us-frontmatter.schema.json
+  defaults:
+    id_pattern: US-{next:03d}
+  allowed_links:
+  - satisfied_by
+  - traces_to
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: IT
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/it-frontmatter.schema.json
+  defaults:
+    id_pattern: IT-{next:03d}
+  allowed_links:
+  - verifies
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: TC
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/tc-frontmatter.schema.json
+  defaults:
+    id_pattern: TC-{next:03d}
+  allowed_links:
+  - verifies
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: AC
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/ac-frontmatter.schema.json
+  defaults:
+    id_pattern: AC-{next:03d}
+  allowed_links:
+  - verifies
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: CON
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/con-frontmatter.schema.json
+  defaults:
+    id_pattern: CON-{next:03d}
+  allowed_links:
+  - constrains
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        description:
+          from: section_body
+          after_heading: Description
+          required: true
+          assert:
+            level: 2
+        body:
+          from: section_body
+          after_heading: Body
+          required: true
+          assert:
+            level: 2
+        dependencies:
+          from: section_body
+          after_heading: Dependencies
+          required: true
+          assert:
+            level: 2
+- name: master-requirements
+  grammar_ref: iso-spec-core
+  frontmatter_schema_ref: schemas/master-requirements-frontmatter.schema.json
+  allowed_links:
+  - depends_on
+  - calls
+  - publishes
+  - consumes
+  - reads
+  - writes
+  - triggers
+  - requires
+  - implements
+  - references
+  examples: []
+  lint_rules_ref: []
+  body_extraction:
+    yield_pattern:
+      match:
+        title:
+          from: heading
+          level: 1
+          regex: ^Master Requirements Specification$
+          required: true
+          assert:
+            level: 1
+        purpose:
+          from: section_body
+          after_heading: Purpose
+          required: true
+          assert:
+            level: 2
+        scope:
+          from: heading
+          level: 2
+          regex: ^Scope$
+          required: true
+          assert:
+            level: 2
+        system_overview:
+          from: heading
+          level: 2
+          regex: ^System Overview$
+          required: true
+          assert:
+            level: 2
+        requirements_architecture:
+          from: heading
+          level: 2
+          regex: ^Requirements Architecture$
+          required: true
+          assert:
+            level: 2
+        references:
+          from: section_body
+          after_heading: References
+          required: true
+          assert:
+            level: 2
+doc_kinds:
+- spec
+object_types: []
+# Advisory lint rules (quire-rs FR-036; format-walkthrough decision #14):
+# AC Verification cells use the ISO 29148 verification methods, optionally
+# annotated with test-case references — `Test (TC-035)`. Evaluated by
+# `quire lint`; never blocks validation/extraction/sync.
+lint_rules:
+- type: table_column_values
+  id: ac-verification-method
+  archetypes: [FR]
+  section: Acceptance Criteria
+  column: Verification
+  allowed: [Inspection, Analysis, Demonstration, Test]
+  annotation_pattern: '\(TC-\d+(,\s*TC-\d+)*\)'
+  severity: warning

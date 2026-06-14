@@ -1,0 +1,86 @@
+name: write-fr
+version: 0.1.0
+description: Create a new functional requirement artifact from a selected FR template variant.
+initialPhase: intake
+phases:
+  - { name: intake }
+  - { name: rendered }
+  - { name: validated }
+  - { name: accepted, terminal: true }
+transitions:
+  - from: intake
+    to: rendered
+    invariants:
+      - "interview.complete:fr"
+    defaultGate: auto
+  - from: rendered
+    to: validated
+    invariants:
+      - "artifact.frontmatter_valid:fr"
+    defaultGate: auto
+  - from: validated
+    to: accepted
+    invariants: []
+    defaultGate: hitl
+itemSchemas:
+  fr_answers: {}
+  FRSchema:
+    required: [id, title, artifact_type]
+    properties:
+      id: { type: string }
+      title: { type: string }
+      artifact_type: { type: string }
+linkSchemas: {}
+interviews:
+  fr:
+    itemType: fr_answers
+    completenessRule: all_required
+    questions:
+      - key: artifact_id
+        prompt: "Functional requirement id, for example FR-001."
+        type: text
+        required: true
+      - key: slug
+        prompt: "Filename slug without the FR id."
+        type: text
+        required: true
+      - key: title
+        prompt: "Requirement title."
+        type: text
+        required: true
+      - key: object_type
+        prompt: "FR object type or behavioral."
+        type: enum
+        options:
+          [
+            behavioral,
+            entity,
+            value_object,
+            event,
+            process,
+            state_machine,
+            api_endpoint,
+            configuration,
+          ]
+        required: true
+      - key: statement
+        prompt: "One normative SHALL statement or skeleton purpose."
+        type: text
+        required: true
+artifactTemplates:
+  fr:
+    source: templates/fr-objects/behavioral/behavioral.md
+    variant: templates/fr-objects/${items.fr_answers.fr.object_type}
+    target: spec/functional/${items.fr_answers.fr.id}-${items.fr_answers.fr.slug}.md
+    phase: rendered
+    frontmatterSchema: FRSchema
+recipes:
+  create-and-validate:
+    description: Render and validate an FR, then stop at the acceptance gate.
+    steps:
+      - command: advance
+        to: rendered
+      - command: advance
+        to: validated
+      - command: advance
+        to: accepted

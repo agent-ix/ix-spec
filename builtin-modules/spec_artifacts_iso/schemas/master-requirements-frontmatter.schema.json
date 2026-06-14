@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "artifact_type",
+    "name",
+    "org",
+    "component_type"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "artifact_type": {
+      "const": "master-requirements"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "org": {
+      "type": "string",
+      "minLength": 1
+    },
+    "component_type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "implementation_language": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "depends_on": {
+      "type": "array"
+    },
+    "standards_alignment": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "security_critical": {
+      "type": "boolean"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target",
+          "type"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": "^ix://"
+          },
+          "type": {
+            "type": "string"
+          },
+          "cardinality": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

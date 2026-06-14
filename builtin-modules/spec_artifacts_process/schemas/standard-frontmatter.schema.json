@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "artifact_type",
+    "code"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,}-[0-9]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_type": {
+      "const": "Standard"
+    },
+    "object": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9.-]*$",
+      "description": "Stable slug identifier referenced from spec frontmatter standards_alignment[]."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short summary of what the standard defines."
+    },
+    "guide": {
+      "type": "string",
+      "description": "Application guidance: when and how to apply the standard."
+    },
+    "link": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical URL for the standard."
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "target",
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "pattern": "^ix://"
+          },
+          "type": {
+            "type": "string"
+          },
+          "cardinality": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

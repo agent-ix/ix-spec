@@ -1,0 +1,50 @@
+manifest_version: 1.0.0
+name: spec-artifacts-app
+version: 0.1.0
+description: "Filament Module: application/composite spec artifact templates (ApplicationSpec, MasterRequirements) \u2014 absorbed spec-master-requirements"
+archetypes:
+- kind: application-spec
+  name: Application Spec
+  doc_backed: true
+  supports_membership: true
+  composition:
+    expected_artifacts:
+    - MasterRequirements
+    - StR
+    - FR
+    - NFR
+grammars:
+- name: app-spec
+  version: 0.1.0
+  description: Composite application spec grammar
+  doc_kinds:
+  - application-spec
+  - master-requirements
+artifact_types:
+- name: ApplicationSpec
+  grammar_ref: app-spec
+  frontmatter_schema_ref: schemas/applicationspec-frontmatter.schema.json
+  defaults:
+    id_pattern: ApplicationSpec-{next:03d}
+  allowed_links:
+  - contains
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+- name: MasterRequirements
+  grammar_ref: app-spec
+  frontmatter_schema_ref: schemas/masterrequirements-frontmatter.schema.json
+  defaults:
+    id_pattern: MasterRequirements-{next:03d}
+  allowed_links:
+  - aggregates
+  - depends_on
+  - references
+  examples: []
+  lint_rules_ref: []
+doc_kinds:
+- application-spec
+- master-requirements
+object_types: []
+lint_rules: []

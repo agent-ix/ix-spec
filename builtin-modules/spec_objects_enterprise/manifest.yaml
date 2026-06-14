@@ -1,0 +1,140 @@
+manifest_version: 1.0.0
+name: spec-objects-enterprise
+version: 0.1.0
+description: 'Filament Module: tier-2 enterprise-architecture ObjectTypes (capability, business_function, value_stream, decision, objective, principle, kpi)'
+nav:
+  category:
+    slug: enterprise-architecture
+    label: Enterprise Architecture
+    icon: Building2
+    order: 50
+archetypes: []
+grammars: []
+artifact_types: []
+lint_rules: []
+object_types:
+- name: capability
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: &id001
+          from: frontmatter_field
+          path:
+          - id
+          required: true
+        title: &id002
+          from: frontmatter_field
+          path:
+          - title
+          required: true
+        artifact_type: &id003
+          from: frontmatter_field
+          path:
+          - artifact_type
+          required: true
+        sub_capabilities:
+          from: section_body
+          after_heading: Sub-capabilities
+          required: true
+- name: business_function
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        description_body:
+          from: section_body
+          after_heading: Description
+          required: true
+- name: value_stream
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        stages:
+          from: section_body
+          after_heading: Stages
+          required: true
+- name: decision
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        decision_body:
+          from: section_body
+          after_heading: Decision
+          required: true
+- name: objective
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        metric:
+          from: frontmatter_field
+          path:
+          - metric
+          required: true
+        target:
+          from: frontmatter_field
+          path:
+          - target
+          required: true
+        deadline:
+          from: frontmatter_field
+          path:
+          - deadline
+          required: false
+- name: principle
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        rationale:
+          from: section_body
+          after_heading: Rationale
+          required: true
+- name: kpi
+  data_schema:
+    type: object
+  body_extraction:
+    yield_pattern:
+      match:
+        id: *id001
+        title: *id002
+        artifact_type: *id003
+        metric:
+          from: frontmatter_field
+          path:
+          - metric
+          required: true
+        target:
+          from: frontmatter_field
+          path:
+          - target
+          required: true
+        threshold:
+          from: frontmatter_field
+          path:
+          - threshold
+          required: false

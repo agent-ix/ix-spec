@@ -4,6 +4,8 @@ node_modules
 pnpm-lock.yaml
 
 # Build Outputs
+builtin-modules/
+builtin-workflows/
 dist/
 dist-storybook/
 storybook-static/
