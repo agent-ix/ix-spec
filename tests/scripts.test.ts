@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 
-import { main } from "../src";
+import { main, packageVersion } from "../src/cli";
 
 test("build-tools help exits successfully", () => {
   const output = execFileSync("node", ["scripts/build-tools.js", "--help"], {
@@ -23,4 +23,18 @@ test("catalog help explains bundled modules and plugin layering", async () => {
   expect(text).toContain("bundled root artifact/object modules");
   expect(text).toContain("spec-artifacts-iso");
   expect(text).toContain("spec-objects-security");
+});
+
+test("version flag prints package version", async () => {
+  const output: string[] = [];
+  const spy = vi.spyOn(console, "log").mockImplementation((message) => {
+    output.push(String(message));
+  });
+  try {
+    await main(["--version"]);
+    await main(["version"]);
+  } finally {
+    spy.mockRestore();
+  }
+  expect(output).toEqual([packageVersion(), packageVersion()]);
 });

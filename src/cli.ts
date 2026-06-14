@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
 
 import { findCatalogEntry, ixHome, loadCatalog } from "./catalog.js";
@@ -133,6 +137,10 @@ Examples:
 
 export async function main(argv: string[]): Promise<void> {
   const parsed = parseArgs(argv);
+  if (parsed.flags.version || parsed.flags.v || parsed.command === "version") {
+    console.log(packageVersion());
+    return;
+  }
   if (!parsed.command) {
     console.log(USAGE);
     return;
@@ -161,6 +169,17 @@ export async function main(argv: string[]): Promise<void> {
     });
   }
   throw new Error(`unknown command ${parsed.command}\n\n${USAGE}`);
+}
+
+export function packageVersion(): string {
+  const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+  const packageJson = JSON.parse(
+    readFileSync(join(packageRoot, "package.json"), "utf8"),
+  ) as { version?: unknown };
+  if (typeof packageJson.version !== "string") {
+    throw new Error("package.json version is missing");
+  }
+  return packageJson.version;
 }
 
 function helpFor(parsed: ParsedArgs): string {
