@@ -18,6 +18,7 @@ import {
   makeLocalPlugin,
   makeDevModule,
   makeRepos,
+  removeSeededModule,
 } from "../lib/fixtures.mjs";
 
 export const SCENARIOS = [
@@ -173,9 +174,9 @@ export const SCENARIOS = [
   {
     id: "EV-010",
     useCase: "US-003",
-    // NOTE: a true `github:`/`package:` install needs a network-reachable plugin repo.
-    // Offline, we stand in with a versioned local "packaged" plugin; the resolve-and-
-    // author behavior is identical. Swap to a real github: source once one is published.
+    // Local "packaged" plugin stand-in (versioned manifest) for the install→resolve
+    // →author→validate path. EV-020 covers a REAL `github:owner/repo//subdir` install
+    // that clones from GitHub over the network.
     setup(ctx) {
       ctx.data.pluginPath = makeLocalPlugin(
         ctx.work,
@@ -341,6 +342,34 @@ export const SCENARIOS = [
       "`ix-spec write . --types domain,api_endpoint,configuration`, author from the " +
       "skeletons, and validate.",
     expect: {
+      files: ["spec/**/*.md"],
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    id: "EV-020",
+    useCase: "US-003",
+    // REAL GitHub install: remove the operational module from the seeded home, then
+    // the agent installs it from GitHub via the subdir source and authors one of its
+    // (skeleton-backed) types. `agentRan` asserts the agent's own github install
+    // command succeeded (a later write also lazily reconciles defaults, so the type
+    // resolving alone wouldn't prove the agent did the install).
+    setup(ctx) {
+      removeSeededModule(ctx, "spec-objects-operational");
+    },
+    prompt:
+      "The `spec-objects-operational` module is not installed. Install it FROM GITHUB " +
+      "with `ix-spec plugin install " +
+      "github:agent-ix/spec-objects-operational//spec_objects_operational@v0.2.0` " +
+      "(this clones the module's subdirectory from GitHub). Then author one " +
+      "`configuration` object under spec/ from its skeleton and validate it.",
+    expect: {
+      agentRan: [
+        {
+          pattern: "plugin install\\s+[\"']?github:[^\\s\"']*//",
+          desc: "github subdir install",
+        },
+      ],
       files: ["spec/**/*.md"],
       validate: { globs: ["spec/**/*.md"], shouldPass: true },
     },

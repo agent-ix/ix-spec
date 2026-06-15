@@ -2,7 +2,13 @@
 // local plugins, sibling dev modules). Ported/adapted from the old deterministic
 // runner.
 
-import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 
 /** Copy a module skeleton (from the snapshotted modules) into the scenario repo. */
@@ -12,6 +18,20 @@ export function copySkeleton(ctx, moduleName, skeletonFile, repoRelTarget) {
   mkdirSync(dirname(target), { recursive: true });
   cpSync(src, target);
   return target;
+}
+
+/**
+ * Remove a seeded default module from a scenario's IX_HOME (modules dir + registry),
+ * so the agent must (re)install it — e.g. to test a real GitHub install. NOTE: a
+ * later `ix-spec write`/`catalog` still lazily reconciles default modules, so pair
+ * this with an `agentRan` assertion that the agent's own install command succeeded.
+ */
+export function removeSeededModule(ctx, name) {
+  rmSync(join(ctx.modulesDir, name), { recursive: true, force: true });
+  const regPath = join(ctx.ixHome, "filament", "registry.json");
+  const reg = JSON.parse(readFileSync(regPath, "utf8"));
+  reg.plugins = (reg.plugins ?? []).filter((p) => p.name !== name);
+  writeFileSync(regPath, `${JSON.stringify(reg, null, 2)}\n`);
 }
 
 /**

@@ -101,6 +101,30 @@ export function findSentinel(path) {
 }
 
 /**
+ * Did the agent run a Bash command matching `patternStr`, and did it succeed?
+ * Success = the tool result is not flagged error and has no non-zero "Exit code N"
+ * prefix (Claude prepends that only on failure). Used to assert the agent actually
+ * exercised a specific approach (e.g. a real `plugin install github:...//` install).
+ */
+export function findCommand(path, patternStr) {
+  const lines = readLines(path);
+  const results = toolResultsById(lines);
+  const re = new RegExp(patternStr);
+  let ran = false;
+  let succeeded = false;
+  for (const block of toolUses(lines)) {
+    const cmd = bashCommand(block);
+    if (!cmd || !re.test(cmd)) continue;
+    ran = true;
+    const res = results.get(block.id);
+    const failed =
+      res?.isError || /(^|\n)Exit code [1-9]/.test(res?.text ?? "");
+    if (!failed) succeeded = true;
+  }
+  return { ran, succeeded };
+}
+
+/**
  * Aggregate real metrics from a transcript.
  * @returns ScenarioMetrics (see report.mjs for the persisted shape)
  */

@@ -8,6 +8,7 @@ import { join, relative, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 
 import { findQuire, ixSpecBin } from "./resolve.mjs";
+import { findCommand } from "./metrics.mjs";
 
 /** Recursively list repo-relative file paths (posix-style), skipping dotdirs. */
 function listFiles(root, dir = root, acc = []) {
@@ -169,6 +170,13 @@ export function assertExpectations(
       failures.push(
         `${type} did not resolve to a module under "${moduleNameIncludes}" (got ${moduleRoot})`,
       );
+  }
+
+  for (const { pattern, desc } of expect.agentRan ?? []) {
+    const { ran, succeeded } = findCommand(ctx.transcriptPath, pattern);
+    checks[`agentRan:${desc}`] = { ran, succeeded };
+    if (!ran || !succeeded)
+      failures.push(`agent did not successfully run: ${desc}`);
   }
 
   const wantSentinel = expect.sentinel ?? "complete";
