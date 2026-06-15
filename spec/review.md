@@ -9,9 +9,9 @@ artifact_type: Review
 ## Findings
 
 - No blocking findings.
-- Quire validation/extraction is not fully wired into flow phases yet; the
-  initial implementation records module ownership so that integration can be
-  added without changing workflow definitions.
+- Scope-based Quire validation is not fully implemented in Quire yet; `ix-spec`
+  now describes the intended validation command while keeping module ownership
+  in the catalog.
 
 ## Gate
 

@@ -7,6 +7,11 @@ import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
 import { findCatalogEntry, ixHome, loadCatalog } from "./catalog.js";
 import { installPlugin, listPlugins, removePlugin } from "./plugins.js";
 import { specFlowNames, startSpecFlow } from "./flows.js";
+import {
+  createAuthoringPack,
+  formatAuthoringPack,
+  parseTypeList,
+} from "./write.js";
 
 interface ParsedArgs {
   command?: string;
@@ -27,16 +32,15 @@ Built in by default:
   Object modules:   spec-objects-business, spec-objects-architecture,
                     spec-objects-enterprise, spec-objects-operational,
                     spec-objects-security
-  Workflows:        write-fr, write-us, write-nfr, write-str, write-it,
-                    review, matrix, to-plan
+  Workflows:        review, matrix, to-plan
 
 Usage:
+  ix-spec write <repo_dir> --types <type[,type...]>
   ix-spec catalog list|validate
   ix-spec catalog show <type>
   ix-spec plugin install <path:...|github:...|package:...>
   ix-spec plugin list
   ix-spec plugin remove <name>
-  ix-spec write-fr|write-us|write-nfr|write-str|write-it [--target <ref>...]
   ix-spec review|matrix|to-plan [--target <ref>...]
 
 Global flags:
@@ -47,8 +51,31 @@ Examples:
   ix-spec catalog list
   ix-spec catalog show FR
   ix-spec plugin install github:agent-ix/spec-objects-custom
-  ix-spec write-fr --target spec/spec.md
+  ix-spec write . --types FR,domain
   ix-flow status <run-id>
+`;
+
+const WRITE_USAGE = `ix-spec write
+
+Build an authoring pack for spec files an agent is about to create or edit.
+
+Pass the target repository and the artifact/object types involved in the work.
+ix-spec resolves those types from the active catalog and returns the local
+skeletons, schemas, module roots, and Quire validation command for the repo.
+
+Usage:
+  ix-spec write <repo_dir> --types <type[,type...]>
+
+Examples:
+  ix-spec write . --types FR
+  ix-spec write . --types FR,domain,entity
+  ix-spec write ../my-service --types fr,DOMAIN --json
+
+Notes:
+  - Type lookup is case-insensitive; FR and fr are the same type.
+  - Types can be artifacts or objects from bundled or installed plugins.
+  - Use the returned skeletons and schemas as the authoring contract.
+  - Run the returned Quire command after editing spec files.
 `;
 
 const CATALOG_USAGE = `ix-spec catalog
@@ -88,8 +115,8 @@ const PLUGIN_USAGE = `ix-spec plugin
 
 Install and manage user/community spec modules.
 
-Root artifact/object modules are already bundled with ix-spec and do not appear
-in "plugin list". Plugins are for additions or overrides stored under ~/.ix.
+Plugins add or override artifact/object modules under ~/.ix. Use "catalog list"
+to see the full active catalog, including bundled root modules and plugins.
 
 Supported install sources:
   path:<dir>             Use a local directory containing manifest.yaml
@@ -110,25 +137,18 @@ Examples:
 
 const FLOW_USAGE = `ix-spec workflows
 
-Start bundled spec workflows. ix-spec creates the workflow run in ~/.ix/flows.
+Start bundled spec review/planning workflows. ix-spec creates the workflow run in ~/.ix/flows.
 Use ix-flow to inspect, resume, advance phases, and acknowledge human gates.
 
 Available workflow launchers:
-  write-fr    Create a Functional Requirement artifact
-  write-us    Create a Use Case artifact
-  write-nfr   Create a Non-Functional Requirement artifact
-  write-str   Create a Stakeholder Requirement artifact
-  write-it    Create an Integration Test intent artifact
   review      Run a composite spec review
   matrix      Build or update a requirements test matrix
   to-plan     Convert accepted requirements into an implementation plan
 
 Usage:
-  ix-spec write-fr|write-us|write-nfr|write-str|write-it [--target <ref>...]
   ix-spec review|matrix|to-plan [--target <ref>...]
 
 Examples:
-  ix-spec write-fr --target spec/spec.md
   ix-spec review --target spec/
   ix-spec matrix --target spec/
   ix-flow status <run-id>
@@ -161,6 +181,7 @@ export async function main(argv: string[]): Promise<void> {
 
   if (parsed.command === "catalog") return runCatalog(parsed);
   if (parsed.command === "plugin") return runPlugin(parsed);
+  if (parsed.command === "write") return runWrite(parsed);
   if (specFlowNames().includes(parsed.command)) {
     return startSpecFlow(parsed.command, {
       json: parsed.flags.json === true,
@@ -183,10 +204,27 @@ export function packageVersion(): string {
 }
 
 function helpFor(parsed: ParsedArgs): string {
+  if (parsed.command === "write") return WRITE_USAGE;
   if (parsed.command === "catalog") return CATALOG_USAGE;
   if (parsed.command === "plugin") return PLUGIN_USAGE;
   if (specFlowNames().includes(parsed.command ?? "")) return FLOW_USAGE;
   return USAGE;
+}
+
+function runWrite(parsed: ParsedArgs): void {
+  const [repoDir] = parsed.positionals;
+  if (!repoDir) throw new Error(`write requires <repo_dir>\n\n${WRITE_USAGE}`);
+  const catalog = loadCatalog();
+  const pack = createAuthoringPack(
+    catalog,
+    repoDir,
+    parseTypeList(arrayFlag(parsed, "types")),
+  );
+  console.log(
+    parsed.flags.json
+      ? JSON.stringify(pack, null, 2)
+      : formatAuthoringPack(pack),
+  );
 }
 
 function runCatalog(parsed: ParsedArgs): void {
@@ -283,7 +321,7 @@ function parseArgs(argv: string[]): ParsedArgs {
           : argv[i + 1] && !argv[i + 1].startsWith("-")
             ? argv[++i]
             : true;
-      if (key === "target")
+      if (key === "target" || key === "types")
         flags[key] = [
           ...arrayFlag({ flags } as ParsedArgs, key),
           String(value),

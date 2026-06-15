@@ -11,6 +11,7 @@ export interface SpecCatalogEntry {
   moduleName: string;
   moduleRoot: string;
   schemaRef?: string;
+  schemaPath?: string;
   skeletonPath?: string;
 }
 
@@ -105,12 +106,14 @@ export function loadCatalog(moduleRoots = defaultModuleRoots()): SpecCatalog {
 
     for (const artifact of artifactTypes) {
       const name = String(artifact.name);
+      const schemaRef = stringValue(artifact.frontmatter_schema_ref);
       entries.push({
         name,
         kind: "artifact",
         moduleName,
         moduleRoot,
-        schemaRef: stringValue(artifact.frontmatter_schema_ref),
+        schemaRef,
+        schemaPath: schemaRef ? join(moduleRoot, schemaRef) : undefined,
         skeletonPath: skeletonPath(moduleRoot, name),
       });
     }
@@ -140,7 +143,14 @@ export function findCatalogEntry(
   catalog: SpecCatalog,
   name: string,
 ): SpecCatalogEntry | undefined {
-  return catalog.entries.find((entry) => entry.name === name);
+  const normalized = normalizeTypeName(name);
+  return catalog.entries.find(
+    (entry) => normalizeTypeName(entry.name) === normalized,
+  );
+}
+
+function normalizeTypeName(name: string): string {
+  return name.toLowerCase();
 }
 
 function locateModuleRoot(candidate: string): string | undefined {

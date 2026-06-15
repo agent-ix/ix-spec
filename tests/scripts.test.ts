@@ -25,6 +25,21 @@ test("catalog help explains bundled modules and plugin layering", async () => {
   expect(text).toContain("spec-objects-security");
 });
 
+test("write help explains authoring packs", async () => {
+  const output: string[] = [];
+  const spy = vi.spyOn(console, "log").mockImplementation((message) => {
+    output.push(String(message));
+  });
+  try {
+    await main(["write", "--help"]);
+  } finally {
+    spy.mockRestore();
+  }
+  const text = output.join("\n");
+  expect(text).toContain("authoring pack");
+  expect(text).toContain("ix-spec write <repo_dir> --types");
+});
+
 test("version flag prints package version", async () => {
   const output: string[] = [];
   const spy = vi.spyOn(console, "log").mockImplementation((message) => {

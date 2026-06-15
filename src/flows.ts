@@ -12,11 +12,6 @@ import {
 import { ixHome } from "./catalog.js";
 
 const FLOW_SKILLS: Record<string, string> = {
-  "write-fr": "write-fr",
-  "write-us": "write-us",
-  "write-nfr": "write-nfr",
-  "write-str": "write-str",
-  "write-it": "write-it",
   review: "review",
   matrix: "matrix",
   "to-plan": "to-plan",

@@ -5,3 +5,8 @@ export {
   findCatalogEntry,
 } from "./catalog.js";
 export { installPlugin, listPlugins, removePlugin } from "./plugins.js";
+export {
+  createAuthoringPack,
+  formatAuthoringPack,
+  parseTypeList,
+} from "./write.js";
