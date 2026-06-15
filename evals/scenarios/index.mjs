@@ -285,7 +285,10 @@ export const SCENARIOS = [
 export const CANARY_IDS = ["EV-001", "EV-008"];
 
 export function selectScenarios({ canary, all, filter }) {
-  if (filter) return SCENARIOS.filter((s) => s.id.includes(filter));
+  if (filter) {
+    const wanted = filter.split(",").map((f) => f.trim());
+    return SCENARIOS.filter((s) => wanted.some((f) => s.id.includes(f)));
+  }
   if (all) return SCENARIOS;
   if (canary) return SCENARIOS.filter((s) => CANARY_IDS.includes(s.id));
   return [];

@@ -30,14 +30,18 @@ export async function runAgent(scenario, ctx, opts) {
   writeFileSync(join(ctx.repo, TASK_FILENAME), buildTaskBrief(scenario, ctx));
 
   const { mod } = await findAgentPty();
-  const env = {
-    ...process.env,
+  // Env the agent's shell must see. tmux does NOT propagate the spawn process's
+  // env to a pane when a tmux server is already running (the pane inherits the
+  // SERVER's env). So we set it INSIDE the pane via `env KEY=VAL ... claude ...`,
+  // which is robust regardless of server state. Without this the agent leaks into
+  // the real ~/.ix and the global (older) quire.
+  const overrides = {
     IX_HOME: ctx.ixHome,
     IX_SCHEMA_PATH: modulesDir, // quire scoped-mode reads this for installed modules
-    PATH: binPaths(shimPath),
+    PATH: binPaths(shimPath), // pins shim ix-spec + quire>=0.2.4
     ...extraEnv, // per-scenario overrides (e.g. IX_SPEC_MODULE_PATHS for dev modules)
   };
-  const args = [
+  const claudeArgs = [
     "--session-id",
     ctx.sessionId,
     "--permission-mode",
@@ -47,13 +51,14 @@ export async function runAgent(scenario, ctx, opts) {
     "--add-dir",
     ctx.repo,
   ];
+  const envArgs = Object.entries(overrides).map(([k, v]) => `${k}=${v}`);
 
   const t0 = Date.now();
   const session = await mod.startSession({
-    bin: "claude",
-    args,
+    bin: "env",
+    args: [...envArgs, "claude", ...claudeArgs],
     cwd: ctx.repo,
-    env,
+    env: { ...process.env, ...overrides },
     cols: 200,
     rows: 50,
     sessionName: `ixeval-${ctx.id.toLowerCase()}-${ctx.sessionId.slice(0, 8)}`,
