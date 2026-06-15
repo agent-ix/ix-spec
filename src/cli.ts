@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
 
 import { findCatalogEntry, ixHome, loadCatalog } from "./catalog.js";
+import { ensureDefaultModules } from "./modules.js";
 import { installPlugin, listPlugins, removePlugin } from "./plugins.js";
 import { specFlowNames, startSpecFlow } from "./flows.js";
 import {
@@ -27,7 +28,7 @@ Spec workflow and catalog CLI for Agent IX.
 ix-spec starts spec-domain work. ix-flow resumes, advances, acknowledges gates,
 and inspects workflow runs created by ix-spec.
 
-Built in by default:
+Default modules (installed on first use into ~/.ix/filament/modules):
   Artifact modules: spec-artifacts-iso, spec-artifacts-app, spec-artifacts-process
   Object modules:   spec-objects-business, spec-objects-architecture,
                     spec-objects-enterprise, spec-objects-operational,
@@ -38,7 +39,7 @@ Usage:
   ix-spec write <repo_dir> --types <type[,type...]>
   ix-spec catalog list|validate
   ix-spec catalog show <type>
-  ix-spec plugin install <path:...|github:...|package:...>
+  ix-spec plugin install <path:...|github:...>
   ix-spec plugin list
   ix-spec plugin remove <name>
   ix-spec review|matrix|to-plan [--target <ref>...]
@@ -84,16 +85,17 @@ Inspect the active artifact/object catalog.
 
 The catalog is assembled from, in order:
   1. IX_SPEC_MODULE_PATHS
-  2. user/community modules installed under ~/.ix/modules
-  3. bundled root artifact/object modules shipped with ix-spec
-  4. sibling dev repositories, when present
+  2. modules installed under ~/.ix/filament/modules
 
-Bundled artifact modules:
+The default module set is installed there automatically on first catalog access,
+and updated by "ix-spec plugin install". The same directory is read by quire-rs.
+
+Default artifact modules:
   spec-artifacts-iso       FR, NFR, StR, US, IT, TC, AC, CON, Spec
   spec-artifacts-app       app-level artifacts
   spec-artifacts-process   plans, reviews, matrices, ADRs, tasks, findings
 
-Bundled object modules:
+Default object modules:
   spec-objects-business
   spec-objects-architecture
   spec-objects-enterprise
@@ -115,17 +117,17 @@ const PLUGIN_USAGE = `ix-spec plugin
 
 Install and manage user/community spec modules.
 
-Plugins add or override artifact/object modules under ~/.ix. Use "catalog list"
-to see the full active catalog, including bundled root modules and plugins.
+Plugins add or override artifact/object modules under ~/.ix/filament/modules.
+Use "catalog list" to see the full active catalog, including default modules and
+plugins.
 
 Supported install sources:
-  path:<dir>             Use a local directory containing manifest.yaml
-  github:<owner>/<repo>  Clone a GitHub repository
-  github:<owner>/<repo>@<ref>
-  package:<name>         Install an npm package containing a spec module
+  path:<dir>                   Use a local directory containing manifest.yaml
+  github:<owner>/<repo>        Clone a GitHub repository (subdir via manifest)
+  github:<owner>/<repo>@<ref>  Pin to a tag, branch, or sha
 
 Usage:
-  ix-spec plugin install <path:...|github:...|package:...>
+  ix-spec plugin install <path:...|github:...>
   ix-spec plugin list
   ix-spec plugin remove <name>
 
@@ -214,6 +216,7 @@ function helpFor(parsed: ParsedArgs): string {
 function runWrite(parsed: ParsedArgs): void {
   const [repoDir] = parsed.positionals;
   if (!repoDir) throw new Error(`write requires <repo_dir>\n\n${WRITE_USAGE}`);
+  ensureDefaultModules();
   const catalog = loadCatalog();
   const pack = createAuthoringPack(
     catalog,
@@ -228,6 +231,7 @@ function runWrite(parsed: ParsedArgs): void {
 }
 
 function runCatalog(parsed: ParsedArgs): void {
+  ensureDefaultModules();
   const catalog = loadCatalog();
   switch (parsed.subcommand) {
     case "list":

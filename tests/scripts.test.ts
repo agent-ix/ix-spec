@@ -9,7 +9,7 @@ test("build-tools help exits successfully", () => {
   expect(output).toContain("Build Tools");
 });
 
-test("catalog help explains bundled modules and plugin layering", async () => {
+test("catalog help explains the installed module dir and default set", async () => {
   const output: string[] = [];
   const spy = vi.spyOn(console, "log").mockImplementation((message) => {
     output.push(String(message));
@@ -20,7 +20,7 @@ test("catalog help explains bundled modules and plugin layering", async () => {
     spy.mockRestore();
   }
   const text = output.join("\n");
-  expect(text).toContain("bundled root artifact/object modules");
+  expect(text).toContain("~/.ix/filament/modules");
   expect(text).toContain("spec-artifacts-iso");
   expect(text).toContain("spec-objects-security");
 });

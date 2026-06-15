@@ -1,119 +1,76 @@
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
-import { execFileSync } from "node:child_process";
-import { basename, join, resolve } from "node:path";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { basename, join } from "node:path";
 
 import { parse as parseYaml } from "yaml";
+import {
+  installEntry,
+  readRegistry,
+  writeRegistry,
+  type InstallOptions,
+  type InstalledPlugin,
+  type Source,
+} from "@agent-ix/ts-plugin-kit";
 
-import { ixHome } from "./catalog.js";
+import { filamentModulesDir, ixHome } from "./catalog.js";
 
-export interface InstalledSpecPlugin {
-  name: string;
-  source: string;
-  moduleRoot?: string;
-  installedAt: string;
-}
-
-interface PluginRegistry {
-  plugins: InstalledSpecPlugin[];
-}
+export type { InstalledPlugin } from "@agent-ix/ts-plugin-kit";
 
 export function registryPath(home = ixHome()): string {
-  return join(home, "plugins", "registry.json");
+  return join(home, "filament", "registry.json");
 }
 
-export function listPlugins(home = ixHome()): InstalledSpecPlugin[] {
-  return readRegistry(home).plugins;
+function installOptions(home: string): InstallOptions {
+  return {
+    cacheRoot: join(home, "cache", "ts-plugin-kit"),
+    targetRoot: filamentModulesDir(home),
+    registryPath: registryPath(home),
+    readName: readModuleName,
+    materialize: "copy",
+  };
 }
 
-export function removePlugin(name: string, home = ixHome()): void {
-  const registry = readRegistry(home);
-  registry.plugins = registry.plugins.filter((plugin) => plugin.name !== name);
-  rmSync(join(home, "modules", name), { force: true, recursive: true });
-  writeRegistry(registry, home);
+/** Map an ix-spec CLI source argument to a typed ts-plugin-kit {@link Source}. */
+export function parseSourceArg(arg: string): Source {
+  if (arg.startsWith("path:")) return { type: "path", path: arg.slice(5) };
+  if (arg.startsWith("github:")) {
+    const [repo, ref] = arg.slice(7).split("@");
+    return { type: "github", repo, ref };
+  }
+  if (arg.startsWith("package:")) {
+    const spec = arg.slice(8);
+    const at = spec.lastIndexOf("@");
+    return at > 0
+      ? { type: "npm", package: spec.slice(0, at), version: spec.slice(at + 1) }
+      : { type: "npm", package: spec };
+  }
+  return { type: "path", path: arg };
 }
 
 export function installPlugin(
   source: string,
   home = ixHome(),
-): InstalledSpecPlugin {
-  mkdirSync(join(home, "plugins"), { recursive: true });
-  mkdirSync(join(home, "modules"), { recursive: true });
-
-  const moduleRoot = installSource(source, home);
-  const name = readModuleName(moduleRoot);
-  const target = join(home, "modules", name);
-  if (!existsSync(target)) symlinkSync(moduleRoot, target, "dir");
-
-  const registry = readRegistry(home);
-  const plugin: InstalledSpecPlugin = {
-    name,
-    source,
-    moduleRoot,
-    installedAt: new Date().toISOString(),
-  };
-  registry.plugins = [
-    ...registry.plugins.filter((entry) => entry.name !== name),
-    plugin,
-  ];
-  writeRegistry(registry, home);
-  return plugin;
+): InstalledPlugin {
+  return installEntry({ source: parseSourceArg(source) }, installOptions(home));
 }
 
-function installSource(source: string, home: string): string {
-  if (source.startsWith("path:")) return resolve(source.slice("path:".length));
-  if (source.startsWith("github:"))
-    return installGithub(source.slice("github:".length), home);
-  if (source.startsWith("package:"))
-    return installPackage(source.slice("package:".length), home);
-  if (existsSync(source)) return resolve(source);
-  throw new Error(`unsupported plugin source ${source}`);
+export function listPlugins(home = ixHome()): InstalledPlugin[] {
+  return readRegistry(registryPath(home)).plugins;
 }
 
-function installGithub(ref: string, home: string): string {
-  const [repoPart, checkout] = ref.split("@");
-  const repo = repoPart.endsWith(".git") ? repoPart : `${repoPart}.git`;
-  const url = repo.startsWith("http") ? repo : `https://github.com/${repo}`;
-  const target = join(
-    home,
-    "plugins",
-    "sources",
-    "github.com",
-    repoPart.replaceAll("/", "__"),
-  );
-  if (!existsSync(target)) {
-    mkdirSync(join(target, ".."), { recursive: true });
-    execFileSync("git", ["clone", "--depth", "1", url, target], {
-      stdio: "inherit",
-    });
-  }
-  if (checkout)
-    execFileSync("git", ["-C", target, "checkout", checkout], {
-      stdio: "inherit",
-    });
-  return target;
+export function removePlugin(name: string, home = ixHome()): void {
+  const reg = readRegistry(registryPath(home));
+  rmSync(join(filamentModulesDir(home), name), {
+    force: true,
+    recursive: true,
+  });
+  writeRegistry(registryPath(home), {
+    schemaVersion: 1,
+    plugins: reg.plugins.filter((plugin) => plugin.name !== name),
+  });
 }
 
-function installPackage(pkg: string, home: string): string {
-  const prefix = join(home, "plugins", "packages");
-  mkdirSync(prefix, { recursive: true });
-  if (!existsSync(join(prefix, "package.json"))) {
-    writeFileSync(
-      join(prefix, "package.json"),
-      JSON.stringify({ private: true }, null, 2),
-    );
-  }
-  execFileSync("pnpm", ["add", pkg, "--prefix", prefix], { stdio: "inherit" });
-  return join(prefix, "node_modules", pkg);
-}
-
-function readModuleName(moduleRoot: string): string {
+/** Read a module's declared name from its `manifest.yaml`. Used as the `readName` hook. */
+export function readModuleName(moduleRoot: string): string {
   const manifestPath = existsSync(join(moduleRoot, "manifest.yaml"))
     ? join(moduleRoot, "manifest.yaml")
     : join(moduleRoot, basename(moduleRoot), "manifest.yaml");
@@ -126,16 +83,4 @@ function readModuleName(moduleRoot: string): string {
     throw new Error(`manifest ${manifestPath} has no name`);
   }
   return manifest.name;
-}
-
-function readRegistry(home: string): PluginRegistry {
-  const path = registryPath(home);
-  if (!existsSync(path)) return { plugins: [] };
-  return JSON.parse(readFileSync(path, "utf8")) as PluginRegistry;
-}
-
-function writeRegistry(registry: PluginRegistry, home: string): void {
-  const path = registryPath(home);
-  mkdirSync(join(path, ".."), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(registry, null, 2)}\n`);
 }

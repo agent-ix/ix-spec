@@ -2,9 +2,16 @@ export { main } from "./cli.js";
 export {
   loadCatalog,
   defaultModuleRoots,
+  filamentModulesDir,
   findCatalogEntry,
 } from "./catalog.js";
-export { installPlugin, listPlugins, removePlugin } from "./plugins.js";
+export { ensureDefaultModules, defaultModulesManifest } from "./modules.js";
+export {
+  installPlugin,
+  listPlugins,
+  removePlugin,
+  parseSourceArg,
+} from "./plugins.js";
 export {
   createAuthoringPack,
   formatAuthoringPack,

@@ -1,27 +1,108 @@
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { stringify as stringifyYaml } from "yaml";
+import type { MarketplaceManifest } from "@agent-ix/ts-plugin-kit";
+
 import {
   createAuthoringPack,
   defaultModuleRoots,
+  defaultModulesManifest,
+  ensureDefaultModules,
+  filamentModulesDir,
   findCatalogEntry,
+  installPlugin,
+  listPlugins,
   loadCatalog,
   main,
+  parseSourceArg,
+  removePlugin,
 } from "../src";
+
+function tmp(prefix: string): string {
+  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+}
+
+// Build a fixture module dir (manifest.yaml + skeletons + schemas) on disk.
+function makeModule(
+  root: string,
+  name: string,
+  body: Record<string, unknown>,
+  files: Record<string, string> = {},
+): string {
+  const dir = join(root, name);
+  mkdirSync(join(dir, "skeletons"), { recursive: true });
+  mkdirSync(join(dir, "schemas"), { recursive: true });
+  writeFileSync(
+    join(dir, "manifest.yaml"),
+    stringifyYaml({ name, version: "0.1.0", ...body }),
+  );
+  for (const [file, content] of Object.entries(files)) {
+    writeFileSync(join(dir, file), content);
+  }
+  return dir;
+}
+
+function isoModule(root: string): string {
+  return makeModule(
+    root,
+    "spec-artifacts-iso",
+    {
+      artifact_types: [
+        {
+          name: "FR",
+          frontmatter_schema_ref: "schemas/fr-frontmatter.schema.json",
+        },
+      ],
+    },
+    { "schemas/fr-frontmatter.schema.json": "{}", "skeletons/fr.md": "# FR\n" },
+  );
+}
+
+function businessModule(root: string): string {
+  return makeModule(
+    root,
+    "spec-objects-business",
+    { object_types: [{ name: "domain" }] },
+    { "skeletons/domain.md": "# domain\n" },
+  );
+}
+
+function defaultSet(root: string): MarketplaceManifest {
+  return {
+    schemaVersion: 1,
+    entries: [
+      {
+        name: "spec-artifacts-iso",
+        source: { type: "path", path: isoModule(root) },
+      },
+      {
+        name: "spec-objects-business",
+        source: { type: "path", path: businessModule(root) },
+      },
+    ],
+  };
+}
 
 test("exports the ix-spec CLI entrypoint", () => {
   expect(typeof main).toBe("function");
 });
 
-test("loads packaged spec artifact and object modules without workspace siblings", () => {
-  const isolatedHome = mkdtempSync(join(tmpdir(), "ix-spec-catalog-"));
-  const isolatedCwd = mkdtempSync(join(tmpdir(), "ix-spec-cwd-"));
-  const catalog = loadCatalog(defaultModuleRoots(isolatedCwd, isolatedHome));
+test("lazily installs the default module set, then loads its artifacts and objects", () => {
+  const home = tmp("home");
+  ensureDefaultModules(home, defaultSet(tmp("src")));
+  expect(
+    existsSync(
+      join(filamentModulesDir(home), "spec-artifacts-iso", "manifest.yaml"),
+    ),
+  ).toBe(true);
+
+  const catalog = loadCatalog(defaultModuleRoots(home));
   expect(findCatalogEntry(catalog, "FR")?.kind).toBe("artifact");
   expect(findCatalogEntry(catalog, "fr")?.kind).toBe("artifact");
-  expect(findCatalogEntry(catalog, "entity")?.kind).toBe("object");
+  expect(findCatalogEntry(catalog, "domain")?.kind).toBe("object");
   expect(catalog.modules.map((module) => module.name)).toContain(
     "spec-artifacts-iso",
   );
@@ -31,15 +112,68 @@ test("loads packaged spec artifact and object modules without workspace siblings
 });
 
 test("creates authoring packs for case-insensitive artifact and object types", () => {
-  const isolatedHome = mkdtempSync(join(tmpdir(), "ix-spec-write-"));
-  const isolatedCwd = mkdtempSync(join(tmpdir(), "ix-spec-write-cwd-"));
-  const catalog = loadCatalog(defaultModuleRoots(isolatedCwd, isolatedHome));
-  const pack = createAuthoringPack(catalog, isolatedCwd, ["fr", "DOMAIN"]);
-  expect(pack.repoRoot).toBe(isolatedCwd);
+  const home = tmp("write-home");
+  const cwd = tmp("write-cwd");
+  ensureDefaultModules(home, defaultSet(tmp("write-src")));
+  const catalog = loadCatalog(defaultModuleRoots(home));
+  const pack = createAuthoringPack(catalog, cwd, ["fr", "DOMAIN"]);
+  expect(pack.repoRoot).toBe(cwd);
   expect(pack.types.map((type) => type.name)).toEqual(["FR", "domain"]);
   expect(pack.types[0]?.schemaPath).toContain("fr-frontmatter.schema.json");
   expect(pack.types[0]?.skeletonPath).toContain("skeletons/fr.md");
   expect(pack.validation.command).toContain("quire validate --scope");
+});
+
+test("installs, lists, and removes a plugin from a local path source", () => {
+  const home = tmp("plugin-home");
+  const mod = businessModule(tmp("plugin-src"));
+  const rec = installPlugin(`path:${mod}`, home);
+  expect(rec.name).toBe("spec-objects-business");
+  expect(listPlugins(home).map((p) => p.name)).toContain(
+    "spec-objects-business",
+  );
+  expect(
+    existsSync(
+      join(filamentModulesDir(home), "spec-objects-business", "manifest.yaml"),
+    ),
+  ).toBe(true);
+
+  removePlugin("spec-objects-business", home);
+  expect(listPlugins(home)).toHaveLength(0);
+  expect(
+    existsSync(join(filamentModulesDir(home), "spec-objects-business")),
+  ).toBe(false);
+});
+
+test("parseSourceArg maps CLI prefixes to typed sources", () => {
+  expect(parseSourceArg("path:/a/b")).toEqual({ type: "path", path: "/a/b" });
+  expect(parseSourceArg("github:agent-ix/x@v1")).toEqual({
+    type: "github",
+    repo: "agent-ix/x",
+    ref: "v1",
+  });
+  expect(parseSourceArg("github:agent-ix/x")).toEqual({
+    type: "github",
+    repo: "agent-ix/x",
+  });
+  expect(parseSourceArg("package:foo@1.2.3")).toEqual({
+    type: "npm",
+    package: "foo",
+    version: "1.2.3",
+  });
+  expect(parseSourceArg("package:foo")).toEqual({
+    type: "npm",
+    package: "foo",
+  });
+  expect(parseSourceArg("./bare")).toEqual({ type: "path", path: "./bare" });
+});
+
+test("ships the committed default module set", () => {
+  const manifest = defaultModulesManifest();
+  expect(manifest.entries).toHaveLength(8);
+  expect(manifest.entries.map((e) => e.name)).toContain(
+    "spec-objects-business",
+  );
 });
 
 test("ships claude plugin skills without artifact-specific write skills", () => {

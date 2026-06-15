@@ -1,7 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { basename, join, resolve } from "node:path";
 
 import { parse as parseYaml } from "yaml";
 
@@ -33,42 +32,26 @@ export interface SpecCatalog {
   }>;
 }
 
-const BASE_MODULE_REPOS = [
-  ["spec-artifacts-iso", "spec_artifacts_iso"],
-  ["spec-artifacts-app", "spec_artifacts_app"],
-  ["spec-artifacts-process", "spec_artifacts_process"],
-  ["spec-objects-business", "spec_objects_business"],
-  ["spec-objects-architecture", "spec_objects_architecture"],
-  ["spec-objects-enterprise", "spec_objects_enterprise"],
-  ["spec-objects-operational", "spec_objects_operational"],
-  ["spec-objects-security", "spec_objects_security"],
-] as const;
-
 export function ixHome(): string {
   return process.env.IX_HOME && process.env.IX_HOME.length > 0
     ? process.env.IX_HOME
     : join(homedir(), ".ix");
 }
 
-export function defaultModuleRoots(
-  cwd = process.cwd(),
-  home = ixHome(),
-): string[] {
+/** The single directory that holds installed Filament modules; also read by quire-rs. */
+export function filamentModulesDir(home = ixHome()): string {
+  return join(home, "filament", "modules");
+}
+
+export function defaultModuleRoots(home = ixHome()): string[] {
   const roots: string[] = [];
   const env = process.env.IX_SPEC_MODULE_PATHS;
   if (env) roots.push(...env.split(":").filter(Boolean));
 
-  const installed = join(home, "modules");
+  const installed = filamentModulesDir(home);
   if (existsSync(installed)) {
     for (const name of readdirSync(installed))
       roots.push(join(installed, name));
-  }
-
-  roots.push(...packagedModuleRoots());
-
-  const devRoot = dirname(resolve(cwd));
-  for (const [repo, pkg] of BASE_MODULE_REPOS) {
-    roots.push(join(devRoot, repo, pkg));
   }
   return roots;
 }
@@ -130,13 +113,6 @@ export function loadCatalog(moduleRoots = defaultModuleRoots()): SpecCatalog {
   }
 
   return { modules, entries, duplicates: findDuplicates(entries) };
-}
-
-function packagedModuleRoots(): string[] {
-  const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-  return BASE_MODULE_REPOS.map(([, pkg]) =>
-    join(packageRoot, "builtin-modules", pkg),
-  );
 }
 
 export function findCatalogEntry(
