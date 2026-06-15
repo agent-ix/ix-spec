@@ -32,8 +32,12 @@ import {
   buildReport,
   writeLatest,
   printSummaryTable,
+  reportsDir,
+  rebuildFromTranscripts,
 } from "./lib/report.mjs";
 import { selectScenarios } from "./scenarios/index.mjs";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
 
 function arg(name) {
   const i = process.argv.indexOf(name);
@@ -44,6 +48,21 @@ function flag(name) {
 }
 
 async function main() {
+  // --rebuild: re-derive metrics + the summary table from the prior run's
+  // transcripts (no agent runs). Useful after a metrics-code change.
+  if (flag("--rebuild")) {
+    const path = join(reportsDir(), "latest.json");
+    if (!existsSync(path)) throw new Error(`no prior report at ${path}`);
+    const prior = JSON.parse(readFileSync(path, "utf8"));
+    const report = rebuildFromTranscripts(prior, extractMetrics, {
+      generatedAt: prior.generatedAt,
+    });
+    writeLatest(report);
+    printSummaryTable(report);
+    console.log(`\nrebuilt: ${path}`);
+    return;
+  }
+
   const model = arg("--model");
   const repeats = Number(arg("--repeats") ?? "1");
   const keep = flag("--keep");

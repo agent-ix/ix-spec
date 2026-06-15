@@ -21,7 +21,14 @@ make evals MODEL=opus REPEATS=3
 node evals/run.mjs --canary --model sonnet
 node evals/run.mjs --all     --model sonnet --repeats 3
 node evals/run.mjs --filter EV-005 --model sonnet --keep
+node evals/run.mjs --rebuild   # re-derive metrics + table from the last run's transcripts (no agent runs)
 ```
+
+Every run auto-writes `evals/reports/latest.json` (full per-scenario metrics +
+p50/p95 aggregates) and prints a summary table. Table columns:
+`ctx` = `ix-spec write` packs (context fetches), `val` = `quire validate` runs,
+`fail` = validations actually **rejected**, `edits` = Write+Edit. `--rebuild`
+regenerates both from existing transcripts after a metrics-code change.
 
 A selector (`--canary` | `--all` | `--filter EV-00X`) and `--model` are **required** —
 `--model` so token counts are comparable across runs, and an explicit selector so a

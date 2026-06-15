@@ -55,6 +55,10 @@ export function buildResult(scenario, runs) {
       tokensIn: summarize(samples.map((s) => s.tokenUsage.contextInput)),
       tokensOut: summarize(samples.map((s) => s.tokenUsage.output)),
       toolCalls: summarize(samples.map((s) => s.toolCalls)),
+      contextFetches: summarize(samples.map((s) => s.contextFetches)),
+      validationAttempts: summarize(samples.map((s) => s.validationAttempts)),
+      validationFailures: summarize(samples.map((s) => s.validationFailures)),
+      edits: summarize(samples.map((s) => s.edits)),
     },
     runs: samples,
   };
@@ -108,9 +112,25 @@ export function printSummaryTable(report) {
       secs(a.latencyMs.p50),
       `${k(a.tokensIn.p50)}/${k(a.tokensOut.p50)}`,
       k(a.toolCalls.p50),
+      k(a.contextFetches.p50),
+      k(a.validationAttempts.p50),
+      k(a.validationFailures.p50),
+      k(a.edits.p50),
     ];
   });
-  const header = ["ID", "OK", "pass", "lat", "in/out", "tools"];
+  // ctx=ix-spec write packs · val=quire validate runs · fail=validations rejected · edits
+  const header = [
+    "ID",
+    "OK",
+    "pass",
+    "lat",
+    "in/out",
+    "tools",
+    "ctx",
+    "val",
+    "fail",
+    "edits",
+  ];
   const widths = header.map((h, i) =>
     Math.max(h.length, ...rows.map((row) => String(row[i]).length)),
   );
@@ -121,10 +141,44 @@ export function printSummaryTable(report) {
   console.log(widths.map((w) => "-".repeat(w)).join("  "));
   for (const row of rows) console.log(fmt(row));
   const g = report.aggregates;
+  const realFails = report.results.reduce(
+    (n, r) => n + (r.aggregate.validationFailures.p50 || 0),
+    0,
+  );
   console.log("");
   console.log(
     `success ${g.successRate} | latency p50 ${secs(g.latencyMs.p50)} p95 ${secs(
       g.latencyMs.p95,
-    )} | tokens(in) p50 ${k(g.tokensIn.p50)} | tools p50 ${k(g.toolCalls.p50)} | model ${report.model}`,
+    )} | tokens(in) p50 ${k(g.tokensIn.p50)} | tools p50 ${k(g.toolCalls.p50)} | validation rejections ${realFails} | model ${report.model}`,
   );
+  console.log(
+    "cols: ctx=ix-spec write packs · val=quire validate runs · fail=validations rejected · edits=Write+Edit",
+  );
+}
+
+/**
+ * Rebuild a report from existing run transcripts (no agent re-runs). Re-extracts
+ * metrics from each `transcriptPath` and carries over the stored assertion outcome.
+ * Used after a metrics-code change to refresh `latest.json` cheaply.
+ */
+export function rebuildFromTranscripts(prior, extractMetrics, meta) {
+  const results = prior.results.map((res) => {
+    const scenario = { id: res.id, useCase: res.useCase };
+    const runs = res.runs.map((s) => ({
+      ok: s.ok,
+      runResult: { wallMs: s.latencyMs, exitReason: s.exitReason },
+      metrics: extractMetrics(s.transcriptPath),
+      assertion: {
+        validation: s.validation,
+        matchedFiles: s.matchedFiles,
+        checks: s.checks,
+        failures: s.failures,
+      },
+      workdir: s.workdir,
+      sessionId: s.sessionId,
+      transcriptPath: s.transcriptPath,
+    }));
+    return buildResult(scenario, runs);
+  });
+  return buildReport(results, { ...prior, ...meta });
 }
