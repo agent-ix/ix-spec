@@ -6,7 +6,6 @@
   "type": "module",
   "files": [
     "dist/",
-    "evals/",
     "default-modules.yaml",
     "skills/",
     "bin/",
@@ -23,7 +22,6 @@
   "scripts": {
     "help": "node scripts/help.js",
     "test": "vitest run",
-    "test:evals": "pnpm run build && node evals/run.mjs",
     "test:coverage": "vitest run --coverage",
     "test:json": "vitest run --reporter=json --outputFile=report.json || true",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" && pnpm run format:check",

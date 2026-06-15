@@ -23,6 +23,14 @@ This matrix defines the minimum agent-facing eval set for spec creation and
 maintenance. Unit tests prove command behavior; these evals measure whether an
 agent can use the commands efficiently to produce valid spec artifacts.
 
+> **Runner status (2026-06-15):** the prior `evals/run.mjs` was a _deterministic_
+> CLI-driving script — it faked the agent metrics below (`tokenUsage` was always
+> null, `contextFetches` a mechanical counter) and broke against the marketplace
+> model. It has been removed. The runner is being rebuilt as an **agent-pty-driven**
+> harness that drives the real agent (Claude) through the spec skills/workflows and
+> records the metrics below for real. The scenario definitions (EV-001..EV-015)
+> remain the source of truth here.
+
 ## Metrics
 
 | Metric              | Definition                                                      | Target                      |

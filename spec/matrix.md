@@ -32,7 +32,7 @@ modules; `scripts.test.ts` covers the CLI help/version surface.
 | FR-010      | ✅ Covered | `plugins.test.ts` :: "parseSourceArg" covers `path:`/`github:`(±`@ref`)/`package:`→npm/bare-path; `cli.test.ts` covers `plugin install` dispatch. The npm-unsupported-at-resolve error is owned + tested by ts-plugin-kit.                                                                                  |
 | FR-011      | ✅ Covered | `catalog.test.ts` :: `defaultModuleRoots` asserts the `IX_SPEC_MODULE_PATHS`-first ordering + the `~/.ix/filament/modules` installed dir. The quire-rs shared-store contract is cross-repo (asserted in quire-rs).                                                                                          |
 | NFR-001     | ⚠️ Review  | Workflow launchers reference catalog modules via `flows.ts`; no automated assertion. Verified by review.                                                                                                                                                                                                    |
-| NFR-002     | ⚠️ Review  | `pnpm run test:evals` (deterministic harness) records latency, tool calls, validation attempts, context fetches; token fields are `null` for deterministic runs. Verified by review.                                                                                                                        |
+| NFR-002     | ⚠️ Pending | The metrics (latency, tokens, tool calls, validation attempts, context fetches) are defined in `spec/evals.md`. The deterministic runner was removed (it faked the agent metrics); the agent-pty-driven harness that records them for real is pending.                                                      |
 | NFR-003     | ✅ Covered | `index.test.ts` :: "lazily installs the default module set…" runs `ensureDefaultModules` against path-source fixtures (no network); reconcile is `mode: "lazy"`. Re-run idempotence is exercised indirectly across tests sharing fixtures; a dedicated double-call assertion is not present (see findings). |
 
 ## Use Case Coverage
@@ -47,9 +47,10 @@ modules; `scripts.test.ts` covers the CLI help/version surface.
 
 ## Eval Coverage
 
-The agent-facing eval set (EV-001…EV-015) and its pass status are tracked in
-`spec/evals.md` (Matrix-002) and `evals/reports/latest.json` via
-`pnpm run test:evals`. This unit-test matrix does not duplicate that table.
+The agent-facing eval set (EV-001…EV-015) is defined in `spec/evals.md`
+(Matrix-002). Its runner is being rebuilt as an agent-pty-driven harness (the
+prior deterministic `evals/run.mjs` was removed); this unit-test matrix does not
+duplicate that table.
 
 ## Backsync Notes
 

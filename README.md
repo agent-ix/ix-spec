@@ -38,12 +38,12 @@ Config, plugin registry, installed modules, and workflow state default to
 pnpm install
 pnpm run build
 pnpm test
-pnpm run test:evals
 pnpm run lint
 ```
 
-This package builds on `@agent-ix/ix-cli-core@0.10.0` from the standalone
+This package builds on `@agent-ix/ix-cli-core` from the standalone
 `ix-cli-core` repo. `ix-spec write` prints compact skeleton/schema/module paths
 so agents can author files directly and validate changed spec files with Quire.
-`pnpm run test:evals` runs the deterministic EV-001..EV-015 eval suite and
-writes metrics to `evals/reports/latest.json`.
+The eval scenarios are defined in `spec/evals.md`; the runner is being rebuilt
+as an agent-pty-driven harness (it profiles a real agent running the
+skills/workflows — unit tests cover the mechanical CLI behavior).
