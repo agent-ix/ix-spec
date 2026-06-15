@@ -11,7 +11,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "dist",
-    "types": ["vitest/globals"],
+    "types": ["node", "vitest/globals"],
     "rootDir": "src"
   },
   "include": ["src"],
