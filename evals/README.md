@@ -43,8 +43,11 @@ bypassPermissions --model <m> --add-dir <repo>` under tmux, drives the startup
    waits for the completion sentinel (`<<<EVAL-COMPLETE>>>`, run by the agent as a final
    `echo`) in the transcript.
 4. **Metrics.** `lib/metrics.mjs` parses the transcript JSONL: token usage
-   (input/output/cache), tool calls + breakdown, and classified counts
-   (`contextFetches` = `ix-spec write`, `validationAttempts` = `quire validate`, …).
+   (input/output/cache), tool calls + breakdown, and classified counts:
+   `contextFetches` (= `ix-spec write`), `validationAttempts` (total `quire validate`
+   runs) vs `validationFailures` (runs actually rejected — non-zero / "failed
+   structural validation"; the real "didn't pass first try" signal, distinct from a
+   validate-then-confirm habit), `flowOps`, `skillInvocations`, `edits`.
 5. **Assert.** `lib/assert.mjs` independently re-checks the end state — expected files
    exist, an independent `quire validate` passes (exit code only; `DuplicateArchetype`
    stderr warnings are benign), and any flow/plugin/rejection/module-preference checks.

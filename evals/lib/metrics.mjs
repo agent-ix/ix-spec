@@ -47,6 +47,31 @@ function bashCommand(block) {
   return typeof cmd === "string" ? cmd : undefined;
 }
 
+/** Map tool_use id -> its result ({ text, isError }) from the user tool_result lines. */
+function toolResultsById(lines) {
+  const map = new Map();
+  for (const line of lines) {
+    const content = line.message?.content;
+    if (!Array.isArray(content)) continue;
+    for (const block of content) {
+      if (block?.type === "tool_result" && block.tool_use_id) {
+        const text =
+          typeof block.content === "string"
+            ? block.content
+            : JSON.stringify(block.content ?? "");
+        map.set(block.tool_use_id, { text, isError: block.is_error === true });
+      }
+    }
+  }
+  return map;
+}
+
+/** A `quire validate` that actually got rejected (vs. a passing re-check). */
+function validateRejected(result) {
+  if (!result) return false;
+  return result.isError || /failed structural validation/i.test(result.text);
+}
+
 /**
  * Did the agent reach a terminal sentinel? Returns "complete" | "failed" | null.
  * Primary signal: a Bash `echo` whose command contains the sentinel (unambiguous —
@@ -92,11 +117,13 @@ export function extractMetrics(path) {
   const toolBreakdown = {};
   const classified = {
     contextFetches: 0,
-    validationAttempts: 0,
+    validationAttempts: 0, // total `quire validate` invocations
+    validationFailures: 0, // those that were actually rejected (non-zero / structural fail)
     skillInvocations: 0,
     edits: 0,
     flowOps: 0,
   };
+  const results = toolResultsById(lines);
   const typePacks = new Set();
   const timestamps = [];
   let assistantTurns = 0;
@@ -129,7 +156,11 @@ export function extractMetrics(path) {
     const cmd = bashCommand(block);
     if (!cmd) continue;
     if (WRITE_RE.test(cmd)) classified.contextFetches += 1;
-    if (VALIDATE_RE.test(cmd)) classified.validationAttempts += 1;
+    if (VALIDATE_RE.test(cmd)) {
+      classified.validationAttempts += 1;
+      if (validateRejected(results.get(block.id)))
+        classified.validationFailures += 1;
+    }
     if (FLOW_RE.test(cmd)) classified.flowOps += 1;
     for (const m of cmd.matchAll(TYPES_RE)) typePacks.add(m[1]);
   }
