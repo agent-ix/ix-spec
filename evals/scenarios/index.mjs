@@ -17,6 +17,7 @@ import {
   removeSection,
   makeLocalPlugin,
   makeDevModule,
+  makeRepos,
 } from "../lib/fixtures.mjs";
 
 export const SCENARIOS = [
@@ -276,6 +277,70 @@ export const SCENARIOS = [
       "catalog should prefer the dev module deterministically. Validate the result.",
     expect: {
       resolvesTo: { type: "domain", moduleNameIncludes: "business-dev" },
+      files: ["spec/**/*.md"],
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+
+  // ---- Extended scenarios (beyond the original spec/evals.md EV-001..EV-015) ----
+
+  {
+    id: "EV-016",
+    useCase: "US-001,US-004",
+    // Multi-repo: author into two sibling repos in one session; cwd + validation
+    // scope are repointed to the parent workspace by makeRepos().
+    setup(ctx) {
+      makeRepos(ctx, ["core", "service"]);
+    },
+    prompt:
+      "This workspace contains TWO repos: `core/` and `service/`. Author a " +
+      "Functional Requirement under `core/spec/` and a `domain` object under " +
+      "`service/spec/` (use `ix-spec write <repo> --types ...` per repo). Validate " +
+      'both with a single scoped run: `quire validate --scope . "core/spec/**/*.md" ' +
+      '"service/spec/**/*.md"`.',
+    expect: {
+      files: ["core/spec/**/*.md", "service/spec/**/*.md"],
+      validate: {
+        globs: ["core/spec/**/*.md", "service/spec/**/*.md"],
+        shouldPass: true,
+      },
+    },
+  },
+  {
+    id: "EV-017",
+    useCase: "US-001,US-002",
+    // Larger, realistic feature spec set with cross-references — sustained authoring.
+    prompt:
+      'Author a fuller feature spec under spec/ for a settled feature (e.g. "users ' +
+      'can schedule reports"): one Stakeholder Requirement (`StR`), two User Stories ' +
+      "(`US`), three Functional Requirements (`FR`), one Non-Functional Requirement " +
+      "(`NFR`), one `domain` object, and two `entity` objects — each in its own file, " +
+      "with sensible cross-references in the bodies. Fetch each type's contract once " +
+      "via `ix-spec write`, then validate the whole set.",
+    expect: {
+      files: [
+        "spec/StR-*.md",
+        "spec/US-*.md",
+        "spec/FR-*.md",
+        "spec/NFR-*.md",
+        "spec/domain-*.md",
+        "spec/entity-*.md",
+      ],
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    id: "EV-018",
+    useCase: "US-001",
+    // Objects drawn from THREE different object modules in one spec — exercises
+    // multi-module catalog resolution in a single authoring pass.
+    prompt:
+      "Author three objects that come from different modules, one file each under " +
+      "spec/: a `domain` (business), an `api_endpoint` (architecture), and a " +
+      "`configuration` (operational). Request them together with " +
+      "`ix-spec write . --types domain,api_endpoint,configuration`, author from the " +
+      "skeletons, and validate.",
+    expect: {
       files: ["spec/**/*.md"],
       validate: { globs: ["spec/**/*.md"], shouldPass: true },
     },

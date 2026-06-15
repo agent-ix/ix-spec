@@ -29,7 +29,12 @@ export function transcriptPathFor(cwd, sessionId) {
 
 /**
  * Create an isolated workspace for one scenario run.
- * @returns {{ id, work, repo, ixHome, modulesDir, sessionId, transcriptPath, cleanup }}
+ *
+ * `cwd` (agent working dir) and `scope` (validation/file-assertion root) both
+ * default to the single `repo`. A multi-repo scenario's setup can repoint them at
+ * `work` (the parent holding several sub-repos). `transcriptPath` is finalized from
+ * `cwd` by the runner AFTER setup, so a setup that changes `cwd` still resolves it.
+ * @returns {{ id, work, repo, cwd, scope, ixHome, modulesDir, sessionId, transcriptPath, data, cleanup }}
  */
 export function makeScenarioWorkspace(id) {
   const work = mkdtempSync(join(tmpdir(), `ix-spec-${id.toLowerCase()}-`));
@@ -43,6 +48,8 @@ export function makeScenarioWorkspace(id) {
     id,
     work,
     repo,
+    cwd: repo, // agent's working dir (setup may repoint to `work`)
+    scope: repo, // validation + file-assertion root (setup may repoint to `work`)
     ixHome,
     modulesDir,
     sessionId,

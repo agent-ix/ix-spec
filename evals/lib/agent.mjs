@@ -26,8 +26,8 @@ export async function runAgent(scenario, ctx, opts) {
     readyTimeoutMs = 45_000,
   } = opts;
 
-  // 1. Drop the task brief into the repo; the agent reads it.
-  writeFileSync(join(ctx.repo, TASK_FILENAME), buildTaskBrief(scenario, ctx));
+  // 1. Drop the task brief into the agent's working dir; the agent reads it.
+  writeFileSync(join(ctx.cwd, TASK_FILENAME), buildTaskBrief(scenario, ctx));
 
   const { mod } = await findAgentPty();
   // Env the agent's shell must see. tmux does NOT propagate the spawn process's
@@ -49,7 +49,7 @@ export async function runAgent(scenario, ctx, opts) {
     "--model",
     model,
     "--add-dir",
-    ctx.repo,
+    ctx.cwd,
   ];
   const envArgs = Object.entries(overrides).map(([k, v]) => `${k}=${v}`);
 
@@ -57,7 +57,7 @@ export async function runAgent(scenario, ctx, opts) {
   const session = await mod.startSession({
     bin: "env",
     args: [...envArgs, "claude", ...claudeArgs],
-    cwd: ctx.repo,
+    cwd: ctx.cwd,
     env: { ...process.env, ...overrides },
     cols: 200,
     rows: 50,

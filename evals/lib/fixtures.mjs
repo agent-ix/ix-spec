@@ -14,6 +14,21 @@ export function copySkeleton(ctx, moduleName, skeletonFile, repoRelTarget) {
   return target;
 }
 
+/**
+ * Multi-repo workspace: create `work/<name>/spec` for each name and repoint the
+ * agent cwd + validation scope at `work` (the parent holding all sub-repos).
+ * Returns the sub-repo names.
+ */
+export function makeRepos(ctx, names) {
+  for (const name of names) {
+    mkdirSync(join(ctx.work, name, "spec"), { recursive: true });
+  }
+  ctx.cwd = ctx.work;
+  ctx.scope = ctx.work;
+  ctx.data.repos = names;
+  return names;
+}
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

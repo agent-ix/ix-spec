@@ -36,7 +36,9 @@ function globToRegExp(glob) {
     } else if (c === "?") re += "[^/]";
     else re += c.replace(/[.+^${}()|[\]\\]/g, "\\$&");
   }
-  return new RegExp(`^${re}$`);
+  // case-insensitive: agents legitimately name files `fr-001.md` (matching the
+  // lowercase skeletons) or `FR-001.md` (canonical type casing) — both should match.
+  return new RegExp(`^${re}$`, "i");
 }
 
 export function matchFiles(repo, glob) {
@@ -74,12 +76,13 @@ export function assertExpectations(
     IX_SCHEMA_PATH: modulesDir,
     ...extraEnv,
   };
+  const scope = ctx.scope ?? ctx.repo; // validation + file-assertion root
   const failures = [];
   const matchedFiles = {};
   const checks = {};
 
   for (const glob of expect.files ?? []) {
-    const hits = matchFiles(ctx.repo, glob);
+    const hits = matchFiles(scope, glob);
     matchedFiles[glob] = hits.length;
     if (hits.length === 0)
       failures.push(`no file matched expected glob: ${glob}`);
@@ -88,8 +91,8 @@ export function assertExpectations(
   let validation = null;
   if (expect.validate) {
     const { globs, shouldPass = true } = expect.validate;
-    const r = spawnSync(quireBin, ["validate", "--scope", ctx.repo, ...globs], {
-      cwd: ctx.repo,
+    const r = spawnSync(quireBin, ["validate", "--scope", scope, ...globs], {
+      cwd: scope,
       encoding: "utf8",
       env,
     });

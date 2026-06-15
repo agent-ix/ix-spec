@@ -18,11 +18,12 @@ export function buildTaskBrief(scenario, ctx) {
       : scenario.prompt;
   return `# Automated authoring task (${scenario.id})
 
-You are completing an automated spec-authoring task in an **isolated test repository**.
+You are completing an automated spec-authoring task in an **isolated test workspace**.
 This is a measured eval: work efficiently and use the provided tooling.
 
-- Working directory (your cwd): \`${ctx.repo}\`
-- Author all spec files **directly** under \`${ctx.repo}/spec/\`.
+- Working directory (your cwd): \`${ctx.cwd}\`
+- Author spec files under the repo(s) described in the task below (a single repo's
+  \`spec/\` unless the task says otherwise).
 
 ## Tooling available in this shell
 
@@ -47,9 +48,9 @@ ${task}
 
 - Use \`ix-spec write\` to obtain the authoring contract for each type **once**, then
   author the file(s) under \`spec/\` from the skeleton(s).
-- When you believe the work is done, run \`quire validate --scope . "<glob>"\` over the
-  files you changed and ensure it passes (exit code 0).
-- Do not modify files outside \`${ctx.repo}\`.
+- When you believe the work is done, run \`quire validate --scope <repo> "<glob>"\` over
+  the files you changed and ensure it passes (exit code 0).
+- Do not modify files outside \`${ctx.cwd}\`.
 
 ## Completion protocol (required)
 

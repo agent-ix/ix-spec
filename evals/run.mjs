@@ -23,7 +23,7 @@ import {
   shimDir,
 } from "./lib/resolve.mjs";
 import { buildSeedOnce } from "./lib/seed.mjs";
-import { makeScenarioWorkspace } from "./lib/env.mjs";
+import { makeScenarioWorkspace, transcriptPathFor } from "./lib/env.mjs";
 import { runAgent } from "./lib/agent.mjs";
 import { extractMetrics } from "./lib/metrics.mjs";
 import { assertExpectations } from "./lib/assert.mjs";
@@ -105,6 +105,8 @@ async function main() {
       const ctx = makeScenarioWorkspace(scenario.id);
       try {
         scenario.setup?.(ctx);
+        // setup may have repointed ctx.cwd (e.g. multi-repo) — finalize the path.
+        ctx.transcriptPath = transcriptPathFor(ctx.cwd, ctx.sessionId);
         const extraEnv = scenario.env ? scenario.env(ctx) : {};
         const runResult = await runAgent(scenario, ctx, {
           model,
