@@ -24,6 +24,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:json": "vitest run --reporter=json --outputFile=report.json || true",
+    "test:evals": "node evals/run.mjs",
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx,js,jsx}\" && pnpm run format:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

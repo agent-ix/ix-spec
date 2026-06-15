@@ -22,6 +22,19 @@ test:
 test-json:
 	pnpm run test:json
 
+# Agent-pty evals (drive the REAL claude agent; cost tokens + minutes — opt-in).
+# MODEL pins the agent model so token counts compare; REPEATS aggregates noise.
+MODEL ?= sonnet
+REPEATS ?= 1
+
+.PHONY: evals
+evals:
+	node evals/run.mjs --canary --model $(MODEL) --repeats $(REPEATS)
+
+.PHONY: evals-all
+evals-all:
+	node evals/run.mjs --all --model $(MODEL) --repeats $(REPEATS)
+
 .PHONY: lint
 lint:
 	pnpm run lint

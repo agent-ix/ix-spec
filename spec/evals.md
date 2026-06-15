@@ -23,13 +23,17 @@ This matrix defines the minimum agent-facing eval set for spec creation and
 maintenance. Unit tests prove command behavior; these evals measure whether an
 agent can use the commands efficiently to produce valid spec artifacts.
 
-> **Runner status (2026-06-15):** the prior `evals/run.mjs` was a _deterministic_
-> CLI-driving script — it faked the agent metrics below (`tokenUsage` was always
-> null, `contextFetches` a mechanical counter) and broke against the marketplace
-> model. It has been removed. The runner is being rebuilt as an **agent-pty-driven**
-> harness that drives the real agent (Claude) through the spec skills/workflows and
-> records the metrics below for real. The scenario definitions (EV-001..EV-015)
-> remain the source of truth here.
+> **Runner status (2026-06-15):** the **agent-pty-driven** harness is built and lives
+> in `evals/` (`node evals/run.mjs`, or `make evals` / `make evals-all`). It drives
+> the real agent (Claude) through this CLI + the `/spec-*` skills via `agent-pty`
+> (tmux), and records the metrics below **for real** from the Claude Code session
+> transcript (token usage, tool calls, latency, validation attempts, context
+> fetches). The prior deterministic runner — which faked `tokenUsage` (always null)
+> and counted `contextFetches` mechanically — was removed. Each scenario runs in an
+> isolated repo + `IX_HOME` seeded once from the default modules; success is asserted
+> by file presence + an independent `quire validate` + a completion sentinel. The
+> scenario definitions (EV-001..EV-015) below remain the source of truth; the harness
+> reads them from `evals/scenarios/index.mjs`. See `evals/README.md` for usage.
 
 ## Metrics
 

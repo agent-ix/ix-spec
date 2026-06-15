@@ -7,5 +7,7 @@ node_modules
 .pnpm-store
 coverage/
 evals/reports/
+evals/.seed-cache/
+evals/.bin/
 .npmrc
 builtin-modules/

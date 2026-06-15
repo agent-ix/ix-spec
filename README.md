@@ -44,6 +44,7 @@ pnpm run lint
 This package builds on `@agent-ix/ix-cli-core` from the standalone
 `ix-cli-core` repo. `ix-spec write` prints compact skeleton/schema/module paths
 so agents can author files directly and validate changed spec files with Quire.
-The eval scenarios are defined in `spec/evals.md`; the runner is being rebuilt
-as an agent-pty-driven harness (it profiles a real agent running the
-skills/workflows — unit tests cover the mechanical CLI behavior).
+The eval scenarios are defined in `spec/evals.md` and run by the agent-pty-driven
+harness in `evals/` (`make evals` / `make evals-all`): it profiles a **real** agent
+running the skills/workflows and records token/tool/latency metrics from the Claude
+Code transcript. Unit tests cover the mechanical CLI behavior; see `evals/README.md`.
