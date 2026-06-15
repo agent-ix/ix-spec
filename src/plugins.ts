@@ -19,7 +19,8 @@ export function registryPath(home = ixHome()): string {
   return join(home, "filament", "registry.json");
 }
 
-function installOptions(home: string): InstallOptions {
+/** Shared ts-plugin-kit install options for this home (default-set reconcile + ad-hoc install). */
+export function installOptions(home: string): InstallOptions {
   return {
     cacheRoot: join(home, "cache", "ts-plugin-kit"),
     targetRoot: filamentModulesDir(home),
@@ -36,6 +37,9 @@ export function parseSourceArg(arg: string): Source {
     const [repo, ref] = arg.slice(7).split("@");
     return { type: "github", repo, ref };
   }
+  // `package:` is forward-declared: it maps to an npm Source, but ts-plugin-kit's
+  // resolveSource currently rejects npm (UnsupportedSourceError), so an install
+  // fails until npm support lands. Not advertised in PLUGIN_USAGE.
   if (arg.startsWith("package:")) {
     const spec = arg.slice(8);
     const at = spec.lastIndexOf("@");

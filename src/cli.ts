@@ -74,7 +74,7 @@ Examples:
 
 Notes:
   - Type lookup is case-insensitive; FR and fr are the same type.
-  - Types can be artifacts or objects from bundled or installed plugins.
+  - Types can be artifacts or objects from the default module set or plugins.
   - Use the returned skeletons and schemas as the authoring contract.
   - Run the returned Quire command after editing spec files.
 `;

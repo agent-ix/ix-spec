@@ -51,19 +51,14 @@ function resolveSkillPath(flow: string): string {
     join(homedir(), ".ix", "plugins", "ix-spec-workflows"),
   ].filter((value): value is string => !!value);
   for (const root of roots) {
-    const packagedRuntime = join(
+    const candidate = join(
       root,
       skill.packageSkill,
       "workflow-assets",
       "skills",
       skill.runtimeSkill,
     );
-    if (existsSync(packagedRuntime)) return packagedRuntime;
-
-    const legacyCandidate = root.endsWith("skills")
-      ? join(root, skill.runtimeSkill)
-      : join(root, "skills", skill.runtimeSkill);
-    if (existsSync(legacyCandidate)) return legacyCandidate;
+    if (existsSync(candidate)) return candidate;
   }
   throw new Error(
     `could not find ix-spec workflow skill ${skill.runtimeSkill}; set IX_SPEC_WORKFLOWS_ROOT`,

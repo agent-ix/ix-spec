@@ -107,25 +107,6 @@ describe("startSpecFlow", () => {
     await expect(startSpecFlow("review")).rejects.toThrow();
   });
 
-  test("resolves a legacy skill layout under <root>/skills/<runtimeSkill>", async () => {
-    const root = tmp("wf-legacy");
-    mkdirSync(join(root, "skills", "review"), { recursive: true });
-    process.env.IX_SPEC_WORKFLOWS_ROOT = root;
-    process.env.IX_HOME = tmp("home");
-    process.env.PATH = `${fakeIxFlowDir(0)}:${savedPath}`;
-    await expect(startSpecFlow("review")).resolves.toBeUndefined();
-  });
-
-  test("resolves a legacy skill layout when root endsWith 'skills'", async () => {
-    const base = tmp("wf-skills-root");
-    const root = join(base, "skills");
-    mkdirSync(join(root, "matrix"), { recursive: true });
-    process.env.IX_SPEC_WORKFLOWS_ROOT = root;
-    process.env.IX_HOME = tmp("home");
-    process.env.PATH = `${fakeIxFlowDir(0)}:${savedPath}`;
-    await expect(startSpecFlow("matrix")).resolves.toBeUndefined();
-  });
-
   test("throws for an unknown flow name", async () => {
     await expect(startSpecFlow("nope")).rejects.toThrow(
       "unknown spec flow nope",

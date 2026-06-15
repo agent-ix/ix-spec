@@ -9,8 +9,8 @@ import {
   type MarketplaceManifest,
 } from "@agent-ix/ts-plugin-kit";
 
-import { filamentModulesDir, ixHome } from "./catalog.js";
-import { readModuleName } from "./plugins.js";
+import { ixHome } from "./catalog.js";
+import { installOptions } from "./plugins.js";
 
 function packageRoot(): string {
   return dirname(dirname(fileURLToPath(import.meta.url)));
@@ -31,14 +31,5 @@ export function ensureDefaultModules(
   home = ixHome(),
   manifest: MarketplaceManifest = defaultModulesManifest(),
 ): void {
-  reconcile(manifest, {
-    mode: "lazy",
-    cacheRoot: join(home, "cache", "ts-plugin-kit"),
-    targetRoot: filamentModulesDir(home),
-    registryPath: join(home, "filament", "registry.json"),
-    readName: readModuleName,
-    materialize: "copy",
-  });
+  reconcile(manifest, { ...installOptions(home), mode: "lazy" });
 }
-
-export { filamentModulesDir } from "./catalog.js";
