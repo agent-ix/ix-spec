@@ -52,8 +52,7 @@ console.log("  pnpm run publish       Publish to GitHub Packages (upstream)");
 console.log(
   "  pnpm run publish:dry-run  Test publish without actually publishing",
 );
-console.log("  pnpm run publish:local Publish to local npm.ix registry");
-console.log("  pnpm run tags          Show dist-tags on npm.ix\n");
+console.log("  pnpm run tags          Show dist-tags on GitHub Packages\n");
 
 console.log("📖 STORYBOOK");
 console.log("  pnpm run storybook         Run Storybook dev server locally");

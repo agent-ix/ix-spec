@@ -29,7 +29,8 @@ const PKG_NAME = packageJson.name; // e.g. @agent-ix/login-box
 const PROJECT_SLUG = PKG_NAME.replace(/^@[^/]+\//, ""); // e.g. login-box
 
 const IMAGE_NAME = `ghcr.io/agent-ix/${PROJECT_SLUG}`;
-const LOCAL_NPM_REGISTRY = process.env.LOCAL_NPM_REGISTRY || "http://npm.ix";
+const LOCAL_NPM_REGISTRY =
+  process.env.LOCAL_NPM_REGISTRY || "https://npm.pkg.github.com";
 const DEV_PATH =
   process.env.DEV_PATH ||
   (process.env.IX_DEV
@@ -59,10 +60,7 @@ function execQuiet(cmd, options = {}) {
 }
 
 function getDockerNetworkArgs() {
-  if (process.env.CI === "true") {
-    return "";
-  }
-  return "--add-host=npm.ix:host-gateway";
+  return "";
 }
 
 function buildDev() {
@@ -306,7 +304,7 @@ if (!cmd || cmd === "--help" || cmd === "-h") {
     '  WATCH_POLLING      Set to "true" if HMR doesn\'t detect file changes (default: false)',
   );
   console.log(
-    "  LOCAL_NPM_REGISTRY Registry for @agent-ix packages (default: http://npm.ix)",
+    "  LOCAL_NPM_REGISTRY Registry for @agent-ix packages (default: https://npm.pkg.github.com)",
   );
   console.log("");
   console.log("TYPICAL WORKFLOW:");
