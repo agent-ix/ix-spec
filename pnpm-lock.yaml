@@ -67,18 +67,18 @@ importers:
 packages:
 
   '@agent-ix/ix-cli-core@0.10.0':
-    resolution: {integrity: sha512-jE6LOFfJvbM4sfYeImYpnHh0V9BDsbtSA+XO4zvTxaosLnDaD+Dcg+X160HTKSA9WO2KyXrkOyyuVMfYKtmY5A==}
+    resolution: {integrity: sha512-O/dm/jaa9ZTJvnnxgjXB7BXiqMO388bvOa6grVt7h8yqJ9pDqN+K3kqxI430VerVCElPr/SoRGBZgj4asVxJaw==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-cli-core/0.10.0/5720b02fb88476c67a45f3f73ec70d0ef30396e2}
     peerDependencies:
       '@oclif/core': '>=4.10.6'
 
   '@agent-ix/ix-ui-cli@0.4.6':
-    resolution: {integrity: sha512-lZ4qHcxK6eoEeHreg8K74I4qRybj1Hfr6GnmN3m681Sx8RO6sNzHg6nxB02YGAbk2VlPrcJzx0EI5j5v+eM4Mw==}
+    resolution: {integrity: sha512-lZ4qHcxK6eoEeHreg8K74I4qRybj1Hfr6GnmN3m681Sx8RO6sNzHg6nxB02YGAbk2VlPrcJzx0EI5j5v+eM4Mw==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-ui-cli/0.4.6/496d4982f4ff0798bc823a3fdd2daca2e496e160}
 
   '@agent-ix/ix-ui-semantic@0.4.6':
-    resolution: {integrity: sha512-ZynzjZBmUu4b7vwlyKQxYDxLn1nKCNS9DslFEy2shJqbR9KEK631/FiEQb9xBvlw7wJHqmKR9xWu6iJZd86TQQ==}
+    resolution: {integrity: sha512-ZynzjZBmUu4b7vwlyKQxYDxLn1nKCNS9DslFEy2shJqbR9KEK631/FiEQb9xBvlw7wJHqmKR9xWu6iJZd86TQQ==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-ui-semantic/0.4.6/6a53752c2011b3e2ea97b26f035630cc5a48db0e}
 
   '@agent-ix/workflow-cli-plugin@0.1.6':
-    resolution: {integrity: sha512-dBSUCQMliEdxY0AMwkMJaIgQaXvj/HPyxpfeTTnz/ghbIHBolOqmZDTm90MnZe3Y6rg29CavXy5OkjV+9Xm1Qg==}
+    resolution: {integrity: sha512-dBSUCQMliEdxY0AMwkMJaIgQaXvj/HPyxpfeTTnz/ghbIHBolOqmZDTm90MnZe3Y6rg29CavXy5OkjV+9Xm1Qg==, tarball: https://npm.pkg.github.com/download/@agent-ix/workflow-cli-plugin/0.1.6/096e31c4b187ad17686854d5a072d604f056bb29}
     peerDependencies:
       '@agent-ix/ix-cli-core': '>=0.6.0-0'
       '@agent-ix/ix-ui-cli': '>=0.4.0-0'
@@ -86,7 +86,7 @@ packages:
       react: '>=18.3.1'
 
   '@agent-ix/workflow-core@0.1.6':
-    resolution: {integrity: sha512-sVMNt9RwBOt2bw5WNVrqdpaHv81L+A36H2jsSc+nIA1a7xpLodudngYfgydERASdeU2bw+n3iVRd3OnRK+RAew==}
+    resolution: {integrity: sha512-sVMNt9RwBOt2bw5WNVrqdpaHv81L+A36H2jsSc+nIA1a7xpLodudngYfgydERASdeU2bw+n3iVRd3OnRK+RAew==, tarball: https://npm.pkg.github.com/download/@agent-ix/workflow-core/0.1.6/0693441d3e94b827244733b2bed6f44b05a60e4e}
 
   '@alcalzone/ansi-tokenize@0.3.0':
     resolution: {integrity: sha512-p+CMKJ93HFmLkjXKlXiVGlMQEuRb6H0MokBSwUsX+S6BRX8eV5naFZpQJFfJHjRZY0Hmnqy1/r6UWl3x+19zYA==}
