@@ -122,9 +122,10 @@ Use "catalog list" to see the full active catalog, including default modules and
 plugins.
 
 Supported install sources:
-  path:<dir>                   Use a local directory containing manifest.yaml
-  github:<owner>/<repo>        Clone a GitHub repository (subdir via manifest)
-  github:<owner>/<repo>@<ref>  Pin to a tag, branch, or sha
+  path:<dir>                        Use a local directory containing manifest.yaml
+  github:<owner>/<repo>             Clone a GitHub repository (manifest at root)
+  github:<owner>/<repo>@<ref>       Pin to a tag, branch, or sha
+  github:<owner>/<repo>//<subdir>   Manifest in a monorepo subdirectory (@<ref> ok)
 
 Usage:
   ix-spec plugin install <path:...|github:...>
@@ -134,6 +135,7 @@ Usage:
 Examples:
   ix-spec plugin install path:../spec-objects-custom
   ix-spec plugin install github:agent-ix/spec-objects-custom
+  ix-spec plugin install github:agent-ix/spec-objects-security//spec_objects_security@v0.1.1
   ix-spec plugin list
 `;
 

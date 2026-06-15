@@ -44,6 +44,24 @@ describe("parseSourceArg", () => {
     });
   });
 
+  test("github: with //subdir maps to a git-subdir source (with ref)", () => {
+    expect(parseSourceArg("github:agent-ix/repo//pkg@v1.0.0")).toEqual({
+      type: "git-subdir",
+      url: "agent-ix/repo",
+      path: "pkg",
+      ref: "v1.0.0",
+    });
+  });
+
+  test("github: with //subdir and no ref leaves ref undefined", () => {
+    expect(parseSourceArg("github:agent-ix/repo//pkg")).toEqual({
+      type: "git-subdir",
+      url: "agent-ix/repo",
+      path: "pkg",
+      ref: undefined,
+    });
+  });
+
   test("package: npm with @version", () => {
     expect(parseSourceArg("package:foo@1.2.3")).toEqual({
       type: "npm",

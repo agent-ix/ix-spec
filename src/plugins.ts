@@ -34,8 +34,20 @@ export function installOptions(home: string): InstallOptions {
 export function parseSourceArg(arg: string): Source {
   if (arg.startsWith("path:")) return { type: "path", path: arg.slice(5) };
   if (arg.startsWith("github:")) {
-    const [repo, ref] = arg.slice(7).split("@");
-    return { type: "github", repo, ref };
+    const [spec, ref] = arg.slice(7).split("@");
+    // `owner/repo//subdir` installs a module that lives in a monorepo subdirectory
+    // (e.g. `agent-ix/spec-objects-security//spec_objects_security`) — the same
+    // git-subdir source the default module set uses.
+    const sep = spec.indexOf("//");
+    if (sep !== -1) {
+      return {
+        type: "git-subdir",
+        url: spec.slice(0, sep),
+        path: spec.slice(sep + 2),
+        ref,
+      };
+    }
+    return { type: "github", repo: spec, ref };
   }
   // `package:` is forward-declared: it maps to an npm Source, but ts-plugin-kit's
   // resolveSource currently rejects npm (UnsupportedSourceError), so an install
