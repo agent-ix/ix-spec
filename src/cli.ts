@@ -209,7 +209,10 @@ function helpFor(parsed: ParsedArgs): string {
   if (parsed.command === "write") return WRITE_USAGE;
   if (parsed.command === "catalog") return CATALOG_USAGE;
   if (parsed.command === "plugin") return PLUGIN_USAGE;
-  if (specFlowNames().includes(parsed.command ?? "")) return FLOW_USAGE;
+  // helpFor is only called after main() has returned early for
+  // `!parsed.command`, so command is always defined here; the prior
+  // `parsed.command ?? ""` fallback was an unreachable defensive branch.
+  if (specFlowNames().includes(parsed.command as string)) return FLOW_USAGE;
   return USAGE;
 }
 
@@ -350,8 +353,9 @@ function stringFlag(parsed: ParsedArgs, key: string): string | undefined {
 }
 
 function arrayFlag(parsed: ParsedArgs, key: string): string[] {
+  // Only called for `target`/`types`, which parseArgs always stores as arrays
+  // (or leaves undefined on the first occurrence). The previous
+  // `typeof value === "string"` case was therefore unreachable.
   const value = parsed.flags[key];
-  if (Array.isArray(value)) return value;
-  if (typeof value === "string") return [value];
-  return [];
+  return Array.isArray(value) ? value : [];
 }

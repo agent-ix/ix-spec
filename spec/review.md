@@ -34,20 +34,19 @@ and NFR-003 added; use cases and test matrix re-traced to the current code and
 - Cross-references: all US→FR links resolve; all matrix test names match
   `test(...)` names in `tests/index.test.ts` / `tests/scripts.test.ts` verbatim.
 
-## Findings (flagged, not blocking Phase 0)
+## Findings
 
-- FR-006 / US-005: no unit test exercises `src/flows.ts`
-  (`specFlowNames`/`startSpecFlow`/`resolveSkillPath`); workflow launch is only
-  covered by the eval harness (EV-005/EV-013). Marked ❌ Missing in the matrix.
-  Recommended: a `specFlowNames()` / `resolveSkillPath` unit test (no `ix-flow`
-  spawn needed).
-- NFR-003: the "no git once installed and pinned" invariant is correct in code
-  (ts-plugin-kit lazy short-circuit) but has no dedicated double-call /
-  no-network assertion. Recommended: a test calling `ensureDefaultModules` twice.
-- Coverage gate: `vite.config.ts` declares 100% v8 thresholds, but actual
-  coverage is ~47% statements / ~50% lines (pre-existing). `make test`
-  (`vitest run`) does not enforce the threshold and passes;
-  `pnpm run test:coverage` enforces it and fails. Not introduced by this change.
+- FR-006 / US-005 (RESOLVED): `tests/flows.test.ts` now exercises `src/flows.ts`
+  (`specFlowNames`/`startSpecFlow`/`resolveSkillPath`/`runIxFlow`) with a real
+  fake `ix-flow` binary covering exit-0 / non-zero / signal / spawn-error and the
+  packaged + legacy skill layouts; `cli.test.ts` covers spec-flow dispatch.
+- Coverage gate (RESOLVED): `pnpm run test:coverage` now **passes at 100%**
+  (branches/functions/lines/statements). Two genuinely-unreachable defensive
+  branches in `src/cli.ts` (`helpFor` `?? ""`, `arrayFlag` string-case) were
+  removed rather than ignore-pragma'd, per the no-pragma coverage rule.
+- NFR-003: the "no git once installed and pinned" lazy short-circuit is correct
+  in code; reconcile idempotence is exercised across fixture-sharing tests. A
+  dedicated double-call assertion remains a nice-to-have (non-blocking).
 - US artifacts carry no Given/When/Then acceptance criteria or Priority — an
   accepted property of this lightweight Phase 0 spec, noted for completeness.
 - Repo `CLAUDE.md` says `make test` "runs jest"; the project actually runs
@@ -55,6 +54,6 @@ and NFR-003 added; use cases and test matrix re-traced to the current code and
 
 ## Gate
 
-Phase 0 accepted. Spec content matches current behavior; two flagged test gaps
-(FR-006/US-005 flow tests, NFR-003 idempotence assertion) and the pre-existing
-coverage-gate mismatch are tracked for follow-up but do not block acceptance.
+Phase 0 accepted. Spec content matches current behavior; the prior FR-006/US-005
+flow-test gap and the coverage-gate mismatch are both resolved (100% coverage,
+`flows.ts` unit-tested).
