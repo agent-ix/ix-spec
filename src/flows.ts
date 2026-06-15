@@ -1,20 +1,18 @@
 import { existsSync } from "node:fs";
+import { spawn } from "node:child_process";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
-import {
-  WorkflowCommandRunner,
-  jsonEnvelope,
-} from "@agent-ix/workflow-cli-plugin";
-
 import { ixHome } from "./catalog.js";
 
-const FLOW_SKILLS: Record<string, string> = {
-  review: "review",
-  matrix: "matrix",
-  "to-plan": "to-plan",
+const FLOW_SKILLS: Record<
+  string,
+  { packageSkill: string; runtimeSkill: string }
+> = {
+  review: { packageSkill: "spec-review", runtimeSkill: "review" },
+  matrix: { packageSkill: "spec-matrix", runtimeSkill: "matrix" },
+  "to-plan": { packageSkill: "spec-to-plan", runtimeSkill: "to-plan" },
 };
 
 export function specFlowNames(): string[] {
@@ -27,66 +25,66 @@ export async function startSpecFlow(
 ): Promise<void> {
   const skillPath = resolveSkillPath(flow);
   const home = ixHome();
-  configureRuntimeContext({
-    configRoot: home,
-    configNamespace: "ix",
-    projectConfigRoot: resolve(process.cwd(), ".ix"),
-    projectConfigEnabled: true,
-  });
-  const runner = new WorkflowCommandRunner({
-    config: {
-      stateDir: join(home, "flows"),
-      defaultDefinition: flow,
-      output: opts.json ? "json" : "human",
-    },
-    actor: { kind: "agent", id: "ix-spec" },
-  });
-  const result = await runner.create({
-    id: opts.id,
-    name: flow,
+  const args = [
+    "run",
+    flow,
+    "--path",
     skillPath,
-    targets: opts.target?.map((ref) => ({ kind: "file", ref })),
-  });
-  if (opts.json) {
-    console.log(jsonEnvelope(result));
-    return;
-  }
-  if (!result.ok) {
-    console.error(
-      `${result.error?.code ?? "workflow_error"}: ${result.error?.message ?? "failed to start spec flow"}`,
-    );
-    process.exitCode = 1;
-    return;
-  }
-  console.log(`started spec flow: ${flow}`);
-  if (result.instance_id) {
-    console.log(`run: ${result.instance_id}`);
-    console.log(`next: ix-flow status ${result.instance_id}`);
-    console.log(`next: ix-flow resume ${result.instance_id}`);
-  }
+    "--config-root",
+    home,
+    "--state-dir",
+    join(home, "flows"),
+  ];
+  if (opts.id) args.push("--id", opts.id);
+  if (opts.json) args.push("--json");
+  for (const target of opts.target ?? []) args.push("--target", target);
+  await runIxFlow(args);
 }
 
 function resolveSkillPath(flow: string): string {
-  const skillName = FLOW_SKILLS[flow];
-  if (!skillName) throw new Error(`unknown spec flow ${flow}`);
+  const skill = FLOW_SKILLS[flow];
+  if (!skill) throw new Error(`unknown spec flow ${flow}`);
   const roots = [
     process.env.IX_SPEC_WORKFLOWS_ROOT,
-    packagedWorkflowRoot(),
+    packagedSkillsRoot(),
     join(dirname(resolve(process.cwd())), "ix-spec-workflows"),
     join(homedir(), ".ix", "plugins", "ix-spec-workflows"),
   ].filter((value): value is string => !!value);
   for (const root of roots) {
-    const candidate = join(root, "skills", skillName);
-    if (existsSync(candidate)) return candidate;
+    const packagedRuntime = join(
+      root,
+      skill.packageSkill,
+      "workflow-assets",
+      "skills",
+      skill.runtimeSkill,
+    );
+    if (existsSync(packagedRuntime)) return packagedRuntime;
+
+    const legacyCandidate = root.endsWith("skills")
+      ? join(root, skill.runtimeSkill)
+      : join(root, "skills", skill.runtimeSkill);
+    if (existsSync(legacyCandidate)) return legacyCandidate;
   }
   throw new Error(
-    `could not find ix-spec-workflows skill ${skillName}; set IX_SPEC_WORKFLOWS_ROOT`,
+    `could not find ix-spec workflow skill ${skill.runtimeSkill}; set IX_SPEC_WORKFLOWS_ROOT`,
   );
 }
 
-function packagedWorkflowRoot(): string {
-  return join(
-    dirname(dirname(fileURLToPath(import.meta.url))),
-    "builtin-workflows",
-  );
+function packagedSkillsRoot(): string {
+  return join(dirname(dirname(fileURLToPath(import.meta.url))), "skills");
+}
+
+async function runIxFlow(args: string[]): Promise<void> {
+  await new Promise<void>((resolvePromise, reject) => {
+    const child = spawn("ix-flow", args, { stdio: "inherit" });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolvePromise();
+        return;
+      }
+      process.exitCode = code ?? 1;
+      resolvePromise();
+    });
+  });
 }

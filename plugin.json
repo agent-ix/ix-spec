@@ -1,0 +1,6 @@
+{
+  "name": "ix-spec",
+  "version": "0.1.0",
+  "description": "Agent IX spec authoring, review, matrix, and planning skills.",
+  "skills": "./skills"
+}

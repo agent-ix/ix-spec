@@ -8,8 +8,9 @@
     "dist/",
     "evals/",
     "builtin-modules/",
-    "builtin-workflows/",
+    "skills/",
     "bin/",
+    "plugin.json",
     "LICENSE",
     "README.md"
   ],
@@ -54,9 +55,7 @@
     "test-results:warnings": "./node_modules/.bin/jest-results warnings"
   },
   "dependencies": {
-    "@agent-ix/ix-cli-core": "0.10.0",
-    "@agent-ix/workflow-cli-plugin": "0.1.6",
-    "@agent-ix/workflow-core": "0.1.6",
+    "@agent-ix/ix-cli-core": "0.10.1",
     "yaml": ">=2.8.3"
   },
   "devDependencies": {

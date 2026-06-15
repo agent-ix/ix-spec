@@ -6,6 +6,7 @@ pnpm-lock.yaml
 # Build Outputs
 builtin-modules/
 builtin-workflows/
+skills/
 dist/
 dist-storybook/
 storybook-static/

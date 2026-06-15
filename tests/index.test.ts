@@ -1,6 +1,7 @@
-import { mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   createAuthoringPack,
@@ -39,4 +40,21 @@ test("creates authoring packs for case-insensitive artifact and object types", (
   expect(pack.types[0]?.schemaPath).toContain("fr-frontmatter.schema.json");
   expect(pack.types[0]?.skeletonPath).toContain("skeletons/fr.md");
   expect(pack.validation.command).toContain("quire validate --scope");
+});
+
+test("ships claude plugin skills without artifact-specific write skills", () => {
+  const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+  expect(existsSync(join(repoRoot, "plugin.json"))).toBe(true);
+  expect(existsSync(join(repoRoot, "skills", "specify", "SKILL.md"))).toBe(
+    true,
+  );
+  expect(existsSync(join(repoRoot, "skills", "spec-review", "SKILL.md"))).toBe(
+    true,
+  );
+  expect(
+    existsSync(
+      join(repoRoot, "skills", "spec-dependency-analysis", "SKILL.md"),
+    ),
+  ).toBe(true);
+  expect(existsSync(join(repoRoot, "skills", "spec-write-fr"))).toBe(false);
 });

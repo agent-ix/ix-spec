@@ -47,7 +47,5 @@ tool-call count, validation attempts, and repeated context fetches.
 ## Dependencies
 
 - `@agent-ix/ix-cli-core`
-- `@agent-ix/workflow-cli-plugin`
-- `@agent-ix/workflow-core`
-- `ix-spec-workflows`
+- `ix-flow`
 - `quire-cli`
