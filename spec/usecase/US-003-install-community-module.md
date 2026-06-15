@@ -21,8 +21,9 @@ from a local path, GitHub repository, or package.
 ## Body
 
 As a user adopting a community module, I want to install the module once under
-`~/.ix`, confirm that its types appear in the active catalog, and request those
-types in an authoring pack.
+`~/.ix/filament/modules` (recorded in `~/.ix/filament/registry.json`), confirm
+that its types appear in the active catalog, and request those types in an
+authoring pack.
 
 The expected command shape is:
 
@@ -33,10 +34,15 @@ ix-spec write . --types custom-object
 ```
 
 The installed module should participate in the same authoring and validation
-flow as the bundled root modules.
+flow as the default modules. `ix-spec` maps the source argument to a typed
+`ts-plugin-kit` source and hands it off; the `package:`/npm source is not yet
+supported and is rejected by `ts-plugin-kit` with an unsupported-source error at
+install time.
 
 ## Dependencies
 
-- Plugin install records are stored under `~/.ix`.
-- Catalog loading merges bundled modules, installed plugins, and development
-  overrides deterministically.
+- Plugin install records are stored in `~/.ix/filament/registry.json`; modules
+  are materialized under `~/.ix/filament/modules`.
+- Catalog loading merges `IX_SPEC_MODULE_PATHS` overrides with installed modules
+  deterministically (env paths first).
+- Install/registry mechanics are delegated to `@agent-ix/ts-plugin-kit`.

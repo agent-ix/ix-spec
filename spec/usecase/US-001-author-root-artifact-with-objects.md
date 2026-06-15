@@ -3,6 +3,8 @@ id: US-001
 title: "Author a root artifact with supporting objects"
 artifact_type: US
 relationships:
+  - target: "ix://agent-ix/ix-spec/FR-001"
+    type: "traces_to"
   - target: "ix://agent-ix/ix-spec/FR-004"
     type: "traces_to"
   - target: "ix://agent-ix/ix-spec/FR-005"
@@ -14,7 +16,8 @@ relationships:
 ## Description
 
 An agent turns a settled design conversation into one or more spec files using
-bundled artifact and object templates.
+the default artifact and object templates installed under
+`~/.ix/filament/modules`.
 
 ## Body
 
@@ -34,5 +37,6 @@ agent to author the files directly and then run Quire on the changed spec files.
 
 ## Dependencies
 
-- Active catalog includes bundled `spec-artifacts-*` and `spec-objects-*` modules.
+- Active catalog includes the default `spec-artifacts-*` and `spec-objects-*`
+  modules, lazily installed into `~/.ix/filament/modules` on first catalog access.
 - `quire` is available to validate authored files.
