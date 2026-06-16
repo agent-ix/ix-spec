@@ -11,13 +11,13 @@ schemaVersion: 1
 name: ix-spec-default-modules
 entries:
   - name: spec-artifacts-iso
-    version: "0.3.0"
+    version: "0.4.0"
     defaultEnabled: true
     source:
       type: git-subdir
       url: agent-ix/spec-artifacts-iso
       path: spec_artifacts_iso
-      ref: v0.3.0
+      ref: v0.4.0
 
   - name: spec-artifacts-app
     version: "0.2.0"
