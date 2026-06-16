@@ -1,7 +1,7 @@
 ---
 id: Plan-001
 title: ix-spec Implementation Plan
-artifact_type: Plan
+type: Plan
 ---
 
 # ix-spec Implementation Plan

@@ -1,7 +1,7 @@
 ---
 id: Matrix-002
 title: ix-spec Authoring Eval Matrix
-artifact_type: TestMatrix
+type: TestMatrix
 relationships:
   - target: "ix://agent-ix/ix-spec/US-001"
     type: "covers"

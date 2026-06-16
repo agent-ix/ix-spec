@@ -1,7 +1,7 @@
 ---
 id: Matrix-001
 title: ix-spec Phase 0 Matrix
-artifact_type: TestMatrix
+type: TestMatrix
 ---
 
 # ix-spec Phase 0 Matrix

@@ -1,5 +1,5 @@
 ---
-artifact_type: master-requirements
+type: master-requirements
 name: ix-spec
 org: agent-ix
 component_type: cli

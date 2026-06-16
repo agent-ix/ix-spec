@@ -1,7 +1,7 @@
 ---
 id: US-004
 title: "Validate changed spec files"
-artifact_type: US
+type: US
 relationships:
   - target: "ix://agent-ix/ix-spec/FR-007"
     type: "traces_to"

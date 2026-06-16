@@ -1,7 +1,7 @@
 ---
 id: US-001
 title: "Author a root artifact with supporting objects"
-artifact_type: US
+type: US
 relationships:
   - target: "ix://agent-ix/ix-spec/FR-001"
     type: "traces_to"

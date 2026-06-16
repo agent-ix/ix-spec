@@ -1,7 +1,7 @@
 ---
 id: Review-001
 title: ix-spec Phase 0 Review
-artifact_type: Review
+type: Review
 ---
 
 # ix-spec Phase 0 Review

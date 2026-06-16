@@ -1,7 +1,7 @@
 ---
 id: US-003
 title: "Install and use a community spec module"
-artifact_type: US
+type: US
 relationships:
   - target: "ix://agent-ix/ix-spec/FR-002"
     type: "traces_to"

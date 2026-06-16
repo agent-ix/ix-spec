@@ -1,7 +1,7 @@
 ---
 id: US-002
 title: "Discover an authoring contract before editing"
-artifact_type: US
+type: US
 relationships:
   - target: "ix://agent-ix/ix-spec/FR-003"
     type: "traces_to"

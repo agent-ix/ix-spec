@@ -1,7 +1,7 @@
 ---
 id: US-005
 title: "Start a gated spec workflow"
-artifact_type: US
+type: US
 relationships:
   - target: "ix://agent-ix/ix-spec/FR-006"
     type: "traces_to"
