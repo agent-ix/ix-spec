@@ -9,6 +9,10 @@
 schemaVersion: 1
 name: ix-spec-default-modules
 entries:
+  # TODO(OKF): bump to the OKF release (type discriminator + index/log
+  # archetypes) once spec-artifacts-iso tags it. Those changes live on the
+  # repo's okf-type-rename branch ahead of v0.2.0 and are not yet released, so
+  # the pin stays at v0.2.0 until the gated upstream tag lands.
   - name: spec-artifacts-iso
     version: "0.2.0"
     defaultEnabled: true
