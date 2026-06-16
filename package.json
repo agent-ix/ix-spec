@@ -55,11 +55,11 @@
   },
   "dependencies": {
     "@agent-ix/ix-cli-core": "0.10.2",
-    "@agent-ix/ts-plugin-kit": ">=0.1.0-0",
+    "@agent-ix/ts-plugin-kit": "^0.1.1",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@types/node": "25.9.1",
+    "@types/node": "25.9.2",
     "@typescript-eslint/eslint-plugin": "8.60.1",
     "@typescript-eslint/parser": "8.60.1",
     "@vitest/coverage-v8": "4.1.8",
