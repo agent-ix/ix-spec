@@ -39,7 +39,11 @@ community modules.
 
 - Let frontmatter identify exactly what each file is. The discriminator field is
   `type` (e.g. `type: FR`, `type: master-requirements`); it names the archetype the
-  document conforms to.
+  document conforms to. `type` is **required and non-empty** — quire treats a
+  missing/empty `type` as an error.
+- `description` (string) and `tags` (string array) are optional, typed
+  frontmatter fields inherited by every archetype. Set them when useful; quire
+  validates their types.
 - Use catalog skeletons and schemas rather than memory.
 - Keep workflow definitions out of artifact/object type vocabularies.
 - Validate every created or edited artifact with Quire.
@@ -47,12 +51,32 @@ community modules.
 
 ## Reserved OKF Files
 
-`spec-artifacts-iso` ships two reserved archetypes for the OKF folder structure;
-author them like any other type:
+`spec-artifacts-iso` ships two reserved archetypes for the OKF folder structure.
+They are first-class catalog types (no allowlist), so author them with `write`
+like any other type:
+
+```bash
+ix-spec write . --types index   # resolves the index.md skeleton + schema
+ix-spec write . --types log     # resolves the log.md skeleton + schema
+```
 
 - `index.md` — `type: index`, body is a `## Contents` link list pointing at the
-  artifacts in the folder.
+  artifacts in the folder. By OKF convention every directory carries one and the
+  bundle-root `index.md` declares an `okf_version` field.
 - `log.md` — `type: log`, body is a `## History` of changes to the folder's specs.
+
+## OKF Completeness & Validation
+
+Two distinct validations, both owned by quire (ix-spec authors; quire validates):
+
+- **Strict, for the repo you own:** `quire validate --scope <repo> "spec/**/*.md"`
+  (the command `ix-spec write` prints). Use it after every authored/edited file.
+- **Permissive, for foreign bundles you read:** `quire validate --okf <bundle>`.
+  It downgrades unknown types, broken `ix://` links, and `index.md` completeness
+  gaps to warnings (untyped docs stay errors) and runs the **index-completeness
+  check** (each directory's `index.md` lists its siblings; the bundle root carries
+  `okf_version`). Do **not** build a separate ix-spec completeness lint — this
+  check lives in quire.
 
 ## Common Spec Layout
 

@@ -51,6 +51,18 @@ and NFR-003 added; use cases and test matrix re-traced to the current code and
   accepted property of this lightweight Phase 0 spec, noted for completeness.
 - Repo `CLAUDE.md` says `make test` "runs jest"; the project actually runs
   vitest. Out of scope for spec/ edits, flagged for a follow-up doc fix.
+- FR-012 / FR-013 (2026-06-16, OKF backsync): reserved `index`/`log` authoring
+  was verified to flow through the generic `write --types` catalog path with **no
+  reserved-name allowlist** in `src/` (grep-confirmed; `spec-artifacts-iso`
+  declares both as artifact types with skeletons + schemas). FR-012 is unit-
+  covered by `write.test.ts`. FR-013 (Review): OKF bundle/index-completeness
+  validation lives entirely in quire (`quire validate --okf` / `--scope`);
+  `src/write.ts` only emits the `--scope` command and ships no completeness lint —
+  boundary confirmed by inspection. README gained "New features (OKF)" and
+  "Plugin / module system" sections; `skills/specify/SKILL.md` documents `type`
+  required + typed `description`/`tags` and points completeness at `quire validate
+--okf`. No `default-modules.yaml` version/ref pins changed (one comment note
+  only; modules re-researched separately).
 
 ## Gate
 

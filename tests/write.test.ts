@@ -31,13 +31,21 @@ function buildCatalog(): { catalog: SpecCatalog; root: string } {
       artifact_types: [
         { name: "FR", frontmatter_schema_ref: "schemas/fr.schema.json" },
         { name: "BARE" },
+        // Reserved OKF archetypes are declared like any other type — no
+        // special-casing in ix-spec (FR-012).
+        { name: "index", frontmatter_schema_ref: "schemas/index.schema.json" },
+        { name: "log", frontmatter_schema_ref: "schemas/log.schema.json" },
       ],
       object_types: [{ name: "domain" }],
     }),
   );
   writeFileSync(join(dir, "schemas", "fr.schema.json"), "{}");
+  writeFileSync(join(dir, "schemas", "index.schema.json"), "{}");
+  writeFileSync(join(dir, "schemas", "log.schema.json"), "{}");
   writeFileSync(join(dir, "skeletons", "fr.md"), "# FR\n");
   writeFileSync(join(dir, "skeletons", "domain.md"), "# domain\n");
+  writeFileSync(join(dir, "skeletons", "index.md"), "# Contents\n");
+  writeFileSync(join(dir, "skeletons", "log.md"), "# History\n");
   const catalog = loadCatalog([dir]);
   return { catalog, root };
 }
@@ -93,7 +101,7 @@ describe("createAuthoringPack", () => {
   test("throws with available type list when a type is not found", () => {
     const { catalog } = buildCatalog();
     expect(() => createAuthoringPack(catalog, tmp("repo"), ["nope"])).toThrow(
-      /catalog type not found: nope[\s\S]*Available types: BARE, domain, FR/,
+      /catalog type not found: nope[\s\S]*Available types: BARE, domain, FR, index, log/,
     );
   });
 
@@ -111,6 +119,17 @@ describe("createAuthoringPack", () => {
       `quire validate --scope ${repo} "spec/**/*.md"`,
     );
     expect(pack.validation.command).not.toContain(`'${repo}'`);
+  });
+
+  test("authors reserved OKF index/log archetypes through the generic catalog path (FR-012)", () => {
+    const { catalog } = buildCatalog();
+    const repo = tmp("repo");
+    const pack = createAuthoringPack(catalog, repo, ["index", "log"]);
+    expect(pack.types.map((t) => t.name)).toEqual(["index", "log"]);
+    expect(pack.types[0]?.skeletonPath).toContain("skeletons/index.md");
+    expect(pack.types[0]?.schemaPath).toContain("index.schema.json");
+    expect(pack.types[1]?.skeletonPath).toContain("skeletons/log.md");
+    expect(pack.types[1]?.schemaPath).toContain("log.schema.json");
   });
 
   test("quotes a repo path containing a space (shellQuote quoting branch)", () => {

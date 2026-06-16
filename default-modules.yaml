@@ -6,6 +6,7 @@
 # from. This file is the canonical-ready source of truth for the module set +
 # pins (a future generator can derive the backend pyproject pins / activation
 # list from it).
+# NOTE: pins bump after spec-artifacts-* module republish (OKF).
 schemaVersion: 1
 name: ix-spec-default-modules
 entries:

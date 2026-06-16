@@ -31,6 +31,8 @@ modules; `scripts.test.ts` covers the CLI help/version surface.
 | FR-009      | ✅ Covered | `index.test.ts` :: "ships the committed default module set" (asserts `default-modules.yaml` has 8 entries incl. `spec-objects-business`)                                                                                                                                                                                                 |
 | FR-010      | ✅ Covered | `plugins.test.ts` :: "parseSourceArg" covers `path:`/`github:`(±`@ref`)/`package:`→npm/bare-path; `cli.test.ts` covers `plugin install` dispatch. The npm-unsupported-at-resolve error is owned + tested by ts-plugin-kit.                                                                                                               |
 | FR-011      | ✅ Covered | `catalog.test.ts` :: `defaultModuleRoots` asserts the `IX_SPEC_MODULE_PATHS`-first ordering + the `~/.ix/filament/modules` installed dir. The quire-rs shared-store contract is cross-repo (asserted in quire-rs).                                                                                                                       |
+| FR-012      | ✅ Covered | `write.test.ts` :: "authors reserved OKF index/log archetypes through the generic catalog path (FR-012)" — `write --types index,log` resolves skeleton+schema with no reserved-name allowlist in `src/`.                                                                                                                                 |
+| FR-013      | ⚠️ Review  | OKF bundle validation + index-completeness live in quire (`quire validate --okf` / `--scope`); `src/write.ts` only emits the `--scope` command and ix-spec ships no completeness lint. Boundary verified by review; the `--okf`/completeness behavior is owned + tested by quire-rs.                                                     |
 | NFR-001     | ⚠️ Review  | Workflow launchers reference catalog modules via `flows.ts`; no automated assertion. Verified by review.                                                                                                                                                                                                                                 |
 | NFR-002     | ✅ Covered | The agent-pty-driven harness (`evals/run.mjs`) drives the real agent and records the metrics (latency, tokens, tool calls, validation attempts, context fetches) **for real** from the Claude Code transcript; defined in `spec/evals.md`, implemented in `evals/`. Canaries EV-001/EV-008 verified live; full set via `make evals-all`. |
 | NFR-003     | ✅ Covered | `index.test.ts` :: "lazily installs the default module set…" runs `ensureDefaultModules` against path-source fixtures (no network); reconcile is `mode: "lazy"`. Re-run idempotence is exercised indirectly across tests sharing fixtures; a dedicated double-call assertion is not present (see findings).                              |
@@ -60,6 +62,10 @@ that table.
   "install records under `~/.ix`" wording to match the current lazy-install +
   `~/.ix/filament/{modules,registry.json}` + ts-plugin-kit delegation model.
 - FR-009/FR-010/FR-011 and NFR-003 are new and trace to existing tests.
+- FR-012/FR-013 (2026-06-16) cover OKF authoring: `write --types index|log`
+  through the generic catalog path (FR-012, unit-tested), and the
+  authoring-vs-validation boundary where quire owns `--okf`/`--scope` validation
+  and index-completeness (FR-013, review — ix-spec ships no completeness lint).
 - FR-006 and US-005 are now unit-covered: `flows.test.ts` tests the launchers
   (incl. a real fake `ix-flow` binary for the exit-code / signal / spawn-error
   paths), closing the prior eval-only gap. The repo now passes
