@@ -56,7 +56,7 @@ Example: An FR for an integration guide with no structural object:
 ---
 id: FR-007
 title: "Consumer Integration Contract"
-artifact_type: FR
+type: FR
 tags: [integration]
 ---
 ```
@@ -66,7 +66,7 @@ Example: An endpoint that is both structural and consumer-facing:
 ---
 id: FR-001
 title: "Login Endpoint"
-artifact_type: FR
+type: FR
 object: api_endpoint
 tags: [consumer-facing]
 ---

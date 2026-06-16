@@ -1,5 +1,5 @@
 ---
-artifact_type: master-requirements
+type: master-requirements
 name: <app-name>
 org: <your-org>
 component_type: application

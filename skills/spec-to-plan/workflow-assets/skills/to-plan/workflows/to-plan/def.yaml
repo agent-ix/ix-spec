@@ -30,9 +30,9 @@ transitions:
 itemSchemas:
   plan_answers: {}
   ImplementationPlanSchema:
-    required: [artifact_type, id, title, traces_to]
+    required: [type, id, title, traces_to]
     properties:
-      artifact_type: { type: string }
+      type: { type: string }
       id: { type: string }
       title: { type: string }
       traces_to: { type: array }

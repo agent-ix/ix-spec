@@ -31,6 +31,6 @@ edited artifact/object file should be included in the validation set.
 
 ## Dependencies
 
-- Authored files include frontmatter with `artifact_type`.
+- Authored files include frontmatter with `type`.
 - Quire can load the relevant modules from the repo scope or installed module
   paths.

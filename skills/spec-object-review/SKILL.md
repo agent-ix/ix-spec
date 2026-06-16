@@ -24,7 +24,7 @@ Scan all `spec/` directories in scope (single repo or ecosystem-wide):
 find spec/ -name "*.md" -path "*/functional/*"
 ```
 
-For each FR, extract frontmatter fields: `id`, `title`, `artifact_type`, `object`.
+For each FR, extract frontmatter fields: `id`, `title`, `type`, `object`.
 
 ### 2. Cross-Reference Audit
 
@@ -67,7 +67,7 @@ All FRs must use standard frontmatter:
 ---
 id: FR-XXX
 title: "Descriptive Title"
-artifact_type: FR
+type: FR
 object: entity          # Only if FR defines a domain object
 relationships:          # Structured array of cross-references
   - target: "ix://org/repo/TargetFR"
@@ -77,7 +77,7 @@ relationships:          # Structured array of cross-references
 ```
 
 **Check for:**
-- `type: functional` instead of `artifact_type: FR` (non-standard).
+- `type: functional` instead of `type: FR` (non-standard value).
 - Missing `object:` on FRs that clearly define domain objects.
 - `domain:` or `status:` fields that aren't part of the standard schema.
 - Missing `relationships:` array in the frontmatter when the body references upstream/downstream dependencies (such as an API, an event, a data entity, or a required permission).

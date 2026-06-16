@@ -31,7 +31,7 @@ The spec-editor-ui `ApplicationDetailPage` has 7 tabs. Each tab extracts data fr
 | Integration | Artifacts with `tags: [integration]` in frontmatter |
 | Security | Trust Boundaries table, artifacts with `tags: [security]`, Standards |
 | Requirements | StR/US/FR/NFR tables parsed from spec.md |
-| Decisions | ADR artifacts (`artifact_type: ADR`) or inline ADR sections |
+| Decisions | ADR artifacts (`type: ADR`) or inline ADR sections |
 | Spec | Raw markdown rendering |
 
 ## Key Parsing Rules (Quire Library)

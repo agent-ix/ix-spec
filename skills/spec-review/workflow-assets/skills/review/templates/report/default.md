@@ -1,5 +1,5 @@
 ---
-artifact_type: spec-review
+type: spec-review
 id: "{{items.operation_request.request.artifact_id}}"
 title: "{{items.operation_request.request.title}}"
 scope: "{{items.operation_request.request.scope}}"

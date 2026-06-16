@@ -1,5 +1,5 @@
 ---
-artifact_type: requirements-matrix
+type: requirements-matrix
 id: "{{items.operation_request.request.artifact_id}}"
 title: "{{items.operation_request.request.title}}"
 scope: "{{items.operation_request.request.scope}}"

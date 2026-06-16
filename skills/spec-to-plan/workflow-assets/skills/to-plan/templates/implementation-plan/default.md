@@ -1,5 +1,5 @@
 ---
-artifact_type: implementation-plan
+type: implementation-plan
 id: "{{items.plan_answers.plan.id}}"
 title: "{{items.plan_answers.plan.title}}"
 traces_to:

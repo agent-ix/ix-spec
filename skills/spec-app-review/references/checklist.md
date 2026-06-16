@@ -6,7 +6,7 @@ Evaluate each item. Report as FAIL (breaks UI), WARN (degraded display), or INFO
 
 ## 1. Frontmatter (spec.md)
 
-- [ ] `artifact_type: master-requirements` is set
+- [ ] `type: master-requirements` is set
 - [ ] `component_type: application` is set
 - [ ] `name` matches repo name
 - [ ] `org: <your-org>` is set
@@ -15,7 +15,7 @@ Evaluate each item. Report as FAIL (breaks UI), WARN (degraded display), or INFO
 - [ ] `tags` is a non-empty array (renders in MasterRequirementsViewer)
 - [ ] `security_critical` is set (boolean)
 
-**Severity**: FAIL if `artifact_type` or `component_type` wrong (UI won't route to app view). WARN for missing tags.
+**Severity**: FAIL if `type` or `component_type` wrong (UI won't route to app view). WARN for missing tags.
 
 ---
 
@@ -148,7 +148,7 @@ For each artifact file (StR, US, FR, NFR):
 ### 7.1 Frontmatter
 - [ ] `id` matches filename pattern (e.g., `FR-001`)
 - [ ] `title` is present and descriptive
-- [ ] `artifact_type` matches the directory (StR, US, FR, NFR)
+- [ ] `type` matches the directory (StR, US, FR, NFR)
 
 ### 7.2 Heading
 - [ ] H1 follows pattern: `# [ID] Title`

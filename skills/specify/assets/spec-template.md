@@ -1,5 +1,5 @@
 ---
-artifact_type: master-requirements
+type: master-requirements
 name: <component-name>            # Required: repo/component name
 org: <your-org>                   # Required: owning organization
 component_type: fastapi-service   # Canonical type (fastapi-service, react-lib, etc.)

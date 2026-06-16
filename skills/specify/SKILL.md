@@ -37,11 +37,22 @@ community modules.
 
 ## Authoring Rules
 
-- Let frontmatter identify exactly what each file is.
+- Let frontmatter identify exactly what each file is. The discriminator field is
+  `type` (e.g. `type: FR`, `type: master-requirements`); it names the archetype the
+  document conforms to.
 - Use catalog skeletons and schemas rather than memory.
 - Keep workflow definitions out of artifact/object type vocabularies.
 - Validate every created or edited artifact with Quire.
 - Use `spec-review` after validation for quality, consistency, and completeness review.
+
+## Reserved OKF Files
+
+`spec-artifacts-iso` ships two reserved archetypes for the OKF folder structure;
+author them like any other type:
+
+- `index.md` — `type: index`, body is a `## Contents` link list pointing at the
+  artifacts in the folder.
+- `log.md` — `type: log`, body is a `## History` of changes to the folder's specs.
 
 ## Common Spec Layout
 

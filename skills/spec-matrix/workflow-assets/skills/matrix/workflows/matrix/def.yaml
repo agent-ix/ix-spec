@@ -30,9 +30,9 @@ transitions:
 itemSchemas:
   operation_request: {}
   OperationReportSchema:
-    required: [artifact_type, id, title, scope]
+    required: [type, id, title, scope]
     properties:
-      artifact_type: { type: string }
+      type: { type: string }
       id: { type: string }
       title: { type: string }
       scope: { type: string }
