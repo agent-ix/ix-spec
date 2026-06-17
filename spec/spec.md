@@ -3,17 +3,53 @@ type: master-requirements
 name: ix-spec
 org: agent-ix
 component_type: cli
+title: "ix-spec Phase 0 Spec"
 ---
 
-# ix-spec Phase 0 Spec
+# Master Requirements Specification
 
-## Description
+## Purpose
 
 `ix-spec` SHALL provide a standalone installable CLI for spec-domain catalog,
 plugin, authoring-contract, Quire, and review/planning flow operations without
 requiring the broader `ix` umbrella CLI.
 
-## Requirements
+## Scope
+
+### In Scope
+
+- The `ix-spec` CLI surface: catalog list/show/validate, `write` authoring
+  packs, plugin install, and the launch of review/matrix/to-plan workflows.
+- The committed default Filament module set and its lazy reconciliation into
+  `~/.ix/filament/modules`, plus user/community plugin install records in
+  `~/.ix/filament/registry.json`.
+
+### Out of Scope
+
+- Workflow lifecycle control (resume/advance/gate/status), which `ix-flow`
+  owns after launch.
+- Frontmatter-driven validation of authored spec files, which `quire` owns;
+  `ix-spec` authors, quire validates.
+
+## System Overview
+
+`ix-spec` is a standalone CLI that assembles a Filament catalog from module
+roots, authors artifact/object files from catalog skeletons, installs
+user/community modules through `@agent-ix/ts-plugin-kit`, and hands lifecycle
+control of review/matrix/planning workflows to `ix-flow`. It does not vendor the
+default modules; the committed `default-modules.yaml` declares them as pinned
+`git-subdir` sources that are reconciled on first catalog access into the shared
+`~/.ix/filament/modules` store also read by quire-rs.
+
+## Requirements Architecture
+
+The requirement classes that make up this specification — Functional
+Requirements, Non-Functional Requirements, and User Stories — and how they trace
+to one another are listed below. Functional and Non-Functional Requirements are
+enumerated in the Requirements table; User Stories that drive them are listed in
+Use Cases and authored under `spec/usecase/`.
+
+### Requirements
 
 | ID      | Requirement                                                                                                                                                                                                                                                                                                                        | Verification |
 | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
@@ -32,7 +68,7 @@ requiring the broader `ix` umbrella CLI.
 | NFR-002 | Authoring evals SHOULD record latency, token usage, tool-call count, validation attempts, and context fetches.                                                                                                                                                                                                                     | Review       |
 | NFR-003 | Default-module reconciliation SHALL be idempotent and perform no network/git work once each module is installed and pinned, so repeated catalog/write invocations stay offline-safe.                                                                                                                                               | Test         |
 
-## Use Cases
+### Use Cases
 
 | ID     | Summary                                         |
 | ------ | ----------------------------------------------- |
@@ -59,8 +95,9 @@ modules. The committed `default-modules.yaml` declares the default set as pinned
 the shared module store also read by quire-rs, so installs and validation see an
 identical catalog.
 
-## Dependencies
+## References
 
+- ISO/IEC/IEEE 29148 — Requirements engineering.
 - `@agent-ix/ix-cli-core` — runtime context/config root.
 - `@agent-ix/ts-plugin-kit` — marketplace install, reconcile, and registry
   primitives for the default set and user/community plugins.

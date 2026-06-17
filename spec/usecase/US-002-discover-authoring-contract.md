@@ -11,16 +11,16 @@ relationships:
 
 # [US-002] Discover an authoring contract before editing
 
-## Description
-
-An agent needs to understand how to write or edit a specific artifact/object
-type before touching files.
-
-## Body
+## Story
 
 As an agent preparing a change, I want to inspect a type by name and retrieve
 the authoring pack for that type, so that I can keep the file structure aligned
 with the catalog contract.
+
+## Context
+
+An agent needs to understand how to write or edit a specific artifact/object
+type before touching files.
 
 The expected commands are:
 

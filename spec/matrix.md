@@ -1,5 +1,5 @@
 ---
-id: Matrix-001
+id: TM-001
 title: ix-spec Phase 0 Matrix
 type: TestMatrix
 ---

@@ -1,5 +1,5 @@
 ---
-id: Matrix-002
+id: TM-002
 title: ix-spec Authoring Eval Matrix
 type: TestMatrix
 relationships:

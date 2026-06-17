@@ -1,5 +1,5 @@
 ---
-id: Review-001
+id: REV-001
 title: ix-spec Phase 0 Review
 type: Review
 ---

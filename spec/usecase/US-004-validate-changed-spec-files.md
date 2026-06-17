@@ -9,16 +9,16 @@ relationships:
 
 # [US-004] Validate changed spec files
 
-## Description
-
-An agent validates every spec artifact/object file it creates or edits before
-handing work back to the user.
-
-## Body
+## Story
 
 As an agent completing spec edits, I want a scoped Quire command for the target
 repository, so that validation checks the changed files using frontmatter to
 select the matching rule set.
+
+## Context
+
+An agent validates every spec artifact/object file it creates or edits before
+handing work back to the user.
 
 The expected command shape is:
 

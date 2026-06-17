@@ -9,16 +9,16 @@ relationships:
 
 # [US-005] Start a gated spec workflow
 
-## Description
-
-A user or agent starts review, matrix, or planning workflow runs from the spec
-CLI and continues execution through `ix-flow`.
-
-## Body
+## Story
 
 As a user running the spec lifecycle, I want `ix-spec` to launch the spec-domain
 workflow and `ix-flow` to manage phase progression and human gates, so that the
 workflow engine stays separate from the catalog and authoring surface.
+
+## Context
+
+A user or agent starts review, matrix, or planning workflow runs from the spec
+CLI and continues execution through `ix-flow`.
 
 The expected command shape is:
 

@@ -13,17 +13,18 @@ relationships:
 
 # [US-003] Install and use a community spec module
 
-## Description
-
-A user extends the spec vocabulary with an additional artifact/object module
-from a local path, GitHub repository, or package.
-
-## Body
+## Story
 
 As a user adopting a community module, I want to install the module once under
 `~/.ix/filament/modules` (recorded in `~/.ix/filament/registry.json`), confirm
 that its types appear in the active catalog, and request those types in an
-authoring pack.
+authoring pack, so that the new vocabulary participates in authoring and
+validation just like the default modules.
+
+## Context
+
+A user extends the spec vocabulary with an additional artifact/object module
+from a local path, GitHub repository, or package.
 
 The expected command shape is:
 
