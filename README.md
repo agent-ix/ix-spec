@@ -12,7 +12,7 @@ Install `ix-spec` with `ix-flow` so the spec launcher and workflow lifecycle
 commands are both available:
 
 ```bash
-npm install -g @agent-ix/ix-spec@latest @agent-ix/ix-flow@latest
+npm install -g @agent-ix/ix-spec@latest @agent-ix/ix-flow@latest --registry https://npm.pkg.github.com
 ```
 
 ## Usage
