@@ -70,7 +70,7 @@ Install `quoin` with `ix-flow` so the spec tooling and workflow lifecycle comman
 both available:
 
 ```bash
-npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest --registry https://npm.pkg.github.com
+npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest
 ```
 
 ## Usage
