@@ -10,8 +10,8 @@
 
 `quoin` is a bundle of **Quire modules**, **agent skills**, and **workflows** for
 authoring [ISO/IEC/IEEE 29148](https://www.iso.org/standard/72089.html)-aligned software specifications and other technical
-documents. It packages the spec vocabulary, the authoring/review/planning contracts,
-and the catalog/plugin tooling agents need to write and validate specs directly as Markdown.
+documents. It includes prepackaged modules for the spec vocabulary and ideation/authoring/review/planning
+workflows agents need to write and validate specs directly as Markdown.
 
 `quoin` is built on the [Quire](https://github.com/agent-ix/quire-rs) document standard and validation engine by Agent-IX.
 
@@ -29,7 +29,7 @@ The default module set defines the spec archetypes and domain-object vocabulary.
 | [spec-artifacts-app](https://github.com/agent-ix/spec-artifacts-app)         | `ApplicationSpec`, `MasterRequirements`                              |
 | [spec-artifacts-process](https://github.com/agent-ix/spec-artifacts-process) | `ADR`, `Plan`, `Task`, `Review`, `Finding`, `TestMatrix`, `Standard` |
 
-**Domain objects** — the entities you reference inside specs:
+**Domain objects** — the objects you reference inside specs:
 
 | Module                                                                             | Objects                                                                                                                                                                                                                                |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
