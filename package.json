@@ -9,7 +9,7 @@
     "default-modules.yaml",
     "skills/",
     "bin/",
-    "plugin.json",
+    ".claude-plugin/",
     "LICENSE",
     "README.md"
   ],

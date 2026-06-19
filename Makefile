@@ -35,6 +35,13 @@ evals:
 evals-all:
 	node evals/run.mjs --all --model $(MODEL) --repeats $(REPEATS)
 
+# Community install smoke test (clean-room Docker: public npm + Claude plugin).
+# Verifies an outside developer can `npm i -g @agent-ix/quoin` and load the
+# plugin (skills/workflows) into Claude Code. See smoke/README.md.
+.PHONY: install-smoke
+install-smoke:
+	./smoke/run.sh
+
 .PHONY: lint
 lint:
 	pnpm run lint

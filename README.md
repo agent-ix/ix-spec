@@ -66,12 +66,28 @@ Multi-agent workflows that fan out, run lenses in parallel, and synthesize resul
 
 ## Install
 
-Install `quoin` with `ix-flow` so the spec tooling and workflow lifecycle commands are
-both available:
+Installing quoin into Claude is **two steps**: the CLI (from public npm) and the plugin
+that adds the [skills](#skills) and [workflows](#workflows) to Claude Code. No Anthropic API
+key is required — your Claude subscription is used.
+
+**1. Install the CLIs** (`quoin` plus `ix-flow`, which runs the workflow lifecycle commands):
 
 ```bash
 npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest
 ```
+
+**2. Add the plugin to Claude Code** (run these inside Claude Code):
+
+```text
+/plugin marketplace add agent-ix/quoin
+/plugin install quoin@quoin
+```
+
+That registers quoin's spec-authoring skills and workflows so you can drive them by asking
+the agent. (To also get the `/ix-flow` runner skills, repeat step 2 for `agent-ix/ix-flow`.)
+
+> A clean-room, repeatable check of this exact install path lives in [`smoke/`](./smoke) —
+> run `make install-smoke`.
 
 ## Usage
 

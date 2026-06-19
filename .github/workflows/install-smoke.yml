@@ -1,0 +1,27 @@
+name: install-smoke
+
+# Clean-room check that a brand-new community user can install quoin from public
+# npm and load its Claude Code plugin (skills/workflows). Uses PLUGIN_SOURCE=local
+# so it validates THIS revision's plugin manifest rather than whatever is already
+# on the default branch. No secrets required: plugin install is pure git, so the
+# "skills present" assertions run without auth (the live plugin-load check is
+# skipped when no subscription credential is present).
+
+on:
+  pull_request:
+  push:
+    tags: ["*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clean-room install + plugin smoke (local plugin source)
+        env:
+          PLUGIN_SOURCE: local
+        run: ./smoke/run.sh
