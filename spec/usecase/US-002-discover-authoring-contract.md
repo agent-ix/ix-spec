@@ -3,9 +3,9 @@ id: US-002
 title: "Discover an authoring contract before editing"
 type: US
 relationships:
-  - target: "ix://agent-ix/ix-spec/FR-003"
+  - target: "ix://agent-ix/quoin/FR-003"
     type: "traces_to"
-  - target: "ix://agent-ix/ix-spec/FR-004"
+  - target: "ix://agent-ix/quoin/FR-004"
     type: "traces_to"
 ---
 
@@ -25,8 +25,8 @@ type before touching files.
 The expected commands are:
 
 ```bash
-ix-spec catalog show FR
-ix-spec write . --types FR
+quoin catalog show FR
+quoin write . --types FR
 ```
 
 The help text should make the next action clear: use the returned skeleton and

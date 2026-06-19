@@ -13,7 +13,7 @@ import {
 } from "../src/write";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 // Build a module that declares one artifact with schema+skeleton, one object
@@ -129,7 +129,7 @@ describe("formatAuthoringPack", () => {
     const repo = tmp("repo");
     const pack = createAuthoringPack(catalog, repo, ["FR", "BARE", "domain"]);
     const text = formatAuthoringPack(pack);
-    expect(text).toContain("ix-spec write");
+    expect(text).toContain("quoin write");
     expect(text).toContain(`Repo: ${repo}`);
     // FR has both skeleton and schema lines.
     expect(text).toContain("- FR (artifact)");

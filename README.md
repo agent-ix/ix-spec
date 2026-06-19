@@ -8,36 +8,36 @@
 [![ISO/IEC/IEEE 29148](https://img.shields.io/badge/ISO%2FIEC%2FIEEE-29148%20aligned-0052CC)](https://www.iso.org/standard/72089.html)
 [![Open Knowledge Format](https://img.shields.io/badge/OKF-Open%20Knowledge%20Format-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf)
 
-`ix-spec` is a bundle of **Quire modules**, **agent skills**, and **workflows** for
-authoring [ISO/IEC/IEEE 29148](https://www.iso.org/standard/72089.html)-aligned software specifications and other technical 
-documents. It packages the spec vocabulary, the authoring/review/planning contracts, 
+`quoin` is a bundle of **Quire modules**, **agent skills**, and **workflows** for
+authoring [ISO/IEC/IEEE 29148](https://www.iso.org/standard/72089.html)-aligned software specifications and other technical
+documents. It packages the spec vocabulary, the authoring/review/planning contracts,
 and the catalog/plugin tooling agents need to write and validate specs directly as Markdown.
 
-`ix-spec` is built on the [Quire](https://github.com/agent-ix/quire-rs) document standard and validation engine by Agent-IX.
+`quoin` is built on the [Quire](https://github.com/agent-ix/quire-rs) document standard and validation engine by Agent-IX.
 
 ## What's included
 
 ### Quire modules
 
-The default module set defines the spec archetypes and domain-object vocabulary. 
+The default module set defines the spec archetypes and domain-object vocabulary.
 
 **Artifact archetypes** — the document types you author:
 
-| Module | Archetypes |
-| --- | --- |
-| [spec-artifacts-iso](https://github.com/agent-ix/spec-artifacts-iso) | `StR`, `FR`, `NFR`, `US`, `IT`, `TC`, `Spec`, `master-requirements` |
-| [spec-artifacts-app](https://github.com/agent-ix/spec-artifacts-app) | `ApplicationSpec`, `MasterRequirements` |
+| Module                                                                       | Archetypes                                                           |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [spec-artifacts-iso](https://github.com/agent-ix/spec-artifacts-iso)         | `StR`, `FR`, `NFR`, `US`, `IT`, `TC`, `Spec`, `master-requirements`  |
+| [spec-artifacts-app](https://github.com/agent-ix/spec-artifacts-app)         | `ApplicationSpec`, `MasterRequirements`                              |
 | [spec-artifacts-process](https://github.com/agent-ix/spec-artifacts-process) | `ADR`, `Plan`, `Task`, `Review`, `Finding`, `TestMatrix`, `Standard` |
 
 **Domain objects** — the entities you reference inside specs:
 
-| Module | Objects |
-| --- | --- |
-| [spec-objects-business](https://github.com/agent-ix/spec-objects-business) | `domain`, `entity`, `value_object`, `aggregate_root`, `nested_entity`, `repository`, `event`, `state_machine`, `process`, `enumeration` |
-| [spec-objects-architecture](https://github.com/agent-ix/spec-objects-architecture) | `api_endpoint`, `data_schema`, `queue`, `action`, `ui_component`, `interface`, `external_contract`, `extension_point`, `binary_format`, `rate_limit` |
-| [spec-objects-enterprise](https://github.com/agent-ix/spec-objects-enterprise) | `capability`, `business_function`, `value_stream`, `decision`, `objective`, `principle`, `kpi` |
-| [spec-objects-operational](https://github.com/agent-ix/spec-objects-operational) | `configuration`, `migration`, `sli`, `slo`, `alert`, `runbook`, `incident`, `deployment` |
-| [spec-objects-security](https://github.com/agent-ix/spec-objects-security) | `auth_flow`, `permission`, `scope`, `role`, `secret`, `encryption_key`, `session_config`, `data_classification`, `trust_boundary`, `audit_event`, `threat`, `control`, `risk`, `vulnerability`, `asset`, `attack_surface`, `policy`, … |
+| Module                                                                             | Objects                                                                                                                                                                                                                                |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [spec-objects-business](https://github.com/agent-ix/spec-objects-business)         | `domain`, `entity`, `value_object`, `aggregate_root`, `nested_entity`, `repository`, `event`, `state_machine`, `process`, `enumeration`                                                                                                |
+| [spec-objects-architecture](https://github.com/agent-ix/spec-objects-architecture) | `api_endpoint`, `data_schema`, `queue`, `action`, `ui_component`, `interface`, `external_contract`, `extension_point`, `binary_format`, `rate_limit`                                                                                   |
+| [spec-objects-enterprise](https://github.com/agent-ix/spec-objects-enterprise)     | `capability`, `business_function`, `value_stream`, `decision`, `objective`, `principle`, `kpi`                                                                                                                                         |
+| [spec-objects-operational](https://github.com/agent-ix/spec-objects-operational)   | `configuration`, `migration`, `sli`, `slo`, `alert`, `runbook`, `incident`, `deployment`                                                                                                                                               |
+| [spec-objects-security](https://github.com/agent-ix/spec-objects-security)         | `auth_flow`, `permission`, `scope`, `role`, `secret`, `encryption_key`, `session_config`, `data_classification`, `trust_boundary`, `audit_event`, `threat`, `control`, `risk`, `vulnerability`, `asset`, `attack_surface`, `policy`, … |
 
 ### Agent Skills
 
@@ -66,11 +66,11 @@ Multi-agent workflows that fan out, run lenses in parallel, and synthesize resul
 
 ## Install
 
-Install `ix-spec` with `ix-flow` so the spec tooling and workflow lifecycle commands are
+Install `quoin` with `ix-flow` so the spec tooling and workflow lifecycle commands are
 both available:
 
 ```bash
-npm install -g @agent-ix/ix-spec@latest @agent-ix/ix-flow@latest --registry https://npm.pkg.github.com
+npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest --registry https://npm.pkg.github.com
 ```
 
 ## Usage
@@ -80,18 +80,16 @@ npm install -g @agent-ix/ix-spec@latest @agent-ix/ix-flow@latest --registry http
 The primary way users author specs is by asking an agent, which invokes the bundled
 [skills](#skills) and [workflows](#workflows).
 
-
-
 ### ClI commands
 
 Inspect the spec vocabulary and manage installed modules:
 
 ```bash
-ix-spec catalog list
-ix-spec catalog show FR
-ix-spec catalog validate
-ix-spec plugin install path:../spec-objects-business
-ix-spec plugin list
+quoin catalog list
+quoin catalog show FR
+quoin catalog validate
+quoin plugin install path:../spec-objects-business
+quoin plugin list
 ```
 
 ## Development
@@ -117,7 +115,8 @@ transcript. Unit tests cover the mechanical CLI behavior; see [evals/README.md](
 
 ## About
 
-IX-spec is part of the Agent-IX ecosystem built on these core libraries:
+quoin is part of the Agent-IX ecosystem built on these core libraries:
+
 - [quire-cli](https://github.com/agent-ix/quire-cli), the static-binary CLI wrapping the Quire engine
 - [ix-cli-core](https://github.com/agent-ix/ix-cli-core), the generic CLI framework
-for Agent IX.
+  for Agent IX.

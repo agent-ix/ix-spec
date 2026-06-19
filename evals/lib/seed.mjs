@@ -1,6 +1,6 @@
 // Hermetic module seeding.
 //
-// Every `ix-spec write`/`catalog` call runs `ensureDefaultModules()`, which
+// Every `quoin write`/`catalog` call runs `ensureDefaultModules()`, which
 // reconciles 8 default Filament modules from GitHub into `$IX_HOME/filament/`.
 // To keep per-scenario runs offline and fast we do that clone exactly ONCE into a
 // cached seed (`evals/.seed-cache/filament`), then `cp -r` it into each scenario's
@@ -49,7 +49,7 @@ export function buildSeedOnce({ force = false, log = () => {} } = {}) {
     return seedPaths(false);
   }
   log("seed: building (one authenticated reconcile of default modules)...");
-  const tmpHome = mkdtempSync(join(tmpdir(), "ix-spec-seed-"));
+  const tmpHome = mkdtempSync(join(tmpdir(), "quoin-seed-"));
   try {
     const out = spawnSync(
       process.execPath,

@@ -45,7 +45,7 @@ export function filamentModulesDir(home = ixHome()): string {
 
 export function defaultModuleRoots(home = ixHome()): string[] {
   const roots: string[] = [];
-  const env = process.env.IX_SPEC_MODULE_PATHS;
+  const env = process.env.QUOIN_MODULE_PATHS;
   if (env) roots.push(...env.split(":").filter(Boolean));
 
   const installed = filamentModulesDir(home);

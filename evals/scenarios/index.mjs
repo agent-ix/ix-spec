@@ -5,7 +5,7 @@
 //  - setup:   optional pre-seed of brownfield/broken/plugin/dev-module fixtures into ctx.
 //             May stash data on ctx.data for prompt(ctx)/env(ctx).
 //  - env:     optional (ctx)=>extra env for BOTH the agent run and the ground-truth
-//             assertion (e.g. IX_SPEC_MODULE_PATHS).
+//             assertion (e.g. QUOIN_MODULE_PATHS).
 //  - expect:  ground-truth success checks (see lib/assert.mjs):
 //             files, validate, flow, cliRejects, plugin, resolvesTo, sentinel.
 //
@@ -42,7 +42,7 @@ export const SCENARIOS = [
     },
     prompt:
       "The repo already contains spec/FR-002.md. Discover its authoring contract " +
-      "(e.g. `ix-spec catalog show FR` or `ix-spec write`), then edit only the " +
+      "(e.g. `quoin catalog show FR` or `quoin write`), then edit only the " +
       "sections needed to change the requirement to be about verifying a signed " +
       "release manifest. Keep it valid and re-validate the changed file.",
     expect: {
@@ -62,7 +62,7 @@ export const SCENARIOS = [
     },
     prompt: (ctx) =>
       `Install the local plugin at \`path:${ctx.data.pluginPath}\` using ` +
-      "`ix-spec plugin install`, then author one `local-widget` object under spec/ " +
+      "`quoin plugin install`, then author one `local-widget` object under spec/ " +
       "and validate it.",
     expect: {
       plugin: { name: "spec-objects-local", present: true },
@@ -102,7 +102,7 @@ export const SCENARIOS = [
     },
     prompt:
       "Start a review workflow for the spec/ directory with " +
-      "`ix-spec review --target spec/ --id eval-review`, then inspect it with " +
+      "`quoin review --target spec/ --id eval-review`, then inspect it with " +
       "`ix-flow status eval-review`.",
     expect: {
       flow: [{ id: "eval-review", defName: "review" }],
@@ -113,7 +113,7 @@ export const SCENARIOS = [
     useCase: "US-001,US-004",
     prompt:
       "Create two Functional Requirements and one `domain` object that share object " +
-      "templates. Fetch each type's authoring contract only ONCE (one `ix-spec write` " +
+      "templates. Fetch each type's authoring contract only ONCE (one `quoin write` " +
       "per type) and reuse it across the files. Validate all of them.",
     expect: {
       files: ["spec/**/*.md"],
@@ -125,7 +125,7 @@ export const SCENARIOS = [
     useCase: "US-002",
     prompt:
       "Author one FR and one domain object, requesting them with LOWERCASE type names " +
-      "(use `ix-spec write . --types fr,domain`). The CLI should resolve them to the " +
+      "(use `quoin write . --types fr,domain`). The CLI should resolve them to the " +
       "canonical types. Validate the result.",
     expect: {
       files: ["spec/**/*.md"],
@@ -186,7 +186,7 @@ export const SCENARIOS = [
     },
     prompt: (ctx) =>
       `Install the packaged plugin at \`path:${ctx.data.pluginPath}\`, then request ` +
-      "its `package-widget` type via `ix-spec write` and author one such object under " +
+      "its `package-widget` type via `quoin write` and author one such object under " +
       "spec/. Validate it.",
     expect: {
       plugin: { name: "spec-objects-package", present: true },
@@ -199,7 +199,7 @@ export const SCENARIOS = [
     useCase: "US-002",
     prompt:
       "Attempt to create an authoring pack for an unknown type by running " +
-      "`ix-spec write . --types no-such-type`. The CLI should report the missing type " +
+      "`quoin write . --types no-such-type`. The CLI should report the missing type " +
       "and exit non-zero. Confirm that it does, then finish (do not author any file).",
     expect: {
       cliRejects: ["no-such-type"],
@@ -234,8 +234,8 @@ export const SCENARIOS = [
     },
     prompt:
       "After requirements are accepted, start a matrix workflow with " +
-      "`ix-spec matrix --target spec/ --id eval-matrix` and a to-plan workflow with " +
-      "`ix-spec to-plan --target spec/ --id eval-to-plan`. Inspect both runs with " +
+      "`quoin matrix --target spec/ --id eval-matrix` and a to-plan workflow with " +
+      "`quoin to-plan --target spec/ --id eval-to-plan`. Inspect both runs with " +
       "`ix-flow status`.",
     expect: {
       flow: [
@@ -253,7 +253,7 @@ export const SCENARIOS = [
     prompt:
       "Author a Phase 0 spec set from a settled idea: a `master-requirements` spec, a " +
       "user story (`US`), a functional requirement (`FR`), a `Plan`, and a " +
-      "`TestMatrix` — one file each under spec/. Use `ix-spec write` to fetch the " +
+      "`TestMatrix` — one file each under spec/. Use `quoin write` to fetch the " +
       "contracts. Validate the whole set.",
     expect: {
       files: ["spec/**/*.md"],
@@ -271,9 +271,9 @@ export const SCENARIOS = [
         marker: "DEV DOMAIN SKELETON MARKER",
       });
     },
-    env: (ctx) => ({ IX_SPEC_MODULE_PATHS: ctx.data.devModulePath }),
+    env: (ctx) => ({ QUOIN_MODULE_PATHS: ctx.data.devModulePath }),
     prompt:
-      "A sibling development module is present (via IX_SPEC_MODULE_PATHS) that " +
+      "A sibling development module is present (via QUOIN_MODULE_PATHS) that " +
       "redefines the `domain` object. Author one `domain` object under spec/. The " +
       "catalog should prefer the dev module deterministically. Validate the result.",
     expect: {
@@ -296,7 +296,7 @@ export const SCENARIOS = [
     prompt:
       "This workspace contains TWO repos: `core/` and `service/`. Author a " +
       "Functional Requirement under `core/spec/` and a `domain` object under " +
-      "`service/spec/` (use `ix-spec write <repo> --types ...` per repo). Validate " +
+      "`service/spec/` (use `quoin write <repo> --types ...` per repo). Validate " +
       'both with a single scoped run: `quire validate --scope . "core/spec/**/*.md" ' +
       '"service/spec/**/*.md"`.',
     expect: {
@@ -317,7 +317,7 @@ export const SCENARIOS = [
       "(`US`), three Functional Requirements (`FR`), one Non-Functional Requirement " +
       "(`NFR`), one `domain` object, and two `entity` objects — each in its own file, " +
       "with sensible cross-references in the bodies. Fetch each type's contract once " +
-      "via `ix-spec write`, then validate the whole set.",
+      "via `quoin write`, then validate the whole set.",
     expect: {
       files: [
         "spec/StR-*.md",
@@ -339,7 +339,7 @@ export const SCENARIOS = [
       "Author three objects that come from different modules, one file each under " +
       "spec/: a `domain` (business), an `api_endpoint` (architecture), and a " +
       "`configuration` (operational). Request them together with " +
-      "`ix-spec write . --types domain,api_endpoint,configuration`, author from the " +
+      "`quoin write . --types domain,api_endpoint,configuration`, author from the " +
       "skeletons, and validate.",
     expect: {
       files: ["spec/**/*.md"],
@@ -359,7 +359,7 @@ export const SCENARIOS = [
     },
     prompt:
       "The `spec-objects-operational` module is not installed. Install it FROM GITHUB " +
-      "with `ix-spec plugin install " +
+      "with `quoin plugin install " +
       "github:agent-ix/spec-objects-operational//spec_objects_operational@v0.2.0` " +
       "(this clones the module's subdirectory from GitHub). Then author one " +
       "`configuration` object under spec/ from its skeleton and validate it.",

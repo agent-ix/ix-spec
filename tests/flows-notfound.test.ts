@@ -25,9 +25,9 @@ describe("resolveSkillPath not-found", () => {
 
   test("throws when no candidate root contains the skill", async () => {
     process.env.IX_SPEC_WORKFLOWS_ROOT = mkdtempSync(
-      join(tmpdir(), "ix-spec-wf-none-"),
+      join(tmpdir(), "quoin-wf-none-"),
     );
-    process.env.IX_HOME = mkdtempSync(join(tmpdir(), "ix-spec-home-"));
+    process.env.IX_HOME = mkdtempSync(join(tmpdir(), "quoin-home-"));
     await expect(startSpecFlow("review")).rejects.toThrow(
       /could not find ix-spec workflow skill review; set IX_SPEC_WORKFLOWS_ROOT/,
     );

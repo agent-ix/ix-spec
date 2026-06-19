@@ -23,7 +23,7 @@ export function copySkeleton(ctx, moduleName, skeletonFile, repoRelTarget) {
 /**
  * Remove a seeded default module from a scenario's IX_HOME (modules dir + registry),
  * so the agent must (re)install it — e.g. to test a real GitHub install. NOTE: a
- * later `ix-spec write`/`catalog` still lazily reconciles default modules, so pair
+ * later `quoin write`/`catalog` still lazily reconciles default modules, so pair
  * this with an `agentRan` assertion that the agent's own install command succeeded.
  */
 export function removeSeededModule(ctx, name) {
@@ -117,8 +117,8 @@ ${marker || `This ${typeName} fixture provides a deterministic plugin object.`}
 /**
  * Build a sibling "dev" module that redefines an object `type`, reusing the REAL
  * installed skeleton (so it still validates against the real archetype) plus a
- * marker. Used to prove `IX_SPEC_MODULE_PATHS` is preferred over the default set.
- * Returns the dev module root (point IX_SPEC_MODULE_PATHS at it).
+ * marker. Used to prove `QUOIN_MODULE_PATHS` is preferred over the default set.
+ * Returns the dev module root (point QUOIN_MODULE_PATHS at it).
  */
 export function makeDevModule(ctx, { moduleName, type, srcModule, marker }) {
   const root = join(ctx.work, moduleName);

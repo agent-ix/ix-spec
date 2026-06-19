@@ -1,10 +1,10 @@
 ---
 id: PL-001
-title: ix-spec Implementation Plan
+title: quoin Implementation Plan
 type: Plan
 ---
 
-# ix-spec Implementation Plan
+# quoin Implementation Plan
 
 ## Tasks
 

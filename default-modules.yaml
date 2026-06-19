@@ -1,4 +1,4 @@
-# Default Filament module set shipped with ix-spec.
+# Default Filament module set shipped with quoin.
 #
 # Lazily installed into ~/.ix/filament/modules on first catalog access (see
 # src/modules.ts). Each entry sparse-checks out one module's data subdir from its
@@ -7,7 +7,7 @@
 # pins (a future generator can derive the backend pyproject pins / activation
 # list from it).
 schemaVersion: 1
-name: ix-spec-default-modules
+name: quoin-default-modules
 entries:
   - name: spec-artifacts-iso
     version: "0.4.0"

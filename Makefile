@@ -1,5 +1,5 @@
 # =============================================================================
-# ix-spec Makefile
+# quoin Makefile
 # =============================================================================
 # This Makefile provides backwards compatibility by delegating to pnpm scripts.
 # All primary functionality is defined in package.json scripts section.
@@ -167,7 +167,7 @@ test-results-warnings:
 
 .PHONY: help
 help:
-	@echo "ix-spec Makefile - Backwards compatibility wrapper"
+	@echo "quoin Makefile - Backwards compatibility wrapper"
 	@echo ""
 	@echo "This Makefile delegates to pnpm scripts defined in package.json"
 	@echo "Run 'pnpm run' to see all available scripts"

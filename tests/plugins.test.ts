@@ -15,7 +15,7 @@ import {
 import { filamentModulesDir } from "../src/catalog";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 function writeManifest(dir: string, name: unknown): void {

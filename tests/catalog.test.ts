@@ -14,7 +14,7 @@ import {
 } from "../src/catalog";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 function writeModule(
@@ -56,13 +56,13 @@ describe("ixHome", () => {
 });
 
 describe("defaultModuleRoots", () => {
-  const originalPaths = process.env.IX_SPEC_MODULE_PATHS;
+  const originalPaths = process.env.QUOIN_MODULE_PATHS;
   afterEach(() => {
-    if (originalPaths === undefined) delete process.env.IX_SPEC_MODULE_PATHS;
-    else process.env.IX_SPEC_MODULE_PATHS = originalPaths;
+    if (originalPaths === undefined) delete process.env.QUOIN_MODULE_PATHS;
+    else process.env.QUOIN_MODULE_PATHS = originalPaths;
   });
 
-  test("includes IX_SPEC_MODULE_PATHS entries and installed module dirs", () => {
+  test("includes QUOIN_MODULE_PATHS entries and installed module dirs", () => {
     const home = tmp("home");
     const installed = filamentModulesDir(home);
     writeModule(join(installed, "spec-objects-business"), {
@@ -70,14 +70,14 @@ describe("defaultModuleRoots", () => {
       object_types: [{ name: "domain" }],
     });
     const extraRoot = tmp("extra");
-    process.env.IX_SPEC_MODULE_PATHS = `${extraRoot}::`; // trailing empties filtered
+    process.env.QUOIN_MODULE_PATHS = `${extraRoot}::`; // trailing empties filtered
     const roots = defaultModuleRoots(home);
     expect(roots).toContain(extraRoot);
     expect(roots).toContain(join(installed, "spec-objects-business"));
   });
 
   test("omits installed dirs when none have been installed", () => {
-    delete process.env.IX_SPEC_MODULE_PATHS;
+    delete process.env.QUOIN_MODULE_PATHS;
     const home = tmp("empty-home");
     expect(defaultModuleRoots(home)).toEqual([]);
   });

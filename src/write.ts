@@ -73,7 +73,7 @@ export function createAuthoringPack(
 
 export function formatAuthoringPack(pack: AuthoringPack): string {
   const lines = [
-    "ix-spec write",
+    "quoin write",
     "",
     `Repo: ${pack.repoRoot}`,
     "",

@@ -1,11 +1,11 @@
 // Binary + sibling-package resolution for the eval harness.
 //
-// The harness drives the REAL `claude` agent (via agent-pty) through the ix-spec
+// The harness drives the REAL `claude` agent (via agent-pty) through the quoin
 // CLI + skills, so it needs to locate three things that are NOT npm dependencies:
 //   - agent-pty's built dist (sibling checkout, dynamically imported)
 //   - a `quire` build new enough to support `validate --scope <glob>` (>= 0.2.4)
-//   - this repo's own `ix-spec` bin
-// It then builds a shim PATH so the spawned agent's bare `ix-spec`/`quire`
+//   - this repo's own `quoin` bin
+// It then builds a shim PATH so the spawned agent's bare `quoin`/`quire`
 // commands resolve to exactly those, regardless of global install state.
 
 import { existsSync, mkdirSync, rmSync, symlinkSync, chmodSync } from "node:fs";
@@ -14,7 +14,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { pathToFileURL } from "node:url";
 
-/** ix-spec repo root (this file lives at evals/lib/resolve.mjs). */
+/** quoin repo root (this file lives at evals/lib/resolve.mjs). */
 export function repoRoot() {
   return resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 }
@@ -23,13 +23,13 @@ export function evalsRoot() {
   return join(repoRoot(), "evals");
 }
 
-/** Absolute path to this repo's ix-spec entry (needs `dist/` built). */
+/** Absolute path to this repo's quoin entry (needs `dist/` built). */
 export function ixSpecBin() {
-  const bin = join(repoRoot(), "bin", "ix-spec.js");
+  const bin = join(repoRoot(), "bin", "quoin.js");
   const dist = join(repoRoot(), "dist", "cli.js");
   if (!existsSync(dist)) {
     throw new Error(
-      `ix-spec is not built: ${dist} missing. Run \`make build\` first.`,
+      `quoin is not built: ${dist} missing. Run \`make build\` first.`,
     );
   }
   return bin;
@@ -84,7 +84,7 @@ export async function findAgentPty() {
 }
 
 /**
- * Build a shim bin dir holding `ix-spec` -> this repo and `quire` -> the resolved
+ * Build a shim bin dir holding `quoin` -> this repo and `quire` -> the resolved
  * build, so the spawned agent's bare commands are pinned. Returns the dir; prepend
  * it to PATH. `claude` and `ix-flow` come from the inherited PATH.
  */
@@ -92,7 +92,7 @@ export function shimDir() {
   const dir = join(evalsRoot(), ".bin");
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
-  link(join(dir, "ix-spec"), ixSpecBin());
+  link(join(dir, "quoin"), ixSpecBin());
   link(join(dir, "quire"), findQuire());
   return dir;
 }

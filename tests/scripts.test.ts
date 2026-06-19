@@ -37,7 +37,7 @@ test("write help explains authoring packs", async () => {
   }
   const text = output.join("\n");
   expect(text).toContain("authoring pack");
-  expect(text).toContain("ix-spec write <repo_dir> --types");
+  expect(text).toContain("quoin write <repo_dir> --types");
 });
 
 test("version flag prints package version", async () => {

@@ -1,21 +1,21 @@
 ---
 id: TM-002
-title: ix-spec Authoring Eval Matrix
+title: quoin Authoring Eval Matrix
 type: TestMatrix
 relationships:
-  - target: "ix://agent-ix/ix-spec/US-001"
+  - target: "ix://agent-ix/quoin/US-001"
     type: "covers"
-  - target: "ix://agent-ix/ix-spec/US-002"
+  - target: "ix://agent-ix/quoin/US-002"
     type: "covers"
-  - target: "ix://agent-ix/ix-spec/US-003"
+  - target: "ix://agent-ix/quoin/US-003"
     type: "covers"
-  - target: "ix://agent-ix/ix-spec/US-004"
+  - target: "ix://agent-ix/quoin/US-004"
     type: "covers"
-  - target: "ix://agent-ix/ix-spec/US-005"
+  - target: "ix://agent-ix/quoin/US-005"
     type: "covers"
 ---
 
-# ix-spec Authoring Eval Matrix
+# quoin Authoring Eval Matrix
 
 ## Purpose
 
@@ -61,27 +61,27 @@ agent can use the commands efficiently to produce valid spec artifacts.
 
 ## Scenarios
 
-| Eval   | Use Case       | Prompt                                                                | Expected Outcome                                                                                                                     | Required Measurements                                     |
-| ------ | -------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
-| EV-001 | US-001         | Create an FR plus `domain` and `entity` objects for a small feature.  | Agent uses one `ix-spec write` pack, creates all files, and Quire validates them.                                                    | success, latency, tool calls, tokens, validation attempts |
-| EV-002 | US-002         | Edit an existing FR after discovering its authoring contract.         | Agent uses `catalog show` or `write`, edits only needed sections, and validates changed files.                                       | success, latency, tool calls, tokens                      |
-| EV-003 | US-003         | Install a local fixture plugin and author one plugin-defined object.  | Plugin appears in catalog, `write --types` resolves it, created file validates.                                                      | success, latency, tool calls, tokens                      |
-| EV-004 | US-004         | Validate a mixed changed set of artifact and object files.            | Agent runs scoped Quire validation over the changed file set and reports failures clearly.                                           | success, latency, tool calls, validation attempts         |
-| EV-005 | US-005         | Start a review workflow for a spec directory and inspect status.      | `ix-spec` starts the workflow and `ix-flow status` reports the run and gate state.                                                   | success, latency, tool calls                              |
-| EV-006 | US-001, US-004 | Create multiple artifacts that share object templates.                | Agent fetches each type contract once, reuses it across files, and validates all changed files.                                      | success, context fetches, tokens, tool calls              |
-| EV-007 | US-002         | Use lowercase type names in an authoring request.                     | `ix-spec write . --types fr,domain` resolves canonical types and prints usable contracts.                                            | success, latency, tool calls                              |
-| EV-008 | US-004         | Repair a spec file after Quire reports validation diagnostics.        | Agent interprets diagnostics, edits the failing file, and reaches passing validation.                                                | success, latency, tool calls, tokens, validation attempts |
-| EV-009 | US-003         | Install, list, remove, and reinstall a local plugin fixture.          | Plugin registry changes are isolated to `IX_HOME`; catalog reflects each lifecycle step.                                             | success, latency, tool calls                              |
-| EV-010 | US-003         | Install a GitHub/package plugin fixture and request one of its types. | `write --types` resolves the installed type and prints usable paths.                                                                 | success, latency, tool calls, tokens                      |
-| EV-011 | US-002         | Request an unknown type in an authoring pack.                         | CLI reports the missing type clearly and exits non-zero.                                                                             | success, latency, tool calls                              |
-| EV-012 | US-004         | Validate multiple globs for a changed-file subset.                    | Quire validates only matching files and reports each invalid file with a path.                                                       | success, latency, tool calls, validation attempts         |
-| EV-013 | US-005         | Start matrix and to-plan workflows after accepted requirements.       | `ix-spec matrix` and `ix-spec to-plan` create runs that `ix-flow status` can inspect.                                                | success, latency, tool calls                              |
-| EV-014 | US-001, US-002 | Author a Phase 0 spec set from a settled conversation.                | Agent creates spec, use cases, matrix, plan, and eval matrix, then validates all spec files.                                         | success, latency, tool calls, tokens, context fetches     |
-| EV-015 | US-001, US-004 | Author with sibling development modules present.                      | Catalog prefers intended dev modules deterministically and validation uses matching contracts.                                       | success, latency, tool calls, tokens                      |
-| EV-016 | US-001, US-004 | Author into two sibling repos in one session.                         | Agent authors under `core/spec/` and `service/spec/` and validates both with one scoped run.                                         | success, latency, tool calls, tokens                      |
-| EV-017 | US-001, US-002 | Author a larger feature spec set with cross-references.               | Agent authors StR + 2 US + 3 FR + NFR + domain + 2 entity, fetching each contract once; all validate.                                | success, latency, tool calls, tokens, context fetches     |
-| EV-018 | US-001         | Author objects drawn from three different object modules.             | One `write` pack resolves `domain`/`api_endpoint`/`configuration` across modules; all validate.                                      | success, latency, tool calls, tokens                      |
-| EV-020 | US-003         | Install a module from GitHub via a subdir source and author its type. | Agent runs `ix-spec plugin install github:owner/repo//subdir@ref` (real network clone), then authors and validates one of its types. | success, latency, tool calls, tokens                      |
+| Eval   | Use Case       | Prompt                                                                | Expected Outcome                                                                                                                   | Required Measurements                                     |
+| ------ | -------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| EV-001 | US-001         | Create an FR plus `domain` and `entity` objects for a small feature.  | Agent uses one `quoin write` pack, creates all files, and Quire validates them.                                                    | success, latency, tool calls, tokens, validation attempts |
+| EV-002 | US-002         | Edit an existing FR after discovering its authoring contract.         | Agent uses `catalog show` or `write`, edits only needed sections, and validates changed files.                                     | success, latency, tool calls, tokens                      |
+| EV-003 | US-003         | Install a local fixture plugin and author one plugin-defined object.  | Plugin appears in catalog, `write --types` resolves it, created file validates.                                                    | success, latency, tool calls, tokens                      |
+| EV-004 | US-004         | Validate a mixed changed set of artifact and object files.            | Agent runs scoped Quire validation over the changed file set and reports failures clearly.                                         | success, latency, tool calls, validation attempts         |
+| EV-005 | US-005         | Start a review workflow for a spec directory and inspect status.      | `quoin` starts the workflow and `ix-flow status` reports the run and gate state.                                                   | success, latency, tool calls                              |
+| EV-006 | US-001, US-004 | Create multiple artifacts that share object templates.                | Agent fetches each type contract once, reuses it across files, and validates all changed files.                                    | success, context fetches, tokens, tool calls              |
+| EV-007 | US-002         | Use lowercase type names in an authoring request.                     | `quoin write . --types fr,domain` resolves canonical types and prints usable contracts.                                            | success, latency, tool calls                              |
+| EV-008 | US-004         | Repair a spec file after Quire reports validation diagnostics.        | Agent interprets diagnostics, edits the failing file, and reaches passing validation.                                              | success, latency, tool calls, tokens, validation attempts |
+| EV-009 | US-003         | Install, list, remove, and reinstall a local plugin fixture.          | Plugin registry changes are isolated to `IX_HOME`; catalog reflects each lifecycle step.                                           | success, latency, tool calls                              |
+| EV-010 | US-003         | Install a GitHub/package plugin fixture and request one of its types. | `write --types` resolves the installed type and prints usable paths.                                                               | success, latency, tool calls, tokens                      |
+| EV-011 | US-002         | Request an unknown type in an authoring pack.                         | CLI reports the missing type clearly and exits non-zero.                                                                           | success, latency, tool calls                              |
+| EV-012 | US-004         | Validate multiple globs for a changed-file subset.                    | Quire validates only matching files and reports each invalid file with a path.                                                     | success, latency, tool calls, validation attempts         |
+| EV-013 | US-005         | Start matrix and to-plan workflows after accepted requirements.       | `quoin matrix` and `quoin to-plan` create runs that `ix-flow status` can inspect.                                                  | success, latency, tool calls                              |
+| EV-014 | US-001, US-002 | Author a Phase 0 spec set from a settled conversation.                | Agent creates spec, use cases, matrix, plan, and eval matrix, then validates all spec files.                                       | success, latency, tool calls, tokens, context fetches     |
+| EV-015 | US-001, US-004 | Author with sibling development modules present.                      | Catalog prefers intended dev modules deterministically and validation uses matching contracts.                                     | success, latency, tool calls, tokens                      |
+| EV-016 | US-001, US-004 | Author into two sibling repos in one session.                         | Agent authors under `core/spec/` and `service/spec/` and validates both with one scoped run.                                       | success, latency, tool calls, tokens                      |
+| EV-017 | US-001, US-002 | Author a larger feature spec set with cross-references.               | Agent authors StR + 2 US + 3 FR + NFR + domain + 2 entity, fetching each contract once; all validate.                              | success, latency, tool calls, tokens, context fetches     |
+| EV-018 | US-001         | Author objects drawn from three different object modules.             | One `write` pack resolves `domain`/`api_endpoint`/`configuration` across modules; all validate.                                    | success, latency, tool calls, tokens                      |
+| EV-020 | US-003         | Install a module from GitHub via a subdir source and author its type. | Agent runs `quoin plugin install github:owner/repo//subdir@ref` (real network clone), then authors and validates one of its types. | success, latency, tool calls, tokens                      |
 
 > EV-016..EV-018 and EV-020 extend the original EV-001..EV-015 set (multi-repo,
 > larger spec-set, multi-module, real GitHub subdir install). They live alongside
@@ -116,7 +116,7 @@ The harness SHOULD store per-scenario fixtures for:
 
 ## Current Harness Inventory
 
-`ix-spec` includes an executable deterministic eval runner at `evals/run.mjs`.
+`quoin` includes an executable deterministic eval runner at `evals/run.mjs`.
 `pnpm run test:evals` builds the CLI, runs EV-001 through EV-015 in disposable
 repositories with isolated `IX_HOME` values, and writes the latest metrics to
 `evals/reports/latest.json`.

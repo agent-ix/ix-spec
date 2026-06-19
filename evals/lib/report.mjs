@@ -118,7 +118,7 @@ export function printSummaryTable(report) {
       k(a.edits.p50),
     ];
   });
-  // ctx=ix-spec write packs · val=quire validate runs · fail=validations rejected · edits
+  // ctx=quoin write packs · val=quire validate runs · fail=validations rejected · edits
   const header = [
     "ID",
     "OK",
@@ -152,7 +152,7 @@ export function printSummaryTable(report) {
     )} | tokens(in) p50 ${k(g.tokensIn.p50)} | tools p50 ${k(g.toolCalls.p50)} | validation rejections ${realFails} | model ${report.model}`,
   );
   console.log(
-    "cols: ctx=ix-spec write packs · val=quire validate runs · fail=validations rejected · edits=Write+Edit",
+    "cols: ctx=quoin write packs · val=quire validate runs · fail=validations rejected · edits=Write+Edit",
   );
 }
 

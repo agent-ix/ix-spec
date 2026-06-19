@@ -27,14 +27,14 @@ This is a measured eval: work efficiently and use the provided tooling.
 
 ## Tooling available in this shell
 
-- \`ix-spec\` — the spec-authoring CLI. Key commands:
-  - \`ix-spec write . --types <Type[,Type...]>\` prints an *authoring pack*: the
+- \`quoin\` — the spec-authoring CLI. Key commands:
+  - \`quoin write . --types <Type[,Type...]>\` prints an *authoring pack*: the
     skeleton + schema paths and the exact \`quire validate\` command for those types.
     Add \`--json\` for machine-readable output. Fetch each type's contract **once**
     and reuse it.
-  - \`ix-spec catalog list|show <Type>\` inspects available types.
-  - \`ix-spec plugin install <path:...|github:...>|list|remove <name>\`.
-  - \`ix-spec review|matrix|to-plan --target <dir> --id <id>\` launches a workflow.
+  - \`quoin catalog list|show <Type>\` inspects available types.
+  - \`quoin plugin install <path:...|github:...>|list|remove <name>\`.
+  - \`quoin review|matrix|to-plan --target <dir> --id <id>\` launches a workflow.
 - \`quire validate --scope . "<glob>"\` validates authored markdown (schemas are
   already provisioned via the environment).
 - \`ix-flow status <id>\` inspects a launched workflow run.
@@ -46,7 +46,7 @@ ${task}
 
 ## Rules
 
-- Use \`ix-spec write\` to obtain the authoring contract for each type **once**, then
+- Use \`quoin write\` to obtain the authoring contract for each type **once**, then
   author the file(s) under \`spec/\` from the skeleton(s).
 - When you believe the work is done, run \`quire validate --scope <repo> "<glob>"\` over
   the files you changed and ensure it passes (exit code 0).

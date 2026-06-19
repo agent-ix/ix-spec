@@ -3,7 +3,7 @@ id: US-005
 title: "Start a gated spec workflow"
 type: US
 relationships:
-  - target: "ix://agent-ix/ix-spec/FR-006"
+  - target: "ix://agent-ix/quoin/FR-006"
     type: "traces_to"
 ---
 
@@ -11,7 +11,7 @@ relationships:
 
 ## Story
 
-As a user running the spec lifecycle, I want `ix-spec` to launch the spec-domain
+As a user running the spec lifecycle, I want `quoin` to launch the spec-domain
 workflow and `ix-flow` to manage phase progression and human gates, so that the
 workflow engine stays separate from the catalog and authoring surface.
 
@@ -23,7 +23,7 @@ CLI and continues execution through `ix-flow`.
 The expected command shape is:
 
 ```bash
-ix-spec review --target spec/
+quoin review --target spec/
 ix-flow status <run-id>
 ix-flow resume <run-id>
 ```
@@ -34,4 +34,4 @@ artifact/object vocabulary inside the workflow definition.
 ## Dependencies
 
 - `ix-flow` is installed separately.
-- Workflow definitions are available to `ix-spec`.
+- Workflow definitions are available to `quoin`.

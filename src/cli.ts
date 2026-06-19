@@ -21,12 +21,12 @@ interface ParsedArgs {
   flags: Record<string, string | boolean | string[]>;
 }
 
-const USAGE = `ix-spec
+const USAGE = `quoin
 
 Spec workflow and catalog CLI for Agent IX.
 
-ix-spec starts spec-domain work. ix-flow resumes, advances, acknowledges gates,
-and inspects workflow runs created by ix-spec.
+quoin starts spec-domain work. ix-flow resumes, advances, acknowledges gates,
+and inspects workflow runs created by quoin.
 
 Default modules (installed on first use into ~/.ix/filament/modules):
   Artifact modules: spec-artifacts-iso, spec-artifacts-app, spec-artifacts-process
@@ -36,41 +36,41 @@ Default modules (installed on first use into ~/.ix/filament/modules):
   Workflows:        review, matrix, to-plan
 
 Usage:
-  ix-spec write <repo_dir> --types <type[,type...]>
-  ix-spec catalog list|validate
-  ix-spec catalog show <type>
-  ix-spec plugin install <path:...|github:...>
-  ix-spec plugin list
-  ix-spec plugin remove <name>
-  ix-spec review|matrix|to-plan [--target <ref>...]
+  quoin write <repo_dir> --types <type[,type...]>
+  quoin catalog list|validate
+  quoin catalog show <type>
+  quoin plugin install <path:...|github:...>
+  quoin plugin list
+  quoin plugin remove <name>
+  quoin review|matrix|to-plan [--target <ref>...]
 
 Global flags:
   --json
   --config-root <dir>     Defaults to ~/.ix
 
 Examples:
-  ix-spec catalog list
-  ix-spec catalog show FR
-  ix-spec plugin install github:agent-ix/spec-objects-custom
-  ix-spec write . --types FR,domain
+  quoin catalog list
+  quoin catalog show FR
+  quoin plugin install github:agent-ix/spec-objects-custom
+  quoin write . --types FR,domain
   ix-flow status <run-id>
 `;
 
-const WRITE_USAGE = `ix-spec write
+const WRITE_USAGE = `quoin write
 
 Build an authoring pack for spec files an agent is about to create or edit.
 
 Pass the target repository and the artifact/object types involved in the work.
-ix-spec resolves those types from the active catalog and returns the local
+quoin resolves those types from the active catalog and returns the local
 skeletons, schemas, module roots, and Quire validation command for the repo.
 
 Usage:
-  ix-spec write <repo_dir> --types <type[,type...]>
+  quoin write <repo_dir> --types <type[,type...]>
 
 Examples:
-  ix-spec write . --types FR
-  ix-spec write . --types FR,domain,entity
-  ix-spec write ../my-service --types fr,DOMAIN --json
+  quoin write . --types FR
+  quoin write . --types FR,domain,entity
+  quoin write ../my-service --types fr,DOMAIN --json
 
 Notes:
   - Type lookup is case-insensitive; FR and fr are the same type.
@@ -79,16 +79,16 @@ Notes:
   - Run the returned Quire command after editing spec files.
 `;
 
-const CATALOG_USAGE = `ix-spec catalog
+const CATALOG_USAGE = `quoin catalog
 
 Inspect the active artifact/object catalog.
 
 The catalog is assembled from, in order:
-  1. IX_SPEC_MODULE_PATHS
+  1. QUOIN_MODULE_PATHS
   2. modules installed under ~/.ix/filament/modules
 
 The default module set is installed there automatically on first catalog access,
-and updated by "ix-spec plugin install". The same directory is read by quire-rs.
+and updated by "quoin plugin install". The same directory is read by quire-rs.
 
 Default artifact modules:
   spec-artifacts-iso       FR, NFR, StR, US, IT, TC, AC, CON, Spec
@@ -103,17 +103,17 @@ Default object modules:
   spec-objects-security
 
 Usage:
-  ix-spec catalog list
-  ix-spec catalog show <type>
-  ix-spec catalog validate
+  quoin catalog list
+  quoin catalog show <type>
+  quoin catalog validate
 
 Examples:
-  ix-spec catalog show FR
-  ix-spec catalog show entity
-  ix-spec catalog validate --json
+  quoin catalog show FR
+  quoin catalog show entity
+  quoin catalog validate --json
 `;
 
-const PLUGIN_USAGE = `ix-spec plugin
+const PLUGIN_USAGE = `quoin plugin
 
 Install and manage user/community spec modules.
 
@@ -128,20 +128,20 @@ Supported install sources:
   github:<owner>/<repo>//<subdir>   Manifest in a monorepo subdirectory (@<ref> ok)
 
 Usage:
-  ix-spec plugin install <path:...|github:...>
-  ix-spec plugin list
-  ix-spec plugin remove <name>
+  quoin plugin install <path:...|github:...>
+  quoin plugin list
+  quoin plugin remove <name>
 
 Examples:
-  ix-spec plugin install path:../spec-objects-custom
-  ix-spec plugin install github:agent-ix/spec-objects-custom
-  ix-spec plugin install github:agent-ix/spec-objects-security//spec_objects_security@v0.1.1
-  ix-spec plugin list
+  quoin plugin install path:../spec-objects-custom
+  quoin plugin install github:agent-ix/spec-objects-custom
+  quoin plugin install github:agent-ix/spec-objects-security//spec_objects_security@v0.1.1
+  quoin plugin list
 `;
 
-const FLOW_USAGE = `ix-spec workflows
+const FLOW_USAGE = `quoin workflows
 
-Start bundled spec review/planning workflows. ix-spec creates the workflow run in ~/.ix/flows.
+Start bundled spec review/planning workflows. quoin creates the workflow run in ~/.ix/flows.
 Use ix-flow to inspect, resume, advance phases, and acknowledge human gates.
 
 Available workflow launchers:
@@ -150,11 +150,11 @@ Available workflow launchers:
   to-plan     Convert accepted requirements into an implementation plan
 
 Usage:
-  ix-spec review|matrix|to-plan [--target <ref>...]
+  quoin review|matrix|to-plan [--target <ref>...]
 
 Examples:
-  ix-spec review --target spec/
-  ix-spec matrix --target spec/
+  quoin review --target spec/
+  quoin matrix --target spec/
   ix-flow status <run-id>
   ix-flow resume <run-id>
 `;

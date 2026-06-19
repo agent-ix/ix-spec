@@ -1,10 +1,10 @@
 ---
 id: TM-001
-title: ix-spec Phase 0 Matrix
+title: quoin Phase 0 Matrix
 type: TestMatrix
 ---
 
-# ix-spec Phase 0 Matrix
+# quoin Phase 0 Matrix
 
 Tests live in `tests/` and run under vitest (`make test` → `vitest run`):
 `index.test.ts` covers the catalog/install/write library surface;
@@ -30,7 +30,7 @@ modules; `scripts.test.ts` covers the CLI help/version surface.
 | FR-008      | ✅ Covered | `spec/evals.md` (Matrix-002) maps EV-001…EV-015 to US-001…US-005                                                                                                                                                                                                                                                                         |
 | FR-009      | ✅ Covered | `index.test.ts` :: "ships the committed default module set" (asserts `default-modules.yaml` has 8 entries incl. `spec-objects-business`)                                                                                                                                                                                                 |
 | FR-010      | ✅ Covered | `plugins.test.ts` :: "parseSourceArg" covers `path:`/`github:`(±`@ref`)/`package:`→npm/bare-path; `cli.test.ts` covers `plugin install` dispatch. The npm-unsupported-at-resolve error is owned + tested by ts-plugin-kit.                                                                                                               |
-| FR-011      | ✅ Covered | `catalog.test.ts` :: `defaultModuleRoots` asserts the `IX_SPEC_MODULE_PATHS`-first ordering + the `~/.ix/filament/modules` installed dir. The quire-rs shared-store contract is cross-repo (asserted in quire-rs).                                                                                                                       |
+| FR-011      | ✅ Covered | `catalog.test.ts` :: `defaultModuleRoots` asserts the `QUOIN_MODULE_PATHS`-first ordering + the `~/.ix/filament/modules` installed dir. The quire-rs shared-store contract is cross-repo (asserted in quire-rs).                                                                                                                         |
 | NFR-001     | ⚠️ Review  | Workflow launchers reference catalog modules via `flows.ts`; no automated assertion. Verified by review.                                                                                                                                                                                                                                 |
 | NFR-002     | ✅ Covered | The agent-pty-driven harness (`evals/run.mjs`) drives the real agent and records the metrics (latency, tokens, tool calls, validation attempts, context fetches) **for real** from the Claude Code transcript; defined in `spec/evals.md`, implemented in `evals/`. Canaries EV-001/EV-008 verified live; full set via `make evals-all`. |
 | NFR-003     | ✅ Covered | `index.test.ts` :: "lazily installs the default module set…" runs `ensureDefaultModules` against path-source fixtures (no network); reconcile is `mode: "lazy"`. Re-run idempotence is exercised indirectly across tests sharing fixtures; a dedicated double-call assertion is not present (see findings).                              |

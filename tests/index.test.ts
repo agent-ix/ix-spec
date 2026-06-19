@@ -22,7 +22,7 @@ import {
 } from "../src";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 // Build a fixture module dir (manifest.yaml + skeletons + schemas) on disk.
@@ -86,7 +86,7 @@ function defaultSet(root: string): MarketplaceManifest {
   };
 }
 
-test("exports the ix-spec CLI entrypoint", () => {
+test("exports the quoin CLI entrypoint", () => {
   expect(typeof main).toBe("function");
 });
 

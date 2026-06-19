@@ -3,7 +3,7 @@ id: US-004
 title: "Validate changed spec files"
 type: US
 relationships:
-  - target: "ix://agent-ix/ix-spec/FR-007"
+  - target: "ix://agent-ix/quoin/FR-007"
     type: "traces_to"
 ---
 

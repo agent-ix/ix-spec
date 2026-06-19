@@ -1,10 +1,10 @@
 ---
 id: REV-001
-title: ix-spec Phase 0 Review
+title: quoin Phase 0 Review
 type: Review
 ---
 
-# ix-spec Phase 0 Review
+# quoin Phase 0 Review
 
 ## Scope
 
@@ -23,11 +23,11 @@ and NFR-003 added; use cases and test matrix re-traced to the current code and
 - FR-009 "pinned to a tag" softened: `default-modules.yaml` `spec-artifacts-app`
   has no `ref:` (pins to default branch). FR now allows a default-branch pin
   where no release tag exists.
-- FR-010 / US-003 corrected: ix-spec only _maps_ the source argument and hands
+- FR-010 / US-003 corrected: quoin only _maps_ the source argument and hands
   off to ts-plugin-kit; the unsupported-`package:`/npm error is thrown by
-  ts-plugin-kit's `resolveSource` at install time, not by ix-spec. Wording now
+  ts-plugin-kit's `resolveSource` at install time, not by quoin. Wording now
   attributes the error correctly.
-- FR-011 ordering (`IX_SPEC_MODULE_PATHS` then `~/.ix/filament/modules`) matches
+- FR-011 ordering (`QUOIN_MODULE_PATHS` then `~/.ix/filament/modules`) matches
   `src/catalog.ts:defaultModuleRoots`; shared store read by quire-rs documented.
 - US-001 now also `traces_to` FR-001 (lazy default-module install is a stated
   dependency of the authoring flow).

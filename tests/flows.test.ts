@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { specFlowNames, startSpecFlow } from "../src/flows";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 // Lay out a packaged-style workflow skill:

@@ -1,4 +1,4 @@
-# ix-spec
+# quoin
 
 ## Commands
 

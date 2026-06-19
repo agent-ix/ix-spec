@@ -9,9 +9,9 @@ import { existsSync, readFileSync } from "node:fs";
 export const SENTINEL_COMPLETE = "<<<EVAL-COMPLETE>>>";
 export const SENTINEL_FAILED = "<<<EVAL-FAILED>>>";
 
-const WRITE_RE = /\bix-spec\b[^\n]*?\bwrite\b/;
+const WRITE_RE = /\bquoin\b[^\n]*?\bwrite\b/;
 const VALIDATE_RE = /\bquire\b[^\n]*?\bvalidate\b/;
-const FLOW_RE = /(\bix-spec\b[^\n]*?\b(review|matrix|to-plan)\b)|(\bix-flow\b)/;
+const FLOW_RE = /(\bquoin\b[^\n]*?\b(review|matrix|to-plan)\b)|(\bix-flow\b)/;
 const TYPES_RE = /--types[=\s]+([^\s'"]+)/g;
 
 /** Read + JSON-parse a transcript, tolerating a trailing partial line. */

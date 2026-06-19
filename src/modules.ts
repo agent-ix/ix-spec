@@ -16,7 +16,7 @@ function packageRoot(): string {
   return dirname(dirname(fileURLToPath(import.meta.url)));
 }
 
-/** The committed default module set shipped with ix-spec. */
+/** The committed default module set shipped with quoin. */
 export function defaultModulesManifest(): MarketplaceManifest {
   const path = join(packageRoot(), "default-modules.yaml");
   return validateMarketplaceManifest(parseYaml(readFileSync(path, "utf8")));

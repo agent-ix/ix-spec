@@ -1,16 +1,16 @@
 ---
 type: master-requirements
-name: ix-spec
+name: quoin
 org: agent-ix
 component_type: cli
-title: "ix-spec Phase 0 Spec"
+title: "quoin Phase 0 Spec"
 ---
 
 # Master Requirements Specification
 
 ## Purpose
 
-`ix-spec` SHALL provide a standalone installable CLI for spec-domain catalog,
+`quoin` SHALL provide a standalone installable CLI for spec-domain catalog,
 plugin, authoring-contract, Quire, and review/planning flow operations without
 requiring the broader `ix` umbrella CLI.
 
@@ -18,7 +18,7 @@ requiring the broader `ix` umbrella CLI.
 
 ### In Scope
 
-- The `ix-spec` CLI surface: catalog list/show/validate, `write` authoring
+- The `quoin` CLI surface: catalog list/show/validate, `write` authoring
   packs, plugin install, and the launch of review/matrix/to-plan workflows.
 - The committed default Filament module set and its lazy reconciliation into
   `~/.ix/filament/modules`, plus user/community plugin install records in
@@ -29,11 +29,11 @@ requiring the broader `ix` umbrella CLI.
 - Workflow lifecycle control (resume/advance/gate/status), which `ix-flow`
   owns after launch.
 - Frontmatter-driven validation of authored spec files, which `quire` owns;
-  `ix-spec` authors, quire validates.
+  `quoin` authors, quire validates.
 
 ## System Overview
 
-`ix-spec` is a standalone CLI that assembles a Filament catalog from module
+`quoin` is a standalone CLI that assembles a Filament catalog from module
 roots, authors artifact/object files from catalog skeletons, installs
 user/community modules through `@agent-ix/ts-plugin-kit`, and hands lifecycle
 control of review/matrix/planning workflows to `ix-flow`. It does not vendor the
@@ -63,7 +63,7 @@ Use Cases and authored under `spec/usecase/`.
 | FR-008  | The spec SHALL define use-case-matched eval scenarios for authoring, validation, plugins, and workflows.                                                                                                                                                                                                                           | Test         |
 | FR-009  | The CLI SHALL ship `default-modules.yaml` as the committed, canonical-ready default module set, declaring each module as a `git-subdir` source pinned to the same tag its Python wheel is built from where a release tag exists (a module without a release tag MAY pin to its default branch).                                    | Test         |
 | FR-010  | The CLI SHALL map `path:`, `github:`, and `package:` plugin-install source arguments to typed `ts-plugin-kit` sources (`path`/`github`/`npm`), and SHALL hand them to `ts-plugin-kit` for install; the `package:`/npm source is not yet supported and `ts-plugin-kit` rejects it with an unsupported-source error at install time. | Test         |
-| FR-011  | The CLI SHALL assemble the catalog from module roots in order: `IX_SPEC_MODULE_PATHS` (colon-separated), then modules installed under `~/.ix/filament/modules`; the same directory is the shared module store read by quire-rs.                                                                                                    | Test         |
+| FR-011  | The CLI SHALL assemble the catalog from module roots in order: `QUOIN_MODULE_PATHS` (colon-separated), then modules installed under `~/.ix/filament/modules`; the same directory is the shared module store read by quire-rs.                                                                                                      | Test         |
 | NFR-001 | Workflow definitions SHOULD avoid redefining doc/object type vocabularies.                                                                                                                                                                                                                                                         | Review       |
 | NFR-002 | Authoring evals SHOULD record latency, token usage, tool-call count, validation attempts, and context fetches.                                                                                                                                                                                                                     | Review       |
 | NFR-003 | Default-module reconciliation SHALL be idempotent and perform no network/git work once each module is installed and pinned, so repeated catalog/write invocations stay offline-safe.                                                                                                                                               | Test         |
@@ -86,7 +86,7 @@ tool-call count, validation attempts, and repeated context fetches.
 
 ## Module Store
 
-`ix-spec` does not vendor the default `spec-artifacts-*` / `spec-objects-*`
+`quoin` does not vendor the default `spec-artifacts-*` / `spec-objects-*`
 modules. The committed `default-modules.yaml` declares the default set as pinned
 `git-subdir` sources; `ensureDefaultModules()` lazily reconciles that set into
 `~/.ix/filament/modules/<name>/` on first catalog access (triggered from

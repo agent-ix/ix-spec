@@ -38,8 +38,8 @@ export async function runAgent(scenario, ctx, opts) {
   const overrides = {
     IX_HOME: ctx.ixHome,
     IX_SCHEMA_PATH: modulesDir, // quire scoped-mode reads this for installed modules
-    PATH: binPaths(shimPath), // pins shim ix-spec + quire>=0.2.4
-    ...extraEnv, // per-scenario overrides (e.g. IX_SPEC_MODULE_PATHS for dev modules)
+    PATH: binPaths(shimPath), // pins shim quoin + quire>=0.2.4
+    ...extraEnv, // per-scenario overrides (e.g. QUOIN_MODULE_PATHS for dev modules)
   };
   const claudeArgs = [
     "--session-id",

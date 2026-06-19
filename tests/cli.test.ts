@@ -7,7 +7,7 @@ import { stringify as stringifyYaml } from "yaml";
 // The CLI's catalog/write handlers call ensureDefaultModules() internally with
 // the committed default-modules.yaml, whose git-subdir sources would hit the
 // network. Stub it to a no-op; tests supply the catalog hermetically through
-// IX_SPEC_MODULE_PATHS (read by loadCatalog) instead.
+// QUOIN_MODULE_PATHS (read by loadCatalog) instead.
 vi.mock("../src/modules", () => ({
   ensureDefaultModules: () => {},
   defaultModulesManifest: () => ({ schemaVersion: 1, entries: [] }),
@@ -17,7 +17,7 @@ vi.mock("../src/modules", () => ({
 import { main, packageVersion } from "../src/cli";
 
 function tmp(prefix: string): string {
-  return mkdtempSync(join(tmpdir(), `ix-spec-${prefix}-`));
+  return mkdtempSync(join(tmpdir(), `quoin-${prefix}-`));
 }
 
 // ---- console capture helpers -------------------------------------------------
@@ -81,15 +81,15 @@ function businessModule(root: string): string {
   );
 }
 
-// Two fixture module roots joined into an IX_SPEC_MODULE_PATHS value.
+// Two fixture module roots joined into an QUOIN_MODULE_PATHS value.
 function modulePaths(...roots: string[]): string {
   return roots.join(":");
 }
 
-// A populated catalog: returns the home dir and sets IX_SPEC_MODULE_PATHS.
+// A populated catalog: returns the home dir and sets QUOIN_MODULE_PATHS.
 function populatedCatalog(): string {
   const src = tmp("src");
-  process.env.IX_SPEC_MODULE_PATHS = modulePaths(
+  process.env.QUOIN_MODULE_PATHS = modulePaths(
     isoModule(src),
     businessModule(src),
   );
@@ -102,7 +102,7 @@ function duplicateCatalog(): string {
   const extra = makeModule(src, "spec-objects-extra", {
     object_types: [{ name: "domain" }],
   });
-  process.env.IX_SPEC_MODULE_PATHS = modulePaths(businessModule(src), extra);
+  process.env.QUOIN_MODULE_PATHS = modulePaths(businessModule(src), extra);
   return tmp("home");
 }
 
@@ -112,7 +112,7 @@ const savedEnv = {
   IX_HOME: process.env.IX_HOME,
   PATH: process.env.PATH,
   WF_ROOT: process.env.IX_SPEC_WORKFLOWS_ROOT,
-  MODULE_PATHS: process.env.IX_SPEC_MODULE_PATHS,
+  MODULE_PATHS: process.env.QUOIN_MODULE_PATHS,
 };
 let savedExitCode: number | undefined;
 
@@ -127,8 +127,8 @@ afterEach(() => {
   if (savedEnv.WF_ROOT === undefined) delete process.env.IX_SPEC_WORKFLOWS_ROOT;
   else process.env.IX_SPEC_WORKFLOWS_ROOT = savedEnv.WF_ROOT;
   if (savedEnv.MODULE_PATHS === undefined)
-    delete process.env.IX_SPEC_MODULE_PATHS;
-  else process.env.IX_SPEC_MODULE_PATHS = savedEnv.MODULE_PATHS;
+    delete process.env.QUOIN_MODULE_PATHS;
+  else process.env.QUOIN_MODULE_PATHS = savedEnv.MODULE_PATHS;
   process.exitCode = savedExitCode;
 });
 
@@ -237,7 +237,7 @@ describe("runCatalog", () => {
         object_types: [{ name: "thing" }],
       }),
     );
-    process.env.IX_SPEC_MODULE_PATHS = noVersion;
+    process.env.QUOIN_MODULE_PATHS = noVersion;
     process.env.IX_HOME = tmp("home");
     const c = captureLog();
     try {

@@ -3,11 +3,11 @@ id: US-001
 title: "Author a root artifact with supporting objects"
 type: US
 relationships:
-  - target: "ix://agent-ix/ix-spec/FR-001"
+  - target: "ix://agent-ix/quoin/FR-001"
     type: "traces_to"
-  - target: "ix://agent-ix/ix-spec/FR-004"
+  - target: "ix://agent-ix/quoin/FR-004"
     type: "traces_to"
-  - target: "ix://agent-ix/ix-spec/FR-005"
+  - target: "ix://agent-ix/quoin/FR-005"
     type: "traces_to"
 ---
 
@@ -28,7 +28,7 @@ the default artifact and object templates installed under
 The expected command shape is:
 
 ```bash
-ix-spec write . --types FR,domain,entity
+quoin write . --types FR,domain,entity
 ```
 
 The output should include enough local paths and validation guidance for the

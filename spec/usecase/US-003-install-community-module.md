@@ -3,11 +3,11 @@ id: US-003
 title: "Install and use a community spec module"
 type: US
 relationships:
-  - target: "ix://agent-ix/ix-spec/FR-002"
+  - target: "ix://agent-ix/quoin/FR-002"
     type: "traces_to"
-  - target: "ix://agent-ix/ix-spec/FR-003"
+  - target: "ix://agent-ix/quoin/FR-003"
     type: "traces_to"
-  - target: "ix://agent-ix/ix-spec/FR-004"
+  - target: "ix://agent-ix/quoin/FR-004"
     type: "traces_to"
 ---
 
@@ -29,13 +29,13 @@ from a local path, GitHub repository, or package.
 The expected command shape is:
 
 ```bash
-ix-spec plugin install github:agent-ix/spec-objects-custom
-ix-spec catalog list
-ix-spec write . --types custom-object
+quoin plugin install github:agent-ix/spec-objects-custom
+quoin catalog list
+quoin write . --types custom-object
 ```
 
 The installed module should participate in the same authoring and validation
-flow as the default modules. `ix-spec` maps the source argument to a typed
+flow as the default modules. `quoin` maps the source argument to a typed
 `ts-plugin-kit` source and hands it off; the `package:`/npm source is not yet
 supported and is rejected by `ts-plugin-kit` with an unsupported-source error at
 install time.
@@ -44,6 +44,6 @@ install time.
 
 - Plugin install records are stored in `~/.ix/filament/registry.json`; modules
   are materialized under `~/.ix/filament/modules`.
-- Catalog loading merges `IX_SPEC_MODULE_PATHS` overrides with installed modules
+- Catalog loading merges `QUOIN_MODULE_PATHS` overrides with installed modules
   deterministically (env paths first).
 - Install/registry mechanics are delegated to `@agent-ix/ts-plugin-kit`.

@@ -1,6 +1,6 @@
-# ix-spec agent-pty eval harness
+# quoin agent-pty eval harness
 
-These evals measure whether the **real agent (Claude) can use ix-spec efficiently** —
+These evals measure whether the **real agent (Claude) can use quoin efficiently** —
 token usage, tool-call counts, validation retries, repeated context fetches. They are
 **not** unit tests (those cover mechanical correctness at 100% coverage in `src/`).
 The harness drives the real `claude` agent through this CLI + the `/spec-*` skills via
@@ -26,7 +26,7 @@ node evals/run.mjs --rebuild   # re-derive metrics + table from the last run's t
 
 Every run auto-writes `evals/reports/latest.json` (full per-scenario metrics +
 p50/p95 aggregates) and prints a summary table. Table columns:
-`ctx` = `ix-spec write` packs (context fetches), `val` = `quire validate` runs,
+`ctx` = `quoin write` packs (context fetches), `val` = `quire validate` runs,
 `fail` = validations actually **rejected**, `edits` = Write+Edit. `--rebuild`
 regenerates both from existing transcripts after a metrics-code change.
 
@@ -51,7 +51,7 @@ bypassPermissions --model <m> --add-dir <repo>` under tmux, drives the startup
    `echo`) in the transcript.
 4. **Metrics.** `lib/metrics.mjs` parses the transcript JSONL: token usage
    (input/output/cache), tool calls + breakdown, and classified counts:
-   `contextFetches` (= `ix-spec write`), `validationAttempts` (total `quire validate`
+   `contextFetches` (= `quoin write`), `validationAttempts` (total `quire validate`
    runs) vs `validationFailures` (runs actually rejected — non-zero / "failed
    structural validation"; the real "didn't pass first try" signal, distinct from a
    validate-then-confirm habit), `flowOps`, `skillInvocations`, `edits`.
@@ -69,7 +69,7 @@ bypassPermissions --model <m> --add-dir <repo>` under tmux, drives the startup
   agent via a shim dir.
 - `agent-pty` built at `../agent-pty/dist/` (dynamically imported; **not** an npm dep,
   so the lockfile is untouched).
-- `ix-flow` on PATH (for the workflow scenarios), `ix-spec` built (`make build`).
+- `ix-flow` on PATH (for the workflow scenarios), `quoin` built (`make build`).
 - Network/GitHub auth **once** to build the module seed (then offline).
 
 `evals/` is dev-only and is **not** published in the npm package.

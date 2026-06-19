@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// ix-spec agent-pty eval harness.
+// quoin agent-pty eval harness.
 //
 // Drives the REAL `claude` agent (via agent-pty) through the spec-authoring CLI +
 // skills for each selected scenario, captures REAL metrics from the Claude Code

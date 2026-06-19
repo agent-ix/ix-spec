@@ -37,7 +37,7 @@ export function transcriptPathFor(cwd, sessionId) {
  * @returns {{ id, work, repo, cwd, scope, ixHome, modulesDir, sessionId, transcriptPath, data, cleanup }}
  */
 export function makeScenarioWorkspace(id) {
-  const work = mkdtempSync(join(tmpdir(), `ix-spec-${id.toLowerCase()}-`));
+  const work = mkdtempSync(join(tmpdir(), `quoin-${id.toLowerCase()}-`));
   const repo = join(work, "repo");
   const ixHome = join(work, "ix-home");
   mkdirSync(join(repo, "spec"), { recursive: true });

@@ -30,7 +30,7 @@ export function installOptions(home: string): InstallOptions {
   };
 }
 
-/** Map an ix-spec CLI source argument to a typed ts-plugin-kit {@link Source}. */
+/** Map a quoin CLI source argument to a typed ts-plugin-kit {@link Source}. */
 export function parseSourceArg(arg: string): Source {
   if (arg.startsWith("path:")) return { type: "path", path: arg.slice(5) };
   if (arg.startsWith("github:")) {

@@ -1,6 +1,6 @@
 ---
 name: specify
-description: Create or update spec files using ix-spec catalog authoring packs and Quire validation.
+description: Create or update spec files using quoin catalog authoring packs and Quire validation.
 ---
 
 # Specify
@@ -12,7 +12,7 @@ spec artifacts and supporting spec objects.
 
 1. Identify the repository that owns the spec files.
 2. Identify every artifact and object type that will be created or edited.
-3. Run `ix-spec write <repo_dir> --types <type[,type...]>` once for the full set of types.
+3. Run `quoin write <repo_dir> --types <type[,type...]>` once for the full set of types.
 4. Use the returned skeletons, schemas, module roots, and examples as the authoring contract.
 5. Author or edit the files directly in the target repo.
 6. Run `quire validate <glob> [glob2 ...]` over the changed spec scope.
@@ -26,9 +26,9 @@ same templates.
 Examples:
 
 ```bash
-ix-spec write . --types FR,domain,entity
-ix-spec write ../service --types StR,US,FR,NFR
-ix-spec write . --types process,configuration,value_object
+quoin write . --types FR,domain,entity
+quoin write ../service --types StR,US,FR,NFR
+quoin write . --types process,configuration,value_object
 ```
 
 Type lookup is catalog-driven and case-insensitive. Types may come from bundled
