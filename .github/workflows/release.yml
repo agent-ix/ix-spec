@@ -1,0 +1,17 @@
+name: Release
+
+on:
+  push:
+    tags: ["*.*.*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # OIDC token for npm Trusted Publishing (no-op for token-based GH Packages)
+
+jobs:
+  ci:
+    uses: agent-ix/nodejs-actions/.github/workflows/release.yml@main
+    with:
+      npm_registry: https://registry.npmjs.org
+      trusted_publish: true
