@@ -64,18 +64,18 @@ importers:
 packages:
 
   '@agent-ix/ix-cli-core@0.10.2':
-    resolution: {integrity: sha512-eAOnCy2zDnDr0d4jc2jy/MdWqMfI0VCHwJ34U9fOk6JC1FIHDPJRdchhgBC53mvUQCqs/OkQ1eW/ocHjWGUNhw==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-cli-core/0.10.2/ccfda2518091adaec48f8e04a31cfb91e7517e5c}
+    resolution: {integrity: sha512-eAOnCy2zDnDr0d4jc2jy/MdWqMfI0VCHwJ34U9fOk6JC1FIHDPJRdchhgBC53mvUQCqs/OkQ1eW/ocHjWGUNhw==}
     peerDependencies:
       '@oclif/core': '>=4.11.4'
 
   '@agent-ix/ix-ui-cli@0.4.7':
-    resolution: {integrity: sha512-khznHNJmOof3rcvToWo0lbZCn61Zr7CHf3HO4qHguOgMLeqLMv+06HZIpoDzFOJDWv/RtY8lEVGQfaHqdqxfGg==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-ui-cli/0.4.7/14fd75ed8e98e0663eee4bfbdb532751648e2749}
+    resolution: {integrity: sha512-khznHNJmOof3rcvToWo0lbZCn61Zr7CHf3HO4qHguOgMLeqLMv+06HZIpoDzFOJDWv/RtY8lEVGQfaHqdqxfGg==}
 
   '@agent-ix/ix-ui-semantic@0.4.7':
-    resolution: {integrity: sha512-DmN/YRB5w1npuF5XthPPP1VyxwwKDbn/rc7XTYM7MOYhvMArcEUQ/M/hTZx9Ma+Nyow27qm9QoqRV15lmaQwgQ==, tarball: https://npm.pkg.github.com/download/@agent-ix/ix-ui-semantic/0.4.7/8ea6adf016c2a18012e16a497d1393b482704546}
+    resolution: {integrity: sha512-DmN/YRB5w1npuF5XthPPP1VyxwwKDbn/rc7XTYM7MOYhvMArcEUQ/M/hTZx9Ma+Nyow27qm9QoqRV15lmaQwgQ==}
 
   '@agent-ix/ts-plugin-kit@0.1.1':
-    resolution: {integrity: sha512-+lDtWPRqfb6/xs5H85lNrBLuQAitYA/K+GuFLgLYKeyY8qbBiliym2PrXxNRBKw+/a2VTRgM1mk788ALVB2zdA==, tarball: https://npm.pkg.github.com/download/@agent-ix/ts-plugin-kit/0.1.1/687ffd2e85cfccbc50fe655a37ab016038878865}
+    resolution: {integrity: sha512-+lDtWPRqfb6/xs5H85lNrBLuQAitYA/K+GuFLgLYKeyY8qbBiliym2PrXxNRBKw+/a2VTRgM1mk788ALVB2zdA==}
 
   '@alcalzone/ansi-tokenize@0.3.0':
     resolution: {integrity: sha512-p+CMKJ93HFmLkjXKlXiVGlMQEuRb6H0MokBSwUsX+S6BRX8eV5naFZpQJFfJHjRZY0Hmnqy1/r6UWl3x+19zYA==}
