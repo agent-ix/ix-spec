@@ -54,8 +54,8 @@
     "test-results:warnings": "./node_modules/.bin/jest-results warnings"
   },
   "dependencies": {
-    "@agent-ix/ix-cli-core": "0.10.2",
-    "@agent-ix/ts-plugin-kit": "^0.1.1",
+    "@agent-ix/ix-cli-core": ">=0.10.4",
+    "@agent-ix/ts-plugin-kit": ">=0.1.3",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
