@@ -91,15 +91,17 @@ claude plugin marketplace add "$MARKET_SRC" || echo "   (marketplace add reporte
 echo "   claude plugin install $PLUGIN@$MARKETPLACE"
 claude plugin install "$PLUGIN@$MARKETPLACE" || echo "   (plugin install reported non-zero — see assertions)"
 
-# Optional live session: capture the system/init event for the load check.
+# Capture the session init event. It lists loaded plugins[], plugin_errors, and
+# every skill exposed as a slash command (e.g. "ix-flow:ix-flow") — the
+# user-visible "installed AND usable" surface. init is emitted before
+# authentication, so this works WITHOUT credentials and gives CI the same
+# deterministic signal (the turn itself may then fail auth; we only need init).
 STREAM=/tmp/init.stream.jsonl
 : > "$STREAM"
-if [ "$LIVE" = 1 ]; then
-  timeout 180 claude -p "Reply with the single word: ok" \
-    --output-format stream-json --verbose \
-    </dev/null >"$STREAM" 2>/tmp/claude.err \
-    || echo "   note: claude print-turn exited non-zero (plugin install already ran above)"
-fi
+timeout 180 claude -p "Reply with the single word: ok" \
+  --output-format stream-json --verbose \
+  </dev/null >"$STREAM" 2>/tmp/claude.err \
+  || echo "   note: claude print-turn exited non-zero (init event still captured for assertions)"
 
 # ======================================================================
 /smoke/assert.sh "$STREAM"
