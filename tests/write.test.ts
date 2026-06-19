@@ -115,7 +115,7 @@ describe("createAuthoringPack", () => {
 
   test("quotes a repo path containing a space (shellQuote quoting branch)", () => {
     const { catalog } = buildCatalog();
-    const parent = mkdtempSync(join(tmpdir(), "ix spec repo "));
+    const parent = mkdtempSync(join(tmpdir(), "quoin repo dir "));
     const pack = createAuthoringPack(catalog, parent, ["FR"]);
     expect(pack.validation.scope).toBe(parent);
     expect(pack.validation.command).toContain(`'${parent}'`);

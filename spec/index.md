@@ -1,11 +1,11 @@
 ---
 type: index
-title: "Ix Spec Specification"
+title: "Quoin Specification"
 description: "Index of artifacts in this directory."
 okf_version: "0.1"
 ---
 
-# Ix Spec Specification
+# Quoin Specification
 
 ## Contents
 

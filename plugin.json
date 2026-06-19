@@ -1,6 +1,6 @@
 {
   "name": "quoin",
   "version": "0.1.0",
-  "description": "Agent IX spec authoring, review, matrix, and planning skills.",
+  "description": "Spec authoring, review, matrix, and planning skills for Agent IX.",
   "skills": "./skills"
 }

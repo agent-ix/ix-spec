@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="logo.png" alt="IX Spec" width="100%" />
+  <img src="logo.png" alt="Quoin" width="100%" />
 </p>
 
-# IX Spec
+# Quoin
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20us-5865F2?logo=discord&logoColor=white)](https://discord.gg/6qsdhSPE)
 [![ISO/IEC/IEEE 29148](https://img.shields.io/badge/ISO%2FIEC%2FIEEE-29148%20aligned-0052CC)](https://www.iso.org/standard/72089.html)
