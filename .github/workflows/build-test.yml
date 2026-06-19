@@ -5,8 +5,13 @@ on:
     tags: ["*.*.*"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write   # OIDC token for npm Trusted Publishing
+
 jobs:
   ci:
     uses: agent-ix/nodejs-actions/.github/workflows/build-test.yml@main
-    secrets:
-      NPM_REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+    with:
+      npm_registry: https://registry.npmjs.org
+      trusted_publish: true
