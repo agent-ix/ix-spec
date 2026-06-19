@@ -17,8 +17,6 @@ workflows agents need to write and validate specs directly as Markdown.
 
 ## What's included
 
-### Quire modules
-
 The default module set defines the spec archetypes and domain-object vocabulary.
 
 **Artifact archetypes** — the document types you author:
@@ -29,7 +27,7 @@ The default module set defines the spec archetypes and domain-object vocabulary.
 | [spec-artifacts-app](https://github.com/agent-ix/spec-artifacts-app)         | `ApplicationSpec`, `MasterRequirements`                              |
 | [spec-artifacts-process](https://github.com/agent-ix/spec-artifacts-process) | `ADR`, `Plan`, `Task`, `Review`, `Finding`, `TestMatrix`, `Standard` |
 
-**Domain objects** — the objects you reference inside specs:
+**Domain objects** — prefab templates for common objects
 
 | Module                                                                             | Objects                                                                                                                                                                                                                                |
 | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -84,10 +82,7 @@ npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest
 ```
 
 That registers quoin's spec-authoring skills and workflows so you can drive them by asking
-the agent. (To also get the `/ix-flow` runner skills, repeat step 2 for `agent-ix/ix-flow`.)
-
-> A clean-room, repeatable check of this exact install path lives in [`smoke/`](./smoke) —
-> run `make install-smoke`.
+the agent.
 
 ## Usage
 
