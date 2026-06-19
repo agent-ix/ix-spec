@@ -17,7 +17,7 @@ PKG_VERSION=0.2.1 ./smoke/run.sh         # pin for byte-for-byte reproducibility
 - `PLUGIN_SOURCE=local` installs the plugin from the mounted checkout — validates
   the manifest in *this* revision before it reaches the default branch. CI uses
   this (see `.github/workflows/install-smoke.yml`) so a PR's own changes are
-  tested. No credentials needed; the live-load check is simply skipped.
+  tested.
 
 ## What it does
 
@@ -27,22 +27,27 @@ override** (exactly an outside user's machine):
 1. **Stage 1 — public npm.** `npm install -g @agent-ix/quoin` from
    `registry.npmjs.org` and runs the `quoin` bin. Proves the published CLI and
    its full dependency tree resolve from public npm with zero auth.
-2. **Stage 2 — Claude plugin.** Configures the `/plugin marketplace add
-   agent-ix/quoin` + `/plugin install quoin@quoin` flow non-interactively (via
-   `~/.claude/settings.json` + `CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1`) and lets
-   Claude Code clone + install the plugin from the public GitHub repo.
-3. **Assert.** Verifies the plugin cloned and every skill/workflow in
-   [`expected.txt`](./expected.txt) is present (14 skills + 3 workflows). If the
-   host's Claude subscription credential is available it also confirms the live
-   session loaded the plugin.
+2. **Stage 2 — Claude plugin.** `claude plugin marketplace add` + `plugin
+   install` (the CLI form of the README's `/plugin` steps) clone and install the
+   plugin.
+3. **Assert.** For every skill/workflow in [`expected.txt`](./expected.txt) (14
+   skills + 3 workflows): the file is present in the plugin cache **and** — the
+   part that matters to a user — the skill is exposed as a usable `/command`.
+   That comes from Claude's `system/init` event (loaded `plugins[]`,
+   `plugin_errors`, and skills as `slash_commands`), which Claude emits **before
+   authentication**, so the whole test is deterministic and needs **no
+   credentials**. A skill present on disk but missing from the command list is a
+   FAIL — the "installed but I don't see it in Claude" failure mode.
 
 ## Auth
 
-`run.sh` bind-mounts `~/.claude/.credentials.json` **read-only**; the token is
-never read or extracted, so the live load-check runs on your subscription with
-no API key. Marketplace cloning is plain git on a public repo, so the
-"skills present" assertions pass even without credentials — only the bonus
-live-load confirmation needs them.
+None required. The plugin install is plain git and the slash-command check reads
+the pre-auth init event, so everything runs without an Anthropic API key or a
+subscription token — which is what makes it CI-friendly.
+
+(`run.sh` will bind-mount `~/.claude/.credentials.json` read-only if present, so
+the `claude -p` probe can also complete a real turn on your subscription; the
+token is never read or extracted. It is optional and changes no assertions.)
 
 This complements the `agent-pty` evals (`make evals`), which measure a real
 agent's token/tool/latency behavior; this harness only verifies installability.
