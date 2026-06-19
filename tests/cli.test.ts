@@ -389,6 +389,21 @@ describe("runPlugin", () => {
     ).rejects.toThrow("plugin install requires <source>");
   });
 
+  test("ensure-defaults runs the installer and reports the registry", async () => {
+    const home = tmp("home");
+    const c = captureLog();
+    try {
+      // ensureDefaultModules is mocked to a no-op, so this exercises the
+      // command dispatch + output contract without hitting the network.
+      await main(["plugin", "ensure-defaults", "--config-root", home]);
+    } finally {
+      c.restore();
+    }
+    const out = JSON.parse(c.lines.join("\n"));
+    expect(out.ensured).toBe(true);
+    expect(Array.isArray(out.plugins)).toBe(true);
+  });
+
   test("remove deletes a plugin and prints confirmation", async () => {
     const home = tmp("home");
     const mod = businessModule(tmp("plugin-src"));

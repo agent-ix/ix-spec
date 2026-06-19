@@ -178,7 +178,12 @@ test("ships the committed default module set", () => {
 
 test("ships claude plugin skills without artifact-specific write skills", () => {
   const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-  expect(existsSync(join(repoRoot, "plugin.json"))).toBe(true);
+  // The Claude plugin manifest moved to the canonical `.claude-plugin/`
+  // location in 2bd928f (alongside marketplace.json); the assertion had
+  // lagged at the old repo-root path.
+  expect(existsSync(join(repoRoot, ".claude-plugin", "plugin.json"))).toBe(
+    true,
+  );
   expect(existsSync(join(repoRoot, "skills", "specify", "SKILL.md"))).toBe(
     true,
   );

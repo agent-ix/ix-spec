@@ -131,12 +131,14 @@ Usage:
   quoin plugin install <path:...|github:...>
   quoin plugin list
   quoin plugin remove <name>
+  quoin plugin ensure-defaults
 
 Examples:
   quoin plugin install path:../spec-objects-custom
   quoin plugin install github:agent-ix/spec-objects-custom
   quoin plugin install github:agent-ix/spec-objects-security//spec_objects_security@v0.1.1
   quoin plugin list
+  quoin plugin ensure-defaults
 `;
 
 const FLOW_USAGE = `quoin workflows
@@ -309,6 +311,20 @@ function runPlugin(parsed: ParsedArgs): void {
       console.log(`removed ${name}`);
       return;
     }
+    case "ensure-defaults":
+      // Idempotently materialize the default module set into
+      // ~/.ix/filament/modules. Exposed as an explicit command so other tools
+      // (notably `quire validate`) can lazy-install the defaults by shelling
+      // out here, rather than relying on the side effect of `catalog list`.
+      ensureDefaultModules();
+      console.log(
+        JSON.stringify(
+          { ensured: true, plugins: listPlugins().map((p) => p.name) },
+          null,
+          2,
+        ),
+      );
+      return;
     default:
       throw new Error(`unknown plugin command ${parsed.subcommand}`);
   }
