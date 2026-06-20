@@ -1,81 +1,67 @@
 name: review
-version: 0.1.0
-description: Run a composite specification review.
+version: 0.2.0
+description: Run a composite specification review producing validated SpecReview docs.
 initialPhase: intake
 phases:
   - { name: intake }
-  - { name: evidence_recorded }
-  - { name: report_rendered }
+  - { name: analyses_run }
+  - { name: reviews_rendered }
   - { name: validated }
   - { name: accepted, terminal: true }
 transitions:
   - from: intake
-    to: evidence_recorded
+    to: analyses_run
     invariants:
       - "interview.complete:request"
     defaultGate: auto
-  - from: evidence_recorded
-    to: report_rendered
+  - from: analyses_run
+    to: reviews_rendered
     invariants: []
     defaultGate: auto
-  - from: report_rendered
+  - from: reviews_rendered
     to: validated
-    invariants:
-      - "artifact.frontmatter_valid:report"
+    invariants: []
     defaultGate: auto
   - from: validated
     to: accepted
-    invariants: []
+    invariants:
+      - "selected_analyses_covered"
     defaultGate: hitl
 itemSchemas:
   operation_request: {}
-  OperationReportSchema:
-    required: [type, id, title, scope]
+  # One per analysis the agent ran + validated: a SpecReview doc on disk.
+  review_doc:
+    required: [analysis, path]
     properties:
-      type: { type: string }
-      id: { type: string }
-      title: { type: string }
-      scope: { type: string }
+      analysis: { type: string }
+      path: { type: string }
 linkSchemas: {}
 interviews:
   request:
     itemType: operation_request
     completenessRule: all_required
     questions:
-      - key: artifact_id
-        prompt: "Report id, for example REPORT-001."
-        type: text
-        required: true
-      - key: title
-        prompt: "Report title."
-        type: text
-        required: true
       - key: scope
-        prompt: "Spec paths, requirement ids, or graph scope to inspect."
+        prompt: "Spec paths, requirement ids, or graph scope to review."
         type: text
         required: true
-      - key: evidence
-        prompt: "Evidence sources used for this operation."
-        type: text
+      - key: review_set
+        prompt: "Review set: 'base' (skill checklist only), 'all' (the six analyses), or 'subset'."
+        type: enum
+        options: [base, all, subset]
         required: true
-      - key: findings
-        prompt: "Findings, gaps, or result summary."
-        type: text
-        required: true
-artifactTemplates:
-  report:
-    source: templates/report/default.md
-    target: spec/reports/review/${items.operation_request.request.artifact_id}.md
-    phase: report_rendered
-    frontmatterSchema: OperationReportSchema
+      - key: selected_analyses
+        prompt: "Analyses to run as a list, drawn from: failure-domain, integrity, dependency, evidence, risk-complexity, scope-boundary. Use all six for 'all'; the chosen ones for 'subset'; leave empty for 'base'."
+        type: list<text>
+        required: false
 recipes:
   run-to-review:
-    description: Record inputs, render the operation report, validate it, then stop at acceptance.
+    description: Record inputs, then advance through analyses, rendering, validation, to acceptance.
     steps:
       - command: advance
-        to: evidence_recorded
+        to: analyses_run
       - command: advance
-        to: report_rendered
+        to: reviews_rendered
       - command: advance
         to: validated
       - command: advance

@@ -502,6 +502,57 @@ export const SCENARIOS = [
       validate: { globs: ["spec/**/*.md"], shouldPass: true },
     },
   },
+  {
+    // Direct-render spec-review: one validated SpecReview doc per selected
+    // analysis, with the coverage gate enforcing the chosen set.
+    id: "EV-026",
+    useCase: "US-005",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+    },
+    // The agent runs a subset spec-review and produces one validated SpecReview
+    // doc per selected analysis. (EV-005 separately covers the ix-flow workflow
+    // lifecycle.) The two `agentRan` guardrails assert the durable behaviors:
+    // reference quoin for the template + validate with quire.
+    //
+    // REQUIRES spec-artifacts-process >= 0.3.0 (the SpecReview archetype +
+    // skeleton). Until that release is pinned in default-modules.yaml, the eval
+    // seed reconciles v0.2.0 (no SpecReview), so `quoin write --types SpecReview`
+    // is "catalog type not found" and the template-fetch guardrail fails.
+    prompt:
+      "Run a spec review of the spec/ directory using the spec-review skill " +
+      "(`quoin review --target spec/ --id eval-specreview`). Choose the `subset` " +
+      "review set with exactly the analyses `integrity` and `dependency`. Fetch the " +
+      "SpecReview template from quoin first with `quoin write --types SpecReview` and " +
+      "author from it. Produce " +
+      "ONE SpecReview document per selected analysis under spec/reviews/ " +
+      "(spec/reviews/integrity.md and spec/reviews/dependency.md) — each with " +
+      "`type: SpecReview` frontmatter, a `## Summary`, and a `## Findings` table " +
+      "(columns ID | Severity | Summary | Refs, FND-NNN ids, Severity one of " +
+      "low/medium/high). Validate them with quire so they pass.",
+    expect: {
+      // Guardrails (over many uses, keep deviations rare): the agent MUST
+      // reference quoin for the template (not invent the format) and MUST
+      // validate its output with quire.
+      agentRan: [
+        {
+          pattern: "quoin\\s+write\\b[\\s\\S]*[Ss]pec[Rr]eview",
+          desc: "fetch the SpecReview template from quoin (quoin write --types SpecReview)",
+        },
+        {
+          pattern: "quire\\s+validate\\b",
+          desc: "validate the docs with quire",
+        },
+      ],
+      files: ["spec/reviews/integrity.md", "spec/reviews/dependency.md"],
+      validate: { globs: ["spec/reviews/*.md"], shouldPass: true },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];
