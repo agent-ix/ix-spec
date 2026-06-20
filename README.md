@@ -15,6 +15,8 @@ workflows agents need to write and validate specs directly as Markdown.
 
 `quoin` is built on the [Quire](https://github.com/agent-ix/quire-rs) document standard and validation engine by Agent-IX.
 
+> **Why:** AI agents write code fast but drift from vague intent. Quoin makes the spec the source of truth — your agent authors a validated, traceable spec first, then plans and builds against it.
+
 ## What's included
 
 The default module set defines the spec archetypes and domain-object vocabulary.
@@ -65,7 +67,7 @@ Multi-agent workflows that fan out, run lenses in parallel, and synthesize resul
 ## Install
 
 Installing quoin into Claude is **two steps**: the CLI (from public npm) and the plugin
-that adds the [skills](#skills) and [workflows](#workflows) to Claude Code. No Anthropic API
+that adds the [skills](#agent-skills) and [workflows](#agent-workflows) to Claude Code. No Anthropic API
 key is required — your Claude subscription is used.
 
 **1. Install the CLIs** (`quoin` plus `ix-flow`, which runs the workflow lifecycle commands):
@@ -89,9 +91,9 @@ the agent.
 ### skills & workflows
 
 The primary way users author specs is by asking an agent, which invokes the bundled
-[skills](#skills) and [workflows](#workflows).
+[skills](#agent-skills) and [workflows](#agent-workflows).
 
-### ClI commands
+### CLI commands
 
 Inspect the spec vocabulary and manage installed modules:
 

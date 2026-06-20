@@ -1,6 +1,6 @@
 {
   "name": "@agent-ix/quoin",
-  "description": "Spec workflow and catalog CLI for Agent IX.",
+  "description": "Spec-driven development for Claude Code — author validated, ISO/IEC/IEEE 29148-aligned specs, then plan and build against them.",
   "version": "0.1.3",
   "license": "MIT",
   "type": "module",
