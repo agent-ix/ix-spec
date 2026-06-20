@@ -29,11 +29,15 @@ document per analysis** under `spec/reviews/`, rather than a single freeform rep
   - `subset` — `base` plus the analyses the user picks from those six.
 - **analyses_run — run the selected set, one SpecReview doc each.** Run each selected
   analysis (the matching `spec-*-analysis` skill). Prefer running them **in parallel** —
-  each writes its own file, so there is no contention. For each, **direct-render a
-  `SpecReview` markdown document** to `spec/reviews/<analysis>.md` (see structure below).
-  `base` renders a single `spec/reviews/base.md` with `analysis: base`.
-- **reviews_rendered — validate.** Run the quire validation command (the calling tool emits
-  it, e.g. `quire validate --scope <repo> "spec/**/*.md"`). Fix any finding-table / severity
+  each writes its own file, so there is no contention.
+  - **Guardrail — fetch the template from quoin (do not invent the format).** Once, run
+    `quoin write <repo> --types SpecReview` and use the emitted skeleton + schema as the
+    authoritative contract. Reuse that one contract for every analysis doc.
+  - **Direct-author** a `SpecReview` markdown document per analysis to
+    `spec/reviews/<analysis>.md` from that template. `base` renders a single
+    `spec/reviews/base.md` with `analysis: base`.
+- **reviews_rendered — validate (guardrail).** Always run the quire validation command (the
+  calling tool emits it, e.g. `quire validate --scope <repo> "spec/**/*.md"`). Fix any finding-table / severity
   / id errors it reports. Only once a SpecReview doc validates, record it:
   `add-item review_doc --item '{"id":"RD-<analysis>","analysis":"<analysis>","path":"spec/reviews/<analysis>.md"}'`
   (the item `id` must be non-empty). These items drive the coverage gate.
@@ -41,8 +45,10 @@ document per analysis** under `spec/reviews/`, rather than a single freeform rep
 
 ## SpecReview document structure
 
-Each `spec/reviews/<analysis>.md` is a `SpecReview` artifact (archetype in
-`spec-artifacts-process`). Author it directly:
+The **authoritative** template comes from `quoin write --types SpecReview` (fetch it; do not
+hand-copy). The structure below is a reference for what that skeleton contains — each
+`spec/reviews/<analysis>.md` is a `SpecReview` artifact (archetype in
+`spec-artifacts-process`):
 
 ```markdown
 ---

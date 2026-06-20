@@ -43,6 +43,8 @@ The six analyses:
     -   Verify Test Coverage (6 Rules).
 3.  Selected Analyses:
     -   Run each analysis the user chose. Prefer running them **in parallel**.
+    -   **Fetch the template from quoin** once with `quoin write --types SpecReview` — use its
+        skeleton + schema as the contract (do not invent the format).
     -   Write **one `SpecReview` document per analysis** to `spec/reviews/<analysis>.md`
         (plus `spec/reviews/base.md` for the base checklist). Findings go in a validated
         `## Findings` table (`| ID | Severity | Summary | Refs |`, `FND-NNN` ids, Severity ∈
