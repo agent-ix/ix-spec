@@ -22,8 +22,8 @@ requiring the broader `ix` umbrella CLI.
 
 - The `quoin` command surface: argument parsing, `version`/help, `catalog`
   list/show/validate, `write` authoring packs, `plugin`
-  install/list/remove/ensure-defaults, and the `review`/`matrix`/`to-plan`
-  workflow launchers.
+  install/list/remove/ensure-defaults, the `review`/`matrix`/`to-plan`
+  workflow launchers, and the `update` self-update command.
 - Assembly of a Filament catalog from module roots (`QUOIN_MODULE_PATHS` plus
   the installed module store) and the authoring contract it exposes (skeletons,
   schemas, module roots).
@@ -46,7 +46,8 @@ requiring the broader `ix` umbrella CLI.
 `quoin` is a single `main(argv)` dispatcher built on
 `@agent-ix/ix-cli-core`. It parses a leading command (and, for `catalog` and
 `plugin`, a subcommand), resolves a config root, configures the shared runtime
-context, and dispatches to the catalog, authoring, plugin, or workflow surface.
+context, and dispatches to the catalog, authoring, plugin, workflow, or
+self-update surface.
 It assembles a Filament catalog from module roots, authors nothing itself —
 instead returning the local skeletons, schemas, and a `quire validate` command
 that the calling agent uses as its authoring contract. It installs
@@ -73,7 +74,7 @@ Stories that drive them are listed under Use Cases and authored in
 | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
 | FR-001 | The CLI SHALL parse a leading command and (for `catalog`/`plugin`) a subcommand, `--flag=value` and `--flag value` long flags, `-x` short boolean flags, and bare positionals, accumulating repeated `--types` and `--target` flags into ordered lists.                                               | Test         |
 | FR-002 | The CLI SHALL print its package version (read from `package.json`) for the `version` command, `--version`, or `-v`, and SHALL fail if the package version is missing or non-string.                                                                                                                   | Test         |
-| FR-003 | The CLI SHALL print root usage when invoked with no command, and command-scoped help for `--help`/`-h` on `write`, `catalog`, `plugin`, and the spec-flow commands, falling back to root usage for unrecognized commands.                                                                             | Test         |
+| FR-003 | The CLI SHALL print root usage when invoked with no command, and command-scoped help for `--help`/`-h` on `write`, `catalog`, `plugin`, `update`, and the spec-flow commands, falling back to root usage for unrecognized commands.                                                                   | Test         |
 | FR-004 | The CLI SHALL resolve a config root from `--config-root` (defaulting to `~/.ix` via `IX_HOME`), export it to `IX_HOME`, and configure the shared `ix-cli-core` runtime context with namespace `ix` and project config root `<cwd>/.ix`, disabling project config when `--no-project-config` is given. | Test         |
 | FR-005 | The CLI SHALL reject an unknown command or an unknown `catalog`/`plugin` subcommand by throwing an error that includes usage, and SHALL exit non-zero.                                                                                                                                                | Test         |
 
@@ -112,6 +113,12 @@ Stories that drive them are listed under Use Cases and authored in
 | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
 | FR-020 | The CLI SHALL expose the `review`, `matrix`, and `to-plan` workflow launchers, resolving each workflow's skill path across `IX_SPEC_WORKFLOWS_ROOT`, the packaged skills, a sibling `ix-spec-workflows` checkout, and `~/.ix/plugins`, and erroring when no candidate contains the skill.                                                 | Test         |
 | FR-021 | On launch the CLI SHALL spawn `ix-flow run <flow> --path <skill> --config-root <home> --state-dir <home>/flows` with optional `--id`/`--json`/`--target` arguments, propagate ix-flow's exit code (defaulting to 1 on signal), surface spawn errors, and hand all subsequent lifecycle control (resume/advance/gate/status) to `ix-flow`. | Test         |
+
+### Functional Requirements — Self-Update
+
+| ID     | Requirement                                                                                                                                                                                                                                                                                                                                                                                        | Verification |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| FR-022 | The CLI SHALL expose an `update` command that upgrades quoin to the latest published `@agent-ix/quoin` by delegating to `ix-cli-core`'s `runSelfUpdate` (npm view → compare to the running version → `npm install -g`), supporting `--check` (report availability without installing) and `--registry <url>` (force a registry); with no `--registry` the ambient npm config resolves the package. | Test         |
 
 ### Non-Functional Requirements
 

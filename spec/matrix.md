@@ -20,11 +20,13 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 - `flows.test.ts` / `flows-notfound.test.ts` — workflow launchers and the real
   fake `ix-flow` binary (exit 0 / non-zero / signal / spawn-error).
 - `scripts.test.ts` — built CLI help/version surface.
+- `update.test.ts` — `runUpdate` delegation to ix-cli-core's `runSelfUpdate`
+  (package coordinates, `--check`, `--registry`); module fully mocked.
 - `index.test.ts` — the public library surface end to end.
 
 > Coverage gate: `vite.config.ts` declares 100% v8 thresholds
 > (branches/functions/lines/statements). `make test` (`vitest run`) passes all
-> 99 tests and `pnpm run test:coverage` passes the gate at **100%**
+> 102 tests and `pnpm run test:coverage` passes the gate at **100%**
 > (branches/functions/lines/statements).
 
 ## Functional Requirements
@@ -52,6 +54,7 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 | FR-019      | ✅ Covered | `plugins.test.ts` :: "install adds a plugin from a path source"; :: "installs, lists, then removes a plugin and its target dir + registry entry"; readModuleName suite ("reads the name from a top-level manifest.yaml"…); `cli.test.ts` :: "install without a source throws"; :: "remove without a name throws"; :: "remove deletes a plugin and prints confirmation"                                                          |
 | FR-020      | ✅ Covered | `flows.test.ts` :: "lists the bundled spec flows"; :: "throws for an unknown flow name"; `flows-notfound.test.ts` :: "throws when no candidate root contains the skill"                                                                                                                                                                                                                                                         |
 | FR-021      | ✅ Covered | `flows.test.ts` :: "resolves when ix-flow exits 0; builds id/json/target args"; :: "matrix runs the flow and propagates a non-zero exit code"; :: "defaults exit code to 1 when ix-flow is killed by a signal (null code)"; :: "rejects when ix-flow cannot be spawned (PATH has no ix-flow)"; `cli.test.ts` :: "review with --target/--json/--id runs the flow (ix-flow exit 0)"                                               |
+| FR-022      | ✅ Covered | `update.test.ts` :: "delegates to runSelfUpdate with quoin's package coordinates" (asserts packageName `@agent-ix/quoin`, currentVersion, header "quoin update", registry undefined → ambient config, check false); :: "passes --check through"; :: "passes a custom --registry through"                                                                                                                                        |
 
 ## Non-Functional Requirements
 

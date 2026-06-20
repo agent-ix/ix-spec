@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { configureRuntimeContext } from "@agent-ix/ix-cli-core";
+import { configureRuntimeContext, runSelfUpdate } from "@agent-ix/ix-cli-core";
 
 import { findCatalogEntry, ixHome, loadCatalog } from "./catalog.js";
 import { ensureDefaultModules } from "./modules.js";
@@ -43,6 +43,7 @@ Usage:
   quoin plugin list
   quoin plugin remove <name>
   quoin review|matrix|to-plan [--target <ref>...]
+  quoin update [--check] [--registry <url>]
 
 Global flags:
   --json
@@ -141,6 +142,31 @@ Examples:
   quoin plugin ensure-defaults
 `;
 
+const UPDATE_USAGE = `quoin update
+
+Check for and install the latest published quoin.
+
+quoin is distributed on the public npm registry as @agent-ix/quoin. This command
+queries the registry for the latest version, compares it to the running version,
+and (unless --check) runs npm install -g to upgrade in place.
+
+Usage:
+  quoin update [--check] [--registry <url>]
+
+Flags:
+  --check               Report whether an update is available; do not install.
+  --registry <url>      Force an npm registry to query/install from. Defaults
+                        to your npm config (the registry @agent-ix resolves to,
+                        i.e. however quoin was installed). Pass
+                        https://registry.npmjs.org/ for public npm, or
+                        http://npm.ix/ for local dev snapshots.
+
+Examples:
+  quoin update
+  quoin update --check
+  quoin update --registry http://npm.ix/
+`;
+
 const FLOW_USAGE = `quoin workflows
 
 Start bundled spec review/planning workflows. quoin creates the workflow run in ~/.ix/flows.
@@ -185,6 +211,7 @@ export async function main(argv: string[]): Promise<void> {
     projectConfigEnabled: parsed.flags["no-project-config"] !== true,
   });
 
+  if (parsed.command === "update") return runUpdate(parsed);
   if (parsed.command === "catalog") return runCatalog(parsed);
   if (parsed.command === "plugin") return runPlugin(parsed);
   if (parsed.command === "write") return runWrite(parsed);
@@ -210,6 +237,7 @@ export function packageVersion(): string {
 }
 
 function helpFor(parsed: ParsedArgs): string {
+  if (parsed.command === "update") return UPDATE_USAGE;
   if (parsed.command === "write") return WRITE_USAGE;
   if (parsed.command === "catalog") return CATALOG_USAGE;
   if (parsed.command === "plugin") return PLUGIN_USAGE;
@@ -235,6 +263,18 @@ function runWrite(parsed: ParsedArgs): void {
       ? JSON.stringify(pack, null, 2)
       : formatAuthoringPack(pack),
   );
+}
+
+async function runUpdate(parsed: ParsedArgs): Promise<void> {
+  await runSelfUpdate({
+    packageName: "@agent-ix/quoin",
+    currentVersion: packageVersion(),
+    header: "quoin update",
+    // undefined → ambient npm config (the registry @agent-ix resolves to).
+    // Override for local dev with --registry http://npm.ix/.
+    registry: stringFlag(parsed, "registry"),
+    check: parsed.flags.check === true,
+  });
 }
 
 function runCatalog(parsed: ParsedArgs): void {
