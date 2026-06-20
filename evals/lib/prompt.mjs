@@ -38,7 +38,10 @@ This is a measured eval: work efficiently and use the provided tooling.
 - \`quire validate --scope . "<glob>"\` validates authored markdown (schemas are
   already provisioned via the environment).
 - \`ix-flow status <id>\` inspects a launched workflow run.
-- The \`/spec-*\` Claude skills are available if you prefer skill-driven authoring.
+- For authoring spec artifacts, use the \`/specify\` skill: it decides which
+  artifact types the request needs and authors each as a discrete file in its
+  OKF directory (\`spec/stakeholder|usecase|functional|non-functional|integration/\`).
+  The other \`/spec-*\` skills (review, matrix, to-plan, analyses) are also available.
 
 ## Task
 
@@ -46,8 +49,9 @@ ${task}
 
 ## Rules
 
-- Use \`quoin write\` to obtain the authoring contract for each type **once**, then
-  author the file(s) under \`spec/\` from the skeleton(s).
+- Author through the \`/specify\` skill (it uses \`quoin write\` to fetch each type's
+  contract once). Each requirement is its own file in its OKF directory — never a
+  row in \`spec.md\`'s table.
 - When you believe the work is done, run \`quire validate --scope <repo> "<glob>"\` over
   the files you changed and ensure it passes (exit code 0).
 - Do not modify files outside \`${ctx.cwd}\`.

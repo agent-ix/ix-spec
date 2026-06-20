@@ -1,12 +1,23 @@
 // Per-scenario workspace: an isolated repo + IX_HOME, a pre-generated session id,
 // and the predetermined Claude Code transcript path.
 
-import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { snapshotInto } from "./seed.mjs";
+
+// The repo's working-tree skills (evals/lib/env.mjs -> repo root -> skills/).
+// Injected into each scenario as project skills so evals exercise the CURRENT
+// skills (e.g. /specify) rather than whatever is globally installed.
+const REPO_SKILLS = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "..",
+  "skills",
+);
 
 /**
  * Claude Code's project-dir slug for a cwd: every non-alphanumeric character
@@ -42,6 +53,12 @@ export function makeScenarioWorkspace(id) {
   const ixHome = join(work, "ix-home");
   mkdirSync(join(repo, "spec"), { recursive: true });
   mkdirSync(ixHome, { recursive: true });
+  // Project-scoped skills: the agent (cwd = repo) loads the working-tree
+  // `/specify` etc. instead of the globally-installed plugin copy. `.claude` is a
+  // dotdir, so it is skipped by file/artifact assertions and quire's spec globs.
+  if (existsSync(REPO_SKILLS)) {
+    cpSync(REPO_SKILLS, join(repo, ".claude", "skills"), { recursive: true });
+  }
   const modulesDir = snapshotInto(ixHome);
   const sessionId = randomUUID();
   return {

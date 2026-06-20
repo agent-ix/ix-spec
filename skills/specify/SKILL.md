@@ -53,7 +53,10 @@ Run only the steps the request needs; stop after IT.
    authoring contract — the per-type rules live in the template, not your memory.
 3. Author each artifact as its own file (table above), in this logical order,
    skipping any type not requested:
-   - `spec.md` (only when starting a new spec) → StR → US →
+   - `spec.md` — **REQUIRED when starting a new spec**: the
+     `type: master-requirements` root/index at `spec/spec.md`, authored from
+     `assets/spec-template.md` (or `assets/app-spec-template.md` for an
+     application). Then → StR → US →
      **derive FR from US** (see [references/us-to-fr.md](references/us-to-fr.md))
      → FR → NFR → IT (see [references/integration-tests.md](references/integration-tests.md)).
 4. Keep traceability in frontmatter `relationships:` (e.g. a US `traces_to` its
