@@ -1,14 +1,14 @@
 ---
 id: REV-001
-title: quoin Phase 0 Review
+title: quoin Spec Review
 type: Review
 ---
 
-# quoin Phase 0 Review
+# quoin Spec Review
 
 ## Scope
 
-Review of the Phase 0 spec **overhaul** — a complete, code-faithful backport of
+Review of the spec **overhaul** — a complete, code-faithful backport of
 `src/` (`cli`, `catalog`, `write`, `plugins`, `modules`, `flows`). The prior
 coarse FR-001…FR-011 set was superseded by a capability-grouped FR-001…FR-021 /
 NFR-001…NFR-008 set (NFR-007/008 added during this review); user stories were
@@ -86,7 +86,7 @@ Both lenses from the `spec-review` process were run against `spec.md` + `src/`:
   behavior — FR-018 (rejected by ts-plugin-kit at install time).
 - ➕ **External-CLI probe (fixed):** FRs delegate to `ix-flow`/`quire` with no
   invocation contract. Added **NFR-007** (PATH resolution, no version pin in
-  Phase 0, absence/non-zero surfaces as non-zero exit, `quire` emitted not run).
+  no version pin, absence/non-zero surfaces as non-zero exit, `quire` emitted not run).
 - ⚠️ **No StR layer (accepted).** Stakeholder intent is not derivable from code;
   reverse-engineering an StR set would be fabrication. User stories carry the
   stakeholder framing informally. A real StR layer is deferred to a phase with
@@ -116,7 +116,7 @@ Both lenses from the `spec-review` process were run against `spec.md` + `src/`:
    the existing missing-manifest skip test.
 7. **External-tool versions unpinned (NFR-007) — known limitation.** `ix-flow`
    and `quire` are resolved from `PATH` with no minimum-version check. Acceptable
-   for Phase 0; revisit when either tool's CLI contract changes.
+   for now; revisit when either tool's CLI contract changes.
 
 ## Analysis Lenses (dependency / evidence / risk / scope)
 
@@ -187,7 +187,7 @@ dependencies and how they are verified **locally**:
    `quire`/`ts-plugin-kit` behavior is not contract-verified here (cross-repo
    contracts such as the quire-rs shared store are asserted in those repos). If
    an upstream CLI contract drifts, quoin's tests would not catch it. Low
-   priority for Phase 0; candidate for an integration-test layer later.
+   priority for now; candidate for an integration-test layer later.
 9. **`package:`/npm source is the top churn item (risk).** FR-018 forward-
    declares npm support that `ts-plugin-kit` rejects today. Isolated in
    `parseSourceArg`; revisit when npm support lands.

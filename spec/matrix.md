@@ -1,10 +1,10 @@
 ---
 id: TM-001
-title: quoin Phase 0 Matrix
+title: quoin Test Matrix
 type: TestMatrix
 ---
 
-# quoin Phase 0 Matrix
+# quoin Test Matrix
 
 Tests live in `tests/` and run under vitest (`make test` → `vitest run`).
 Coverage is mapped requirement → test as `file :: "test name"`:
@@ -87,7 +87,7 @@ the Claude Code transcript. This unit-test matrix does not duplicate that table.
 
 ## Backsync Notes
 
-- Requirements were renumbered and expanded in the Phase 0 overhaul to be a
+- Requirements were renumbered and expanded in the spec overhaul to be a
   faithful, atomic backport of `src/` (`cli`, `catalog`, `write`, `plugins`,
   `modules`, `flows`). The prior coarse FR-001…FR-011 set is superseded by the
   capability-grouped FR-001…FR-021 / NFR-001…NFR-006 set in `spec.md`.
