@@ -13,19 +13,74 @@ Use this skill for a full or multi-artifact spec review before implementation, r
 
 ## What It Does
 
-Run a composite specification review. The workflow definition is the source of truth for phases, gates, item schemas, recipes, and validation points.
+Run a composite specification review. The workflow definition is the source of truth for
+phases, gates, item schemas, and recipes. The review produces **one validated `SpecReview`
+document per analysis** under `spec/reviews/`, rather than a single freeform report.
 
 ## Workflow Behavior
 
 - Start from the workflow status and follow reported next actions.
-- Record evidence items before advancing analysis, review, or validation phases.
-- Use recipes for deterministic command chains, but preserve human gates for acceptance.
-- Prefer templates for stable artifact creation and generic file editing for broad semantic rewrites.
+- **intake — offer the review set.** Before advancing, present the choice to the user and
+  record it in the `request` interview as `review_set` plus `selected_analyses`:
+  - `base` — the skill checklist only (ID formats, US/FR/TC quality, the six coverage
+    rules). No analysis skills. `selected_analyses` is empty.
+  - `all` — `base` plus all six analyses: `failure-domain`, `integrity`, `dependency`,
+    `evidence`, `risk-complexity`, `scope-boundary`.
+  - `subset` — `base` plus the analyses the user picks from those six.
+- **analyses_run — run the selected set, one SpecReview doc each.** Run each selected
+  analysis (the matching `spec-*-analysis` skill). Prefer running them **in parallel** —
+  each writes its own file, so there is no contention. For each, **direct-render a
+  `SpecReview` markdown document** to `spec/reviews/<analysis>.md` (see structure below).
+  `base` renders a single `spec/reviews/base.md` with `analysis: base`.
+- **reviews_rendered — validate.** Run the quire validation command (the calling tool emits
+  it, e.g. `quire validate --scope <repo> "spec/**/*.md"`). Fix any finding-table / severity
+  / id errors it reports. Only once a SpecReview doc validates, record it:
+  `add-item review_doc --item '{"id":"RD-<analysis>","analysis":"<analysis>","path":"spec/reviews/<analysis>.md"}'`
+  (the item `id` must be non-empty). These items drive the coverage gate.
+- Use recipes for deterministic command chains, but preserve the human gate for acceptance.
+
+## SpecReview document structure
+
+Each `spec/reviews/<analysis>.md` is a `SpecReview` artifact (archetype in
+`spec-artifacts-process`). Author it directly:
+
+```markdown
+---
+id: SR-001
+title: "<analysis> review of <scope>"
+type: SpecReview
+analysis: <failure-domain|integrity|dependency|evidence|risk-complexity|scope-boundary|base>
+scope: <spec paths / ids>
+review_set: <base|all|subset>
+---
+
+## Summary
+
+<one or two sentences on what this analysis found>
+
+## Findings
+
+| ID | Severity | Summary | Refs |
+| --- | --- | --- | --- |
+| FND-001 | medium | <one-line finding> | FR-014 |
+```
+
+The `## Findings` table is **validated by quire**: exact columns `[ID, Severity, Summary,
+Refs]`, at least one row, `FND-NNN` ids, and `Severity` must be one of `low`/`medium`/`high`.
+An analysis that found nothing still renders a doc; record that as a single
+`FND-001 | low | No issues found | —` row (or state it in `## Summary`).
+
+## Coverage gate
+
+The final `validated → accepted` transition enforces `selected_analyses_covered`: the run
+cannot be accepted until every selected analysis has a recorded `review_doc`. If it reports
+`selected_analyses_not_run` with a `missing` list, render + validate + record those analyses
+before retrying acceptance. `base` passes with no analyses required.
 
 ## Acceptance Criteria
 
 - AC-1: Reviews structural integrity, traceability, coverage, and readiness across selected artifacts.
-- AC-2: Records evidence items before validation.
+- AC-2: Produces one validated `SpecReview` doc per selected analysis before acceptance.
 - AC-3: Stops at acceptance with findings and recommended next workflows rather than making broad edits.
 
 ## Boundaries
