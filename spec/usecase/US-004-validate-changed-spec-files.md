@@ -3,7 +3,7 @@ id: US-004
 title: "Validate changed spec files"
 type: US
 relationships:
-  - target: "ix://agent-ix/quoin/FR-007"
+  - target: "ix://agent-ix/quoin/FR-015"
     type: "traces_to"
 ---
 
@@ -11,9 +11,9 @@ relationships:
 
 ## Story
 
-As an agent completing spec edits, I want a scoped Quire command for the target
-repository, so that validation checks the changed files using frontmatter to
-select the matching rule set.
+**As an** agent completing spec edits
+**I want** a scoped Quire command for the target repository
+**So that** validation checks the changed files using frontmatter to select the matching rule set.
 
 ## Context
 

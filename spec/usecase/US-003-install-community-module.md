@@ -3,11 +3,11 @@ id: US-003
 title: "Install and use a community spec module"
 type: US
 relationships:
-  - target: "ix://agent-ix/quoin/FR-002"
+  - target: "ix://agent-ix/quoin/FR-011"
     type: "traces_to"
-  - target: "ix://agent-ix/quoin/FR-003"
+  - target: "ix://agent-ix/quoin/FR-018"
     type: "traces_to"
-  - target: "ix://agent-ix/quoin/FR-004"
+  - target: "ix://agent-ix/quoin/FR-019"
     type: "traces_to"
 ---
 
@@ -15,11 +15,9 @@ relationships:
 
 ## Story
 
-As a user adopting a community module, I want to install the module once under
-`~/.ix/filament/modules` (recorded in `~/.ix/filament/registry.json`), confirm
-that its types appear in the active catalog, and request those types in an
-authoring pack, so that the new vocabulary participates in authoring and
-validation just like the default modules.
+**As a** user adopting a community module
+**I want** to install the module once under `~/.ix/filament/modules` (recorded in `~/.ix/filament/registry.json`), confirm that its types appear in the active catalog, and request those types in an authoring pack
+**So that** the new vocabulary participates in authoring and validation just like the default modules.
 
 ## Context
 

@@ -3,11 +3,13 @@ id: US-001
 title: "Author a root artifact with supporting objects"
 type: US
 relationships:
-  - target: "ix://agent-ix/quoin/FR-001"
+  - target: "ix://agent-ix/quoin/FR-010"
     type: "traces_to"
-  - target: "ix://agent-ix/quoin/FR-004"
+  - target: "ix://agent-ix/quoin/FR-013"
     type: "traces_to"
-  - target: "ix://agent-ix/quoin/FR-005"
+  - target: "ix://agent-ix/quoin/FR-014"
+    type: "traces_to"
+  - target: "ix://agent-ix/quoin/FR-017"
     type: "traces_to"
 ---
 

@@ -13,3 +13,4 @@ description: "Index of artifacts in this directory."
 - [US-003: Install and use a community spec module](./US-003-install-community-module.md)
 - [US-004: Validate changed spec files](./US-004-validate-changed-spec-files.md)
 - [US-005: Start a gated spec workflow](./US-005-start-gated-spec-workflow.md)
+- [US-006: Detect conflicting type definitions across modules](./US-006-detect-conflicting-type-definitions.md)
