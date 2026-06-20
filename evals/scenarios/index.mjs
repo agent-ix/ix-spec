@@ -7,7 +7,12 @@
 //  - env:     optional (ctx)=>extra env for BOTH the agent run and the ground-truth
 //             assertion (e.g. QUOIN_MODULE_PATHS).
 //  - expect:  ground-truth success checks (see lib/assert.mjs):
-//             files, validate, flow, cliRejects, plugin, resolvesTo, sentinel.
+//             files, validate, artifacts, flow, cliRejects, plugin, resolvesTo, sentinel.
+//
+// EV-021..EV-025 are the artifact-completeness set: they drive `/specify` for
+// request shapes (new project / add US / edit FR / add US+FR / backport) and use
+// the `artifacts` check to assert the EXACT artifact types were authored as
+// discrete files (an FR written only as a row in spec.md's table fails).
 //
 // The two canaries (EV-001 greenfield, EV-008 repair loop) are the cheapest, highest
 // -signal scenarios; `--canary` runs only those.
@@ -19,6 +24,7 @@ import {
   makeDevModule,
   makeRepos,
   removeSeededModule,
+  writeRepoFile,
 } from "../lib/fixtures.mjs";
 
 export const SCENARIOS = [
@@ -371,6 +377,127 @@ export const SCENARIOS = [
         },
       ],
       files: ["spec/**/*.md"],
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+
+  // --- EV-021..EV-025: artifact-completeness for spec-change requests ---------
+  {
+    id: "EV-021",
+    useCase: "US-001",
+    prompt:
+      "Start a new spec for a small URL-shortener service: a user submits a long " +
+      "URL and gets back a short code that later redirects to the original. Create " +
+      "the spec under spec/ — author the user story and the functional requirement " +
+      "that implements it as their own files.",
+    expect: {
+      files: ["spec/spec.md"],
+      artifacts: {
+        require: {
+          US: { min: 1, dir: "spec/usecase" },
+          FR: { min: 1, dir: "spec/functional" },
+        },
+      },
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    id: "EV-022",
+    useCase: "US-001",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "us.md",
+        "spec/usecase/US-001-existing.md",
+      );
+    },
+    prompt:
+      "The repo already contains spec/usecase/US-001-existing.md. Add a SECOND " +
+      "user story for a different capability (for example: an administrator " +
+      "disables a short code). Author it as its own file. Do not write functional " +
+      "or non-functional requirements.",
+    expect: {
+      artifacts: {
+        require: { US: { min: 2, dir: "spec/usecase" } },
+        absent: ["FR", "NFR", "IT"],
+      },
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    id: "EV-023",
+    useCase: "US-002",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001-checksums.md",
+      );
+    },
+    prompt:
+      "The repo has spec/functional/FR-001-checksums.md. Edit ONLY that file to " +
+      "change the requirement to be about verifying a signed release manifest. " +
+      "Keep it valid and re-validate. Do not create any new artifacts.",
+    expect: {
+      artifacts: {
+        require: { FR: { min: 1, dir: "spec/functional" } },
+        absent: ["US", "NFR", "IT"],
+      },
+      validate: {
+        globs: ["spec/functional/FR-001-checksums.md"],
+        shouldPass: true,
+      },
+    },
+  },
+  {
+    id: "EV-024",
+    useCase: "US-001",
+    prompt:
+      "Add a user story for a user exporting their data as a CSV file, and the " +
+      "functional requirement that implements it. Author each as its own artifact " +
+      "file and trace the FR back to the user story.",
+    expect: {
+      artifacts: {
+        require: {
+          US: { min: 1, dir: "spec/usecase" },
+          FR: { min: 1, dir: "spec/functional" },
+        },
+      },
+      validate: { globs: ["spec/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    id: "EV-025",
+    useCase: "US-001",
+    setup(ctx) {
+      writeRepoFile(
+        ctx,
+        "src/shorten.mjs",
+        [
+          "// Maps a long URL to a 6-char base62 code and stores the pair.",
+          "export function shorten(url, store) {",
+          "  if (!/^https?:\\/\\//.test(url)) throw new Error('invalid url');",
+          "  const code = Math.abs(hash(url)).toString(36).slice(0, 6);",
+          "  store.set(code, url);",
+          "  return code;",
+          "}",
+          "export function resolve(code, store) {",
+          "  if (!store.has(code)) throw new Error('unknown code');",
+          "  return store.get(code);",
+          "}",
+          "function hash(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return h; }",
+          "",
+        ].join("\n"),
+      );
+    },
+    prompt:
+      "Backport a spec from the code in src/shorten.mjs. Capture its behavior as " +
+      "functional requirement artifacts under spec/functional/ (not just a summary " +
+      "table). Validate the spec files.",
+    expect: {
+      artifacts: { require: { FR: { min: 1, dir: "spec/functional" } } },
       validate: { globs: ["spec/**/*.md"], shouldPass: true },
     },
   },

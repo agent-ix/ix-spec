@@ -49,15 +49,16 @@ agent can use the commands efficiently to produce valid spec artifacts.
 
 ## Variation Coverage
 
-| Dimension          | Required Variations                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Authoring mode     | greenfield repo, brownfield edit, multi-document creation, validation repair loop                             |
-| Type source        | bundled artifact, bundled object, installed local plugin, installed GitHub/plugin package, sibling dev module |
-| Type lookup        | canonical casing, lowercase input, mixed artifact/object request, unknown type                                |
-| Validation scope   | exact module scope, repo search scope, multiple glob arguments, changed-file subset, invalid document         |
-| Workflow lifecycle | review launch, matrix launch, to-plan launch, status inspection, human gate handoff                           |
-| Config state       | clean isolated `~/.ix`, existing plugin registry, plugin removal/reinstall                                    |
-| Agent efficiency   | one authoring pack reused across multiple files, no repeated template fetch for same type                     |
+| Dimension             | Required Variations                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Authoring mode        | greenfield repo, brownfield edit, multi-document creation, validation repair loop                             |
+| Type source           | bundled artifact, bundled object, installed local plugin, installed GitHub/plugin package, sibling dev module |
+| Type lookup           | canonical casing, lowercase input, mixed artifact/object request, unknown type                                |
+| Validation scope      | exact module scope, repo search scope, multiple glob arguments, changed-file subset, invalid document         |
+| Workflow lifecycle    | review launch, matrix launch, to-plan launch, status inspection, human gate handoff                           |
+| Config state          | clean isolated `~/.ix`, existing plugin registry, plugin removal/reinstall                                    |
+| Agent efficiency      | one authoring pack reused across multiple files, no repeated template fetch for same type                     |
+| Artifact completeness | request → required artifact set: new project, add US only, edit FR only, add US+FR, backport → FR artifacts   |
 
 ## Scenarios
 
@@ -82,10 +83,19 @@ agent can use the commands efficiently to produce valid spec artifacts.
 | EV-017 | US-001, US-002 | Author a larger feature spec set with cross-references.               | Agent authors StR + 2 US + 3 FR + NFR + domain + 2 entity, fetching each contract once; all validate.                              | success, latency, tool calls, tokens, context fetches     |
 | EV-018 | US-001         | Author objects drawn from three different object modules.             | One `write` pack resolves `domain`/`api_endpoint`/`configuration` across modules; all validate.                                    | success, latency, tool calls, tokens                      |
 | EV-020 | US-003         | Install a module from GitHub via a subdir source and author its type. | Agent runs `quoin plugin install github:owner/repo//subdir@ref` (real network clone), then authors and validates one of its types. | success, latency, tool calls, tokens                      |
+| EV-021 | US-001         | Start a new spec from a settled idea (greenfield).                    | Agent creates `spec.md` plus ≥1 US and ≥1 FR **as discrete files**; all validate. (`artifacts` check)                              | success, latency, tool calls, tokens                      |
+| EV-022 | US-001         | Add one user story to an existing spec.                               | Agent adds a new `US` file and creates **no** FR/NFR/IT artifacts; all validate. (`artifacts` require + absent)                    | success, latency, tool calls                              |
+| EV-023 | US-002         | Edit an existing FR in place.                                         | Agent modifies the FR file only, creating no new artifact types; the FR validates. (`artifacts` require + absent)                  | success, latency, tool calls, validation attempts         |
+| EV-024 | US-001         | Add a user story **and** the FR that implements it.                   | Agent authors **both** a `US` and an `FR` artifact (FR traced to the US); all validate. (`artifacts` require)                      | success, latency, tool calls, tokens                      |
+| EV-025 | US-001         | Backport a spec from a small source file.                             | Agent authors ≥1 `FR` artifact under `spec/functional/` (not just a `spec.md` table) capturing the code's behavior; all validate.  | success, latency, tool calls, tokens                      |
 
 > EV-016..EV-018 and EV-020 extend the original EV-001..EV-015 set (multi-repo,
-> larger spec-set, multi-module, real GitHub subdir install). They live alongside
-> the rest in `evals/scenarios/index.mjs`.
+> larger spec-set, multi-module, real GitHub subdir install). EV-021..EV-025 are
+> the **artifact-completeness** set: they drive `/specify` for spec-change request
+> shapes (new project, add US, edit FR, add US+FR, backport) and assert via the
+> `artifacts` check that the request produced the exact artifact **types** as
+> discrete files — guarding against requirements authored only as `spec.md` table
+> rows. They live alongside the rest in `evals/scenarios/index.mjs`.
 
 ## Harness Requirements
 

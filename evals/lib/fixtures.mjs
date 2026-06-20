@@ -11,6 +11,14 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 
+/** Write an arbitrary file into the scenario repo (e.g. seed source code to backport). */
+export function writeRepoFile(ctx, repoRelTarget, content) {
+  const target = join(ctx.repo, repoRelTarget);
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, content);
+  return target;
+}
+
 /** Copy a module skeleton (from the snapshotted modules) into the scenario repo. */
 export function copySkeleton(ctx, moduleName, skeletonFile, repoRelTarget) {
   const src = join(ctx.modulesDir, moduleName, "skeletons", skeletonFile);
