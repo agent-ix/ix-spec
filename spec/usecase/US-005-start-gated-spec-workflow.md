@@ -3,7 +3,9 @@ id: US-005
 title: "Start a gated spec workflow"
 type: US
 relationships:
-  - target: "ix://agent-ix/quoin/FR-006"
+  - target: "ix://agent-ix/quoin/FR-020"
+    type: "traces_to"
+  - target: "ix://agent-ix/quoin/FR-021"
     type: "traces_to"
 ---
 
@@ -11,9 +13,9 @@ relationships:
 
 ## Story
 
-As a user running the spec lifecycle, I want `quoin` to launch the spec-domain
-workflow and `ix-flow` to manage phase progression and human gates, so that the
-workflow engine stays separate from the catalog and authoring surface.
+**As a** user running the spec lifecycle
+**I want** `quoin` to launch the spec-domain workflow and `ix-flow` to manage phase progression and human gates
+**So that** the workflow engine stays separate from the catalog and authoring surface.
 
 ## Context
 

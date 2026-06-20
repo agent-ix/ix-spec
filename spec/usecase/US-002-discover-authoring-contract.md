@@ -3,9 +3,9 @@ id: US-002
 title: "Discover an authoring contract before editing"
 type: US
 relationships:
-  - target: "ix://agent-ix/quoin/FR-003"
+  - target: "ix://agent-ix/quoin/FR-011"
     type: "traces_to"
-  - target: "ix://agent-ix/quoin/FR-004"
+  - target: "ix://agent-ix/quoin/FR-013"
     type: "traces_to"
 ---
 
@@ -13,9 +13,9 @@ relationships:
 
 ## Story
 
-As an agent preparing a change, I want to inspect a type by name and retrieve
-the authoring pack for that type, so that I can keep the file structure aligned
-with the catalog contract.
+**As an** agent preparing a change
+**I want** to inspect a type by name and retrieve the authoring pack for that type
+**So that** I can keep the file structure aligned with the catalog contract.
 
 ## Context
 
