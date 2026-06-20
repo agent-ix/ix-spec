@@ -24,10 +24,8 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 
 > Coverage gate: `vite.config.ts` declares 100% v8 thresholds
 > (branches/functions/lines/statements). `make test` (`vitest run`) passes all
-> 97 tests; `pnpm run test:coverage` currently **fails the gate** at 99.61%
-> lines / 98.24% funcs — the only gap is the `(p) => p.name` mapping in
-> `cli.ts:322` (`plugin ensure-defaults`), exercised only when the registry is
-> non-empty (see Backsync Notes).
+> 99 tests and `pnpm run test:coverage` passes the gate at **100%**
+> (branches/functions/lines/statements).
 
 ## Functional Requirements
 
@@ -49,7 +47,7 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 | FR-014      | ✅ Covered | `write.test.ts` :: "renders an authoring pack as text"; :: "renders an authoring pack as JSON with --json"; :: "renders skeleton+schema, manifest-only, and object contracts"; :: "does not emit a manifest-only line when a contract has artifacts"                                                                                                                                                                            |
 | FR-015      | ✅ Covered | `write.test.ts` :: "builds a pack with contracts and a non-quoted clean repo path"; :: "quotes a repo path containing a space (shellQuote quoting branch)"; `index.test.ts` :: validation.command asserts `quire validate --scope`                                                                                                                                                                                              |
 | FR-016      | ✅ Covered | `index.test.ts` :: "ships the committed default module set" (asserts `default-modules.yaml` validates as a marketplace manifest with the expected entries)                                                                                                                                                                                                                                                                      |
-| FR-017      | ✅ Covered | `index.test.ts` :: "lazily installs the default module set, then loads its artifacts and objects"; `cli.test.ts` :: "ensure-defaults runs the installer and reports the registry"                                                                                                                                                                                                                                               |
+| FR-017      | ✅ Covered | `index.test.ts` :: "lazily installs the default module set, then loads its artifacts and objects"; `cli.test.ts` :: "ensure-defaults runs the installer and reports the registry"; :: "ensure-defaults reports installed plugin names from a non-empty registry"                                                                                                                                                                |
 | FR-018      | ✅ Covered | `plugins.test.ts` :: "path: prefix"; :: "github: with @ref"; :: "github: without ref leaves ref undefined"; :: "github: with //subdir maps to a git-subdir source (with ref)"; :: "github: with //subdir and no ref leaves ref undefined"; :: "package: npm with @version"; :: "package: npm without version"; :: "scoped package: npm keeps the scope @, splits on the last @"; :: "bare argument falls back to a path source" |
 | FR-019      | ✅ Covered | `plugins.test.ts` :: "install adds a plugin from a path source"; :: "installs, lists, then removes a plugin and its target dir + registry entry"; readModuleName suite ("reads the name from a top-level manifest.yaml"…); `cli.test.ts` :: "install without a source throws"; :: "remove without a name throws"; :: "remove deletes a plugin and prints confirmation"                                                          |
 | FR-020      | ✅ Covered | `flows.test.ts` :: "lists the bundled spec flows"; :: "throws for an unknown flow name"; `flows-notfound.test.ts` :: "throws when no candidate root contains the skill"                                                                                                                                                                                                                                                         |
@@ -66,7 +64,7 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 | NFR-005     | ⚠️ Review  | Workflow launchers reference catalog modules via `flows.ts` and the bundled skills; no automated assertion. Verified by review.                                                                                                                                              |
 | NFR-006     | ⚠️ Review  | The agent-pty harness (`evals/run.mjs`) records latency, tokens, tool calls, validation attempts, and context fetches from the Claude Code transcript; defined in `spec/evals.md`, implemented in `evals/`.                                                                  |
 | NFR-007     | ✅ Covered | `flows.test.ts` :: "rejects when ix-flow cannot be spawned (PATH has no ix-flow)"; :: "sets process.exitCode when ix-flow exits non-zero"; `write.test.ts` validation-command tests confirm `quire` is emitted, not executed. (Version pinning is an accepted gap — Review.) |
-| NFR-008     | ⚠️ Review  | `catalog.test.ts` :: "skips candidates that do not resolve to a module root" covers the missing-manifest skip. The strict-abort path on a present-but-unparseable `manifest.yaml` has **no dedicated test** (see Backsync Notes).                                            |
+| NFR-008     | ✅ Covered | `catalog.test.ts` :: "skips candidates that do not resolve to a module root" (missing-manifest skip); :: "aborts (strict) on a present but unparseable manifest.yaml" (strict-abort path).                                                                                   |
 
 ## Use Case Coverage
 
@@ -98,12 +96,9 @@ the Claude Code transcript. This unit-test matrix does not duplicate that table.
   scenarios live in `spec/evals.md`.
 - US trace targets were re-pointed to the new FR IDs and US-006 (duplicate
   detection) was added to cover `catalog validate`.
-- **Untested strict-abort (NFR-008):** the loader skips a candidate with no
-  `manifest.yaml` (tested) but throws on a present-but-unparseable
-  `manifest.yaml` (untested). A fixture with a corrupt `manifest.yaml` asserting
-  the abort would close this.
-- **Open coverage gap (FR-017):** `cli.test.ts` :: "ensure-defaults runs the
-  installer and reports the registry" runs against an empty registry, so the
-  `(p) => p.name` mapping at `cli.ts:322` is never executed and the 100%
-  coverage gate fails. Closing it needs an `ensure-defaults` case where
-  `listPlugins()` returns ≥1 plugin (assert the reported `plugins` array).
+- **Strict-abort (NFR-008) — RESOLVED:** `catalog.test.ts` :: "aborts (strict)
+  on a present but unparseable manifest.yaml" now covers the corrupt-manifest
+  path alongside the missing-manifest skip.
+- **Coverage gate (FR-017) — RESOLVED:** `cli.test.ts` :: "ensure-defaults
+  reports installed plugin names from a non-empty registry" exercises the
+  `(p) => p.name` mapping; `pnpm run test:coverage` now passes at 100%.

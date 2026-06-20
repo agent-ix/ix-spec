@@ -404,6 +404,23 @@ describe("runPlugin", () => {
     expect(Array.isArray(out.plugins)).toBe(true);
   });
 
+  test("ensure-defaults reports installed plugin names from a non-empty registry", async () => {
+    const home = tmp("home");
+    const mod = businessModule(tmp("plugin-src"));
+    const c = captureLog();
+    try {
+      await main(["plugin", "install", `path:${mod}`, "--config-root", home]);
+      // With a plugin already in the registry, ensure-defaults exercises the
+      // `listPlugins().map((p) => p.name)` reporting path (cli.ts).
+      await main(["plugin", "ensure-defaults", "--config-root", home]);
+    } finally {
+      c.restore();
+    }
+    const out = JSON.parse(c.lines[c.lines.length - 1]);
+    expect(out.ensured).toBe(true);
+    expect(out.plugins).toContain("spec-objects-business");
+  });
+
   test("remove deletes a plugin and prints confirmation", async () => {
     const home = tmp("home");
     const mod = businessModule(tmp("plugin-src"));

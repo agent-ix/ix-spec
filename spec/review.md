@@ -11,8 +11,9 @@ type: Review
 Review of the Phase 0 spec **overhaul** — a complete, code-faithful backport of
 `src/` (`cli`, `catalog`, `write`, `plugins`, `modules`, `flows`). The prior
 coarse FR-001…FR-011 set was superseded by a capability-grouped FR-001…FR-021 /
-NFR-001…NFR-006 set; user stories were re-traced and US-006 (duplicate
-detection) was added; the test matrix was regenerated against `tests/`.
+NFR-001…NFR-008 set (NFR-007/008 added during this review); user stories were
+re-traced and US-006 (duplicate detection) was added; the test matrix was
+regenerated against `tests/`.
 
 ## Automated Checks
 
@@ -22,7 +23,8 @@ detection) was added; the test matrix was regenerated against `tests/`.
 - **Link integrity:** every `US → FR` `traces_to` target (FR-010/011/012/013/
   014/015/017/018/019/020/021) resolves to a declared FR.
 - **Quire validation:** `quire validate --scope . "spec/**/*.md"` exits 0.
-- **Test suite:** `make test` → 97 passed (9 files).
+- **Test suite:** `make test` → 99 passed (9 files); `pnpm run test:coverage`
+  passes the 100% gate.
 
 ## Checklist Results
 
@@ -43,13 +45,10 @@ detection) was added; the test matrix was regenerated against `tests/`.
 
 ## Findings
 
-1. **Open coverage gap (FR-017) — action item.** `pnpm run test:coverage`
-   fails the declared 100% gate at 99.61% lines / 98.24% funcs. The sole gap is
-   the `(p) => p.name` mapping at `cli.ts:322` in `plugin ensure-defaults`,
-   reached only when the registry is non-empty; the existing test runs against
-   an empty registry. **Action:** add an `ensure-defaults` test that seeds ≥1
-   plugin and asserts the reported `plugins` array. (`make test` itself is
-   green; only the coverage script is red.)
+1. **Coverage gap (FR-017) — RESOLVED.** `cli.test.ts` :: "ensure-defaults
+   reports installed plugin names from a non-empty registry" now exercises the
+   `(p) => p.name` mapping at `cli.ts:322`. `pnpm run test:coverage` passes at
+   100% (branches/functions/lines/statements), 99 tests.
 
 2. **Framework FRs are intentionally not US-traced.** FR-001…FR-009 and FR-016
    describe CLI-framework and catalog-assembly mechanics (arg grammar, version,
@@ -112,25 +111,99 @@ Both lenses from the `spec-review` process were run against `spec.md` + `src/`:
 
 ## Findings (analysis)
 
-6. **NFR-008 strict-abort is untested — action item.** The skip-on-missing path
-   is tested; the abort-on-malformed-manifest path is not. Add a corrupt-manifest
-   fixture asserting the throw.
+6. **NFR-008 strict-abort — RESOLVED.** `catalog.test.ts` :: "aborts (strict)
+   on a present but unparseable manifest.yaml" now asserts the throw, alongside
+   the existing missing-manifest skip test.
 7. **External-tool versions unpinned (NFR-007) — known limitation.** `ix-flow`
    and `quire` are resolved from `PATH` with no minimum-version check. Acceptable
    for Phase 0; revisit when either tool's CLI contract changes.
 
+## Analysis Lenses (dependency / evidence / risk / scope)
+
+The remaining four lenses from the `spec-review` process were also run. Kept
+inline here (the dependency skill permits inline analysis) rather than as
+separate `spec/analysis/*.md` files, since no `analysis` archetype exists and
+loose files would not validate under Quire.
+
+### Dependency & Ordering — no cycles
+
+Logical implementation order (enablement → feature):
+
+1. **Root enablement:** FR-001 (arg parsing), FR-004 (config root / runtime
+   context).
+2. **Catalog enablement:** FR-006 (module-root location) → FR-007 (assembly
+   order) → FR-008 (dedup) / FR-009 (manifest parse) / FR-010 (lookup).
+3. **Module-store enablement:** FR-016 (committed default set), FR-018 (source
+   grammar).
+4. **Features:** FR-002/003/005 (version/help/errors), FR-011/012 (list/show/
+   validate), FR-013/014/015 (write), FR-017/019 (reconcile / plugin lifecycle),
+   FR-020/021 (workflow launch).
+
+No cyclic prerequisites. (Retrospective DAG — the code already exists; this
+orders a re-implementation and feeds `spec-to-plan`.)
+
+### Verification & Evidence — no open gaps
+
+Every FR is `test` with a named case in `spec/matrix.md`. Non-test methods:
+NFR-004 = inspection (`package.json` deps), NFR-005 = inspection
+(`flows.ts` + bundled skills), NFR-006 = metric (`evals/` harness), NFR-008 =
+test (skip + strict-abort paths). **Open evidence gaps:** none — the FR-017 and
+NFR-008 gaps flagged during review (Findings 1 and 6) were closed with new
+tests; `pnpm run test:coverage` passes at 100%.
+
+### Risk & Complexity — no high tech risk
+
+quoin is a low-novelty CLI: no concurrency, cryptography, or perf SLA, and is
+not `security_critical`. Tech risk is low across the board. The volatility
+cluster is **external-contract coupling**:
+
+| Req        | Tech | Volatility | Driver                                                |
+| ---------- | ---- | ---------- | ----------------------------------------------------- |
+| FR-017/019 | Low  | Medium     | `ts-plugin-kit` install/reconcile/registry contract   |
+| FR-018     | Low  | Med-High   | `package:`/npm source is forward-declared; will churn |
+| FR-020/021 | Low  | Medium     | `ix-flow` CLI argument contract (unpinned, NFR-007)   |
+| NFR-006    | Low  | Medium     | agent-pty evals depend on the external model provider |
+
+**Top hazard:** FR-018's npm source — the highest-churn item — but it is
+isolated in `parseSourceArg`, so the blast radius is contained.
+
+### Scope & Boundary — external deps are all _assumed_
+
+In scope: arg dispatch, catalog assembly, authoring-pack emission, default-set
+reconcile trigger, plugin source mapping, workflow launch. External
+dependencies and how they are verified **locally**:
+
+| Dependency                | Relationship                           | Verified locally?                                                      |
+| ------------------------- | -------------------------------------- | ---------------------------------------------------------------------- |
+| `@agent-ix/ts-plugin-kit` | delegated (install/registry/reconcile) | Assumed — exercised via path-source fixtures, not a contract test      |
+| `ix-flow`                 | spawned process                        | Assumed — tested against a **fake** `ix-flow` binary, not the real CLI |
+| `quire`                   | command emitted, never run by quoin    | Assumed — only the command string is asserted                          |
+| `@agent-ix/ix-cli-core`   | linked runtime context                 | Assumed                                                                |
+
+## Findings (analysis, continued)
+
+8. **No local contract tests against external tools (scope).** Every external
+   boundary is `assumed`. `ix-flow` is covered only by a fake-binary stand-in;
+   `quire`/`ts-plugin-kit` behavior is not contract-verified here (cross-repo
+   contracts such as the quire-rs shared store are asserted in those repos). If
+   an upstream CLI contract drifts, quoin's tests would not catch it. Low
+   priority for Phase 0; candidate for an integration-test layer later.
+9. **`package:`/npm source is the top churn item (risk).** FR-018 forward-
+   declares npm support that `ts-plugin-kit` rejects today. Isolated in
+   `parseSourceArg`; revisit when npm support lands.
+
 ## Gate
 
-**Accepted with action items, ready to commit.** The spec is a faithful backport
-of current behavior, validates under Quire, and every requirement traces to a
-real test. No blocker is a _spec_ defect — the open items are test gaps and
-known limitations:
+**Accepted — clean.** The spec is a faithful backport of current behavior,
+validates under Quire, and every requirement traces to a real test:
 
-- Finding 1 (FR-017 coverage gap) and Finding 6 (NFR-008 untested) are **test**
-  gaps, not spec gaps — they belong to the implementation, recorded here for the
-  backlog.
-- Findings 2–5, 7 and the StR/atomicity notes are accepted properties or
-  documented limitations.
+- Findings 1 (FR-017) and 6 (NFR-008) — the two test gaps found during review —
+  were **closed** with new tests; `pnpm run test:coverage` passes the 100% gate
+  (99 tests).
+- Findings 2–5, 7, 8, 9 and the StR/atomicity notes are accepted properties,
+  documented limitations, or low-priority follow-ups (cross-repo contract tests,
+  the forward-declared npm source) — none block the spec or a release.
 
-The spec accurately reflects `src/` as of this review and is safe to commit; the
-two test gaps should be closed before a release gate.
+All six `spec-review` analysis lenses (integrity, failure-domain, dependency,
+evidence, risk, scope) were run. The spec accurately reflects `src/` as of this
+review with no open action items.

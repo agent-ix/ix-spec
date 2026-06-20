@@ -126,6 +126,15 @@ describe("loadCatalog", () => {
     expect(catalog.modules).toEqual([]);
   });
 
+  test("aborts (strict) on a present but unparseable manifest.yaml", () => {
+    // NFR-008: a missing manifest is skipped, but a corrupt one surfaces rather
+    // than being silently dropped — loadCatalog throws instead of returning a
+    // partial catalog.
+    const dir = tmp("bad-manifest");
+    writeFileSync(join(dir, "manifest.yaml"), "name: [unterminated\n");
+    expect(() => loadCatalog([dir])).toThrow();
+  });
+
   test("handles modules with and without a version and artifacts with/without schemaRef", () => {
     const root = tmp("versions");
     writeModule(
