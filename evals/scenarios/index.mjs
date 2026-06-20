@@ -502,6 +502,36 @@ export const SCENARIOS = [
       validate: { globs: ["spec/**/*.md"], shouldPass: true },
     },
   },
+  {
+    // Direct-render spec-review: one validated SpecReview doc per selected
+    // analysis, with the coverage gate enforcing the chosen set.
+    id: "EV-026",
+    useCase: "US-005",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+    },
+    // Outcome-focused: the agent runs a subset spec-review and produces one
+    // validated SpecReview doc per selected analysis. (EV-005 separately covers
+    // the ix-flow workflow lifecycle; here we assert the artifacts + validation.)
+    prompt:
+      "Run a spec review of the spec/ directory using the spec-review skill " +
+      "(`quoin review --target spec/ --id eval-specreview`). Choose the `subset` " +
+      "review set with exactly the analyses `integrity` and `dependency`. Produce " +
+      "ONE SpecReview document per selected analysis under spec/reviews/ " +
+      "(spec/reviews/integrity.md and spec/reviews/dependency.md) — each with " +
+      "`type: SpecReview` frontmatter, a `## Summary`, and a `## Findings` table " +
+      "(columns ID | Severity | Summary | Refs, FND-NNN ids, Severity one of " +
+      "low/medium/high). Validate them with quire so they pass.",
+    expect: {
+      files: ["spec/reviews/integrity.md", "spec/reviews/dependency.md"],
+      validate: { globs: ["spec/reviews/*.md"], shouldPass: true },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];
