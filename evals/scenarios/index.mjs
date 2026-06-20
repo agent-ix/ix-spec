@@ -387,9 +387,10 @@ export const SCENARIOS = [
     useCase: "US-001",
     prompt:
       "Start a new spec for a small URL-shortener service: a user submits a long " +
-      "URL and gets back a short code that later redirects to the original. Create " +
-      "the spec under spec/ — author the user story and the functional requirement " +
-      "that implements it as their own files.",
+      "URL and gets back a short code that later redirects to the original. " +
+      "Initialize the spec: create the master spec.md (the master-requirements " +
+      "root/index) plus the user story and the functional requirement that " +
+      "implements it — each as its own file in its OKF directory.",
     expect: {
       files: ["spec/spec.md"],
       artifacts: {
