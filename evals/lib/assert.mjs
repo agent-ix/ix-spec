@@ -3,7 +3,7 @@
 // and keys `quire validate` pass/fail on EXIT CODE only — `DuplicateArchetype`
 // warnings on stderr coexist with a passing (exit 0) validation.
 
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -47,6 +47,34 @@ export function matchFiles(repo, glob) {
   return listFiles(repo).filter((f) => re.test(f));
 }
 
+/** Read the frontmatter `type:` discriminator of a markdown file (null if none). */
+function frontmatterType(abs) {
+  let text;
+  try {
+    text = readFileSync(abs, "utf8");
+  } catch {
+    return null;
+  }
+  if (!text.startsWith("---")) return null;
+  const end = text.indexOf("\n---", 3);
+  if (end === -1) return null;
+  const m = text
+    .slice(3, end)
+    .match(/^type:\s*["']?([A-Za-z0-9_-]+)["']?\s*$/m);
+  return m ? m[1] : null;
+}
+
+/** Map every `*.md` under root to its frontmatter `type` (repo-relative path -> type). */
+function artifactsByType(root) {
+  const byType = {};
+  for (const rel of listFiles(root)) {
+    if (!rel.toLowerCase().endsWith(".md")) continue;
+    const t = frontmatterType(join(root, rel));
+    if (t) (byType[t.toLowerCase()] ??= []).push(rel);
+  }
+  return byType;
+}
+
 function ixSpec(ctx, args, env) {
   return spawnSync(process.execPath, [ixSpecBin(), ...args], {
     cwd: ctx.repo,
@@ -59,6 +87,7 @@ function ixSpec(ctx, args, env) {
  * Assert a scenario's expectations against the final repo + config state.
  * @param expect {
  *   files?: string[], validate?: {globs, shouldPass},
+ *   artifacts?: {require?: {[TYPE]: {min?, dir?}}, absent?: string[]},
  *   flow?: [{id, defName}], cliRejects?: string[],
  *   plugin?: {name, present}, resolvesTo?: {type, moduleNameIncludes},
  *   sentinel?: "complete"|"failed"
@@ -87,6 +116,38 @@ export function assertExpectations(
     matchedFiles[glob] = hits.length;
     if (hits.length === 0)
       failures.push(`no file matched expected glob: ${glob}`);
+  }
+
+  // Artifact-completeness: a request must produce the right artifact TYPES as
+  // discrete files (an FR authored only as a row in spec.md's table is NOT an FR
+  // artifact and must fail here). Keyed on frontmatter `type:`.
+  if (expect.artifacts) {
+    const { require: required = {}, absent = [] } = expect.artifacts;
+    const byType = artifactsByType(scope);
+    const pathsFor = (type) => byType[type.toLowerCase()] ?? [];
+    for (const [type, spec] of Object.entries(required)) {
+      const { min = 1, dir } = spec ?? {};
+      let paths = pathsFor(type);
+      if (dir) {
+        const prefix = dir.replace(/\/+$/, "") + "/";
+        paths = paths.filter((p) => p.startsWith(prefix));
+      }
+      checks[`artifacts:${type}`] = { ok: paths.length >= min, paths };
+      if (paths.length < min) {
+        failures.push(
+          `expected >=${min} ${type} artifact(s)${dir ? ` under ${dir}/` : ""}, found ${paths.length}`,
+        );
+      }
+    }
+    for (const type of absent) {
+      const paths = pathsFor(type);
+      checks[`artifacts:absent:${type}`] = { ok: paths.length === 0, paths };
+      if (paths.length > 0) {
+        failures.push(
+          `expected no ${type} artifact but found ${paths.length}: ${paths.join(", ")}`,
+        );
+      }
+    }
   }
 
   let validation = null;
