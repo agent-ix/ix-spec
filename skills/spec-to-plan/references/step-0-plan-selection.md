@@ -22,8 +22,30 @@ A project holds **multiple plans** under `plan/`, each a bundle
 
    Continue one of these, or start a new plan?
    ```
-3. **Continue** → use the chosen bundle; jump to Step 1 (it appends/updates).
-   **New** → go to step 2 below.
+3. **Continue** (update an existing plan, e.g. after a spec change) → use the chosen
+   bundle and **update it in place** (see below). **New** → go to step 2 below.
+
+#### Updating an existing plan
+
+A common flow is: the spec changed (a requirement was added, edited, or removed),
+now regenerate the plan. Continue the existing bundle — **never spawn a second plan
+for the same effort**:
+
+- **Diff coverage.** Re-read the current requirements and compare them to the plan's
+  `relationships: references` and existing `tasks/`. Identify requirements that are
+  new, changed, or removed.
+- **Add only what's missing.** Create `Task` files for newly covered requirements,
+  continuing the existing `Task-NNN` numbering. Do **not** duplicate tasks that
+  already exist for unchanged requirements.
+- **Reconcile changed/removed.** For a changed requirement, update its task's scope
+  and `verifies`/`references` edges. For a removed requirement, drop or mark its task
+  (don't silently leave an orphan).
+- **Preserve progress.** Leave `status` on tasks already `in_progress`/`done` intact.
+- **Update the plan doc + edges.** Extend `plan.md`'s `relationships: references` and
+  body (dependency graph, tracks) to include the new work.
+- **Refresh index + log.** Update `index.md`'s `## Contents` for any added/removed
+  task files, and append a dated `log.md` `## History` entry describing the change
+  (e.g. "Regenerated after FR-008 added: +Task-013").
 
 ### 2. Create a new plan bundle
 

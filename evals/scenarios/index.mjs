@@ -7,7 +7,8 @@
 //  - env:     optional (ctx)=>extra env for BOTH the agent run and the ground-truth
 //             assertion (e.g. QUOIN_MODULE_PATHS).
 //  - expect:  ground-truth success checks (see lib/assert.mjs):
-//             files, validate, artifacts, flow, cliRejects, plugin, resolvesTo, sentinel.
+//             files, absentFiles, validate, artifacts, flow, cliRejects, plugin,
+//             resolvesTo, sentinel.
 //
 // EV-021..EV-025 are the artifact-completeness set: they drive `/specify` for
 // request shapes (new project / add US / edit FR / add US+FR / backport) and use
@@ -704,6 +705,132 @@ export const SCENARIOS = [
         "plan/Plan-002-*/index.md",
         "plan/Plan-002-*/log.md",
       ],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // Update-in-place: the spec gained a requirement the existing plan doesn't
+    // cover; the agent must regenerate the SAME plan (add a task, refresh
+    // index/log) rather than spawn a second one. `Plan max:1` + `Task min:3`
+    // proves the existing bundle grew; `absentFiles` rules out a second plan.
+    id: "EV-029",
+    useCase: "US-008",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-002.md",
+      );
+      const seedTask = (id, title, fr) =>
+        [
+          "---",
+          `id: ${id}`,
+          `title: "${title}"`,
+          "type: Task",
+          "status: not_started",
+          "track: A",
+          "priority: P1",
+          "relationships:",
+          `  - target: ix://agent-ix/eval/${fr}`,
+          "    type: references",
+          "---",
+          `# ${id}: ${title}`,
+          "",
+          "## Scope",
+          `Covers ${fr}.`,
+          "",
+        ].join("\n");
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/plan.md",
+        [
+          "---",
+          "id: PLAN-001",
+          'title: "Core plan"',
+          "type: Plan",
+          "status: active",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# PLAN-001: Core plan",
+          "",
+          "## Scope",
+          "Covers FR-001 only (FR-002 not yet planned).",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/index.md",
+        [
+          "---",
+          "type: index",
+          'title: "PLAN-001 — Core plan"',
+          'description: "Contents of the PLAN-001 bundle."',
+          'okf_version: "0.1"',
+          "---",
+          "# PLAN-001 — Core plan",
+          "",
+          "## Contents",
+          "",
+          "* [PLAN-001: Core plan](./plan.md) - Plan overview.",
+          "* [TASK-001](./tasks/TASK-001-fr001.md) - FR-001 work.",
+          "* [TASK-002](./tasks/TASK-002-fr001-tests.md) - FR-001 tests.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/log.md",
+        [
+          "---",
+          "type: log",
+          'title: "PLAN-001 — Update Log"',
+          'description: "Change log for the PLAN-001 bundle."',
+          "---",
+          "# PLAN-001 — Update Log",
+          "",
+          "## History",
+          "",
+          "* **2026-06-21** — Plan created covering FR-001.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/tasks/TASK-001-fr001.md",
+        seedTask("TASK-001", "FR-001 implementation", "FR-001"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/tasks/TASK-002-fr001-tests.md",
+        seedTask("TASK-002", "FR-001 tests", "FR-001"),
+      );
+    },
+    prompt:
+      "The spec now has a NEW requirement, FR-002 (spec/functional/FR-002.md), that " +
+      "the existing plan plan/PLAN-001-core/ does NOT cover — it currently plans only " +
+      "FR-001. Use the spec-to-plan skill to UPDATE that existing plan in place: add " +
+      "task(s) covering FR-002 (continuing the TASK-NNN numbering), extend the plan's " +
+      "`relationships: references`, and refresh its index.md and log.md. Do NOT create " +
+      "a second plan bundle. Validate all plans with quire so they pass.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 1, max: 1, dir: "plan" },
+          Task: { min: 3, dir: "plan" },
+        },
+      },
+      files: ["plan/PLAN-001-core/tasks/*.md"],
+      absentFiles: ["plan/PLAN-002-*/plan.md", "plan/Plan-002-*/plan.md"],
       validate: { globs: ["plan/**/*.md"], shouldPass: true },
     },
   },
