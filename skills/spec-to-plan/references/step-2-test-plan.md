@@ -17,10 +17,12 @@
     -   For each Non-Functional Requirement (NFR), define the **Verification Method** (e.g., Load Test script, Static Analysis check, Manual Inspection).
 
 4.  **Structure the Plan**:
-    -   Append a "Test Plan" section to `/plan/plan.md`.
+    -   Append a "Test Plan" section to the bundle's `plan/<Plan-id>-<slug>/plan.md`.
     -   Group tests by the component/module they target.
+    -   Note the TC ids here — Step 3 wires them onto each task as
+        `relationships: verifies` edges, so keep them stable.
 
-## Output Format (/plan/plan.md)
+## Output Format (appended to plan/<Plan-id>-<slug>/plan.md)
 
 ```markdown
 ## Test Plan

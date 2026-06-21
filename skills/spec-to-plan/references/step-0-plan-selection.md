@@ -1,0 +1,99 @@
+# Step 0: Plan Selection
+
+**Goal**: Decide which plan this run targets — continue an existing one or start a
+new one — and scaffold the plan bundle so Steps 1–3 have a place to write.
+
+A project holds **multiple plans** under `plan/`, each a bundle
+`plan/<Plan-id>-<slug>/`. This step picks exactly one target bundle.
+
+## Process
+
+### 1. Resolve the target plan
+
+1. **Already in context?** If the user named a plan (an arg like `Plan-002`, or a
+   plan established earlier this session), use it and skip the prompt.
+2. **Discover existing plans.** Glob `plan/*/plan.md`. For each, read the frontmatter
+   `id`, `title`, and `status`. Present them:
+
+   ```
+   Existing plans:
+   - Plan-001  electron-hello core app        (active)
+   - Plan-002  packaging & distribution        (active)
+
+   Continue one of these, or start a new plan?
+   ```
+3. **Continue** → use the chosen bundle; jump to Step 1 (it appends/updates).
+   **New** → go to step 2 below.
+
+### 2. Create a new plan bundle
+
+1. **Allocate the id.** Next `Plan-NNN` after the highest existing id (zero-padded
+   to 3 digits, e.g. `Plan-003`). If none exist, `Plan-001`.
+2. **Derive `slug` and `title`.** Slug is kebab-case, no id prefix (e.g.
+   `electron-hello-core`). Title is human-readable.
+3. **Scope the requirements.** Collect the requirement ids (StR/FR/NFR) this plan
+   covers — these become the plan's `relationships: references` edges.
+4. **Scaffold the bundle** at `plan/<Plan-id>-<slug>/`:
+
+   - `plan.md` — `type: Plan` frontmatter (Step 1 fills the body):
+
+     ```yaml
+     ---
+     id: Plan-003
+     title: "Packaging & distribution"
+     type: Plan
+     status: active
+     relationships:
+       - target: ix://<org>/<component>/FR-008
+         type: references
+       # …one per covered requirement
+     ---
+     ```
+     `<org>`/`<component>` come from the spec's `spec.md` frontmatter (`org`, `name`).
+
+   - `index.md` — `type: index`, body `## Contents` (link list; starts with `plan.md`,
+     grows as tasks are added in Step 3):
+
+     ```markdown
+     ---
+     type: index
+     title: "Plan-003 — Packaging & distribution"
+     description: "Contents of the Plan-003 bundle."
+     okf_version: "0.1"
+     ---
+     # Plan-003 — Packaging & distribution
+
+     ## Contents
+
+     * [Plan-003: Packaging & distribution](./plan.md) - Plan overview, DAG, tracks, gates.
+     ```
+
+   - `log.md` — `type: log`, body `## History` (dated entries; seed with creation):
+
+     ```markdown
+     ---
+     type: log
+     title: "Plan-003 — Update Log"
+     description: "Chronological log of changes to the Plan-003 bundle."
+     ---
+     # Plan-003 — Update Log
+
+     ## History
+
+     * **<YYYY-MM-DD>** — Plan created from spec; scoped to FR-008, FR-009, NFR-004.
+     ```
+
+   - `tasks/` — empty directory (Step 3 populates it).
+
+### 3. Hand off
+
+State the resolved bundle path (e.g. `plan/Plan-003-packaging-distribution/`)
+explicitly so Steps 1–3 — and any downstream skill — write to the right place.
+
+## Notes
+
+- **Never write to a second plan's files** during this run. One run targets one bundle.
+- Use **today's date** (real calendar date) in `log.md`; do not invent or reuse a
+  date from the skeleton.
+- `index.md`/`log.md` follow the reserved OKF archetypes from `spec-artifacts-iso`
+  (`skeletons/index.md`, `skeletons/log.md`).

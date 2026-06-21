@@ -65,7 +65,10 @@ interviews:
 artifactTemplates:
   implementation_plan:
     source: templates/implementation-plan/default.md
-    target: spec/plans/${items.plan_answers.plan.id}-${items.plan_answers.plan.slug}.md
+    # Plan bundle layout: plan/<Plan-id>-<slug>/plan.md (index.md, log.md and the
+    # tasks/ Task files are authored by the skill's Step 0 / Step 3, which read the
+    # same plan_answers). This template drafts the bundle's plan.md shell.
+    target: plan/${items.plan_answers.plan.id}-${items.plan_answers.plan.slug}/plan.md
     phase: plan_drafted
     frontmatterSchema: ImplementationPlanSchema
 recipes:
