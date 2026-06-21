@@ -20,13 +20,33 @@
     -   **Build a DAG**: Express dependencies as directed edges with reasons. This graph drives Step 3 execution planning.
 
 4.  **Traceability Mapping**:
-    -   Create or update `/plan/plan.md` with a requirements checklist.
+    -   Create or update the target bundle's `plan/<Plan-id>-<slug>/plan.md` (the
+        bundle resolved in Step 0) with a requirements checklist.
     -   Include the full dependency graph with edge labels.
+    -   Ensure the plan's frontmatter `relationships:` carries one `references` edge
+        per requirement the plan covers (see the frontmatter block below); this is
+        the machine-readable trace.
 
-## Output Format (/plan/plan.md)
+## Output Format (plan/<Plan-id>-<slug>/plan.md)
+
+The file is a `type: Plan` artifact. Frontmatter is the machine contract; the body
+below is the human-facing plan. `<org>`/`<component>` come from `spec.md`
+frontmatter (`org`, `name`).
 
 ```markdown
-# Implementation Plan: [Component Name]
+---
+id: Plan-001
+title: "[Component] — [plan title]"
+type: Plan
+status: active
+relationships:
+  - target: ix://<org>/<component>/FR-001
+    type: references
+  - target: ix://<org>/<component>/NFR-001
+    type: references
+  # …one `references` edge per covered requirement
+---
+# Implementation Plan: [Plan title]
 
 ## Requirements Summary
 

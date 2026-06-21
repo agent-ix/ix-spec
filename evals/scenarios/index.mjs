@@ -7,7 +7,8 @@
 //  - env:     optional (ctx)=>extra env for BOTH the agent run and the ground-truth
 //             assertion (e.g. QUOIN_MODULE_PATHS).
 //  - expect:  ground-truth success checks (see lib/assert.mjs):
-//             files, validate, artifacts, flow, cliRejects, plugin, resolvesTo, sentinel.
+//             files, absentFiles, validate, artifacts, flow, cliRejects, plugin,
+//             resolvesTo, sentinel.
 //
 // EV-021..EV-025 are the artifact-completeness set: they drive `/specify` for
 // request shapes (new project / add US / edit FR / add US+FR / backport) and use
@@ -551,6 +552,286 @@ export const SCENARIOS = [
       ],
       files: ["spec/reviews/integrity.md", "spec/reviews/dependency.md"],
       validate: { globs: ["spec/reviews/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // spec-to-plan emits a multi-plan bundle: plan/<Plan-id>-<slug>/ with a
+    // type: Plan plan.md, type: Task task files, and the reserved index.md/log.md.
+    // The DAG/ownership/test traces live in each Task's `relationships:`
+    // (depends_on/references/verifies). This asserts the bundle is authored as
+    // discrete Plan + Task artifacts and validates. The agent chooses Plan/Task ids
+    // valid under the active spec-artifacts-process schema (e.g. PL-001/TSK-001 under
+    // the uppercase-only published schema; Plan-001/Task-001 once the mixed-case
+    // schema PR is pinned in default-modules.yaml).
+    id: "EV-027",
+    useCase: "US-008",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+    },
+    prompt:
+      "Requirements are accepted in spec/. Use the spec-to-plan skill to create a " +
+      "NEW implementation plan as a bundle under plan/ — a directory " +
+      "plan/<Plan-id>-<slug>/ containing a `type: Plan` plan.md, an index.md " +
+      "(`type: index`), a log.md (`type: log`), and a tasks/ directory of " +
+      "`type: Task` files. Decompose into at least 3 tasks and encode the " +
+      "dependencies as `relationships: depends_on` edges in the task frontmatter " +
+      "(plus `references` to the requirement and `verifies` to its test cases). " +
+      "Validate the whole bundle with quire so it passes.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 1, dir: "plan" },
+          Task: { min: 3, dir: "plan" },
+        },
+      },
+      files: ["plan/**/index.md", "plan/**/log.md", "plan/**/tasks/*.md"],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // Step-0 multi-plan selection: a project already holds a plan; the agent must
+    // start a SECOND, independent plan (Plan-002) without disturbing the first.
+    // Asserts >=2 Plan artifacts and a Plan-002 bundle, all validating.
+    id: "EV-028",
+    useCase: "US-008",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+      // Seed an existing, valid Plan-001 bundle.
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/plan.md",
+        [
+          "---",
+          "id: PLAN-001",
+          'title: "Seed plan"',
+          "type: Plan",
+          "status: active",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# PLAN-001: Seed plan",
+          "",
+          "## Scope",
+          "Pre-existing plan in this project.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/index.md",
+        [
+          "---",
+          "type: index",
+          'title: "Plan-001 — Seed plan"',
+          'description: "Contents of the Plan-001 bundle."',
+          'okf_version: "0.1"',
+          "---",
+          "# Plan-001 — Seed plan",
+          "",
+          "## Contents",
+          "",
+          "* [Plan-001: Seed plan](./plan.md) - Plan overview.",
+          "* [Task-001: seed task](./tasks/Task-001-seed.md) - Seed task.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/log.md",
+        [
+          "---",
+          "type: log",
+          'title: "Plan-001 — Update Log"',
+          'description: "Change log for the Plan-001 bundle."',
+          "---",
+          "# Plan-001 — Update Log",
+          "",
+          "## History",
+          "",
+          "* **2026-06-21** — Seed plan created.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/tasks/Task-001-seed.md",
+        [
+          "---",
+          "id: TASK-001",
+          'title: "seed task"',
+          "type: Task",
+          "status: not_started",
+          "track: A",
+          "priority: P1",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# Task-001: seed task",
+          "",
+          "## Scope",
+          "Seed task in Plan-001.",
+          "",
+        ].join("\n"),
+      );
+    },
+    prompt:
+      "This project ALREADY has a plan at plan/Plan-001-seed/. Use the spec-to-plan " +
+      "skill to start a NEW, SECOND plan (do not modify Plan-001) for a follow-up " +
+      "effort based on the requirements in spec/. Produce a fresh bundle " +
+      "plan/Plan-002-<slug>/ with a `type: Plan` plan.md, index.md, log.md, and a " +
+      "tasks/ directory of `type: Task` files. Validate all plans with quire so they " +
+      "pass.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 2, dir: "plan" },
+          Task: { min: 2, dir: "plan" },
+        },
+      },
+      files: [
+        "plan/Plan-002-*/plan.md",
+        "plan/Plan-002-*/index.md",
+        "plan/Plan-002-*/log.md",
+      ],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // Update-in-place: the spec gained a requirement the existing plan doesn't
+    // cover; the agent must regenerate the SAME plan (add a task, refresh
+    // index/log) rather than spawn a second one. `Plan max:1` + `Task min:3`
+    // proves the existing bundle grew; `absentFiles` rules out a second plan.
+    id: "EV-029",
+    useCase: "US-008",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-002.md",
+      );
+      const seedTask = (id, title, fr) =>
+        [
+          "---",
+          `id: ${id}`,
+          `title: "${title}"`,
+          "type: Task",
+          "status: not_started",
+          "track: A",
+          "priority: P1",
+          "relationships:",
+          `  - target: ix://agent-ix/eval/${fr}`,
+          "    type: references",
+          "---",
+          `# ${id}: ${title}`,
+          "",
+          "## Scope",
+          `Covers ${fr}.`,
+          "",
+        ].join("\n");
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/plan.md",
+        [
+          "---",
+          "id: PLAN-001",
+          'title: "Core plan"',
+          "type: Plan",
+          "status: active",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# PLAN-001: Core plan",
+          "",
+          "## Scope",
+          "Covers FR-001 only (FR-002 not yet planned).",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/index.md",
+        [
+          "---",
+          "type: index",
+          'title: "PLAN-001 — Core plan"',
+          'description: "Contents of the PLAN-001 bundle."',
+          'okf_version: "0.1"',
+          "---",
+          "# PLAN-001 — Core plan",
+          "",
+          "## Contents",
+          "",
+          "* [PLAN-001: Core plan](./plan.md) - Plan overview.",
+          "* [TASK-001](./tasks/TASK-001-fr001.md) - FR-001 work.",
+          "* [TASK-002](./tasks/TASK-002-fr001-tests.md) - FR-001 tests.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/log.md",
+        [
+          "---",
+          "type: log",
+          'title: "PLAN-001 — Update Log"',
+          'description: "Change log for the PLAN-001 bundle."',
+          "---",
+          "# PLAN-001 — Update Log",
+          "",
+          "## History",
+          "",
+          "* **2026-06-21** — Plan created covering FR-001.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/tasks/TASK-001-fr001.md",
+        seedTask("TASK-001", "FR-001 implementation", "FR-001"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/PLAN-001-core/tasks/TASK-002-fr001-tests.md",
+        seedTask("TASK-002", "FR-001 tests", "FR-001"),
+      );
+    },
+    prompt:
+      "The spec now has a NEW requirement, FR-002 (spec/functional/FR-002.md), that " +
+      "the existing plan plan/PLAN-001-core/ does NOT cover — it currently plans only " +
+      "FR-001. Use the spec-to-plan skill to UPDATE that existing plan in place: add " +
+      "task(s) covering FR-002 (continuing the TASK-NNN numbering), extend the plan's " +
+      "`relationships: references`, and refresh its index.md and log.md. Do NOT create " +
+      "a second plan bundle. Validate all plans with quire so they pass.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 1, max: 1, dir: "plan" },
+          Task: { min: 3, dir: "plan" },
+        },
+      },
+      files: ["plan/PLAN-001-core/tasks/*.md"],
+      absentFiles: ["plan/PLAN-002-*/plan.md", "plan/Plan-002-*/plan.md"],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
     },
   },
 ];

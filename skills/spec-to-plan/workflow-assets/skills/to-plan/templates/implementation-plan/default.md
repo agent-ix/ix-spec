@@ -1,7 +1,8 @@
 ---
-type: implementation-plan
+type: Plan
 id: "{{items.plan_answers.plan.id}}"
 title: "{{items.plan_answers.plan.title}}"
+status: active
 traces_to:
   - "{{items.plan_answers.plan.requirement_ids}}"
 ---

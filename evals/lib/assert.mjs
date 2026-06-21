@@ -86,7 +86,7 @@ function ixSpec(ctx, args, env) {
 /**
  * Assert a scenario's expectations against the final repo + config state.
  * @param expect {
- *   files?: string[], validate?: {globs, shouldPass},
+ *   files?: string[], absentFiles?: string[], validate?: {globs, shouldPass},
  *   artifacts?: {require?: {[TYPE]: {min?, dir?}}, absent?: string[]},
  *   flow?: [{id, defName}], cliRejects?: string[],
  *   plugin?: {name, present}, resolvesTo?: {type, moduleNameIncludes},
@@ -118,6 +118,17 @@ export function assertExpectations(
       failures.push(`no file matched expected glob: ${glob}`);
   }
 
+  // Negative file globs: assert NO file matches (e.g. an update-in-place scenario
+  // must not spawn a second plan bundle).
+  for (const glob of expect.absentFiles ?? []) {
+    const hits = matchFiles(scope, glob);
+    matchedFiles[`!${glob}`] = hits.length;
+    if (hits.length > 0)
+      failures.push(
+        `expected no file matching ${glob}, found ${hits.length}: ${hits.join(", ")}`,
+      );
+  }
+
   // Artifact-completeness: a request must produce the right artifact TYPES as
   // discrete files (an FR authored only as a row in spec.md's table is NOT an FR
   // artifact and must fail here). Keyed on frontmatter `type:`.
@@ -126,16 +137,23 @@ export function assertExpectations(
     const byType = artifactsByType(scope);
     const pathsFor = (type) => byType[type.toLowerCase()] ?? [];
     for (const [type, spec] of Object.entries(required)) {
-      const { min = 1, dir } = spec ?? {};
+      const { min = 1, max, dir } = spec ?? {};
       let paths = pathsFor(type);
       if (dir) {
         const prefix = dir.replace(/\/+$/, "") + "/";
         paths = paths.filter((p) => p.startsWith(prefix));
       }
-      checks[`artifacts:${type}`] = { ok: paths.length >= min, paths };
-      if (paths.length < min) {
+      const okMin = paths.length >= min;
+      const okMax = max === undefined || paths.length <= max;
+      checks[`artifacts:${type}`] = { ok: okMin && okMax, paths };
+      if (!okMin) {
         failures.push(
           `expected >=${min} ${type} artifact(s)${dir ? ` under ${dir}/` : ""}, found ${paths.length}`,
+        );
+      }
+      if (!okMax) {
+        failures.push(
+          `expected <=${max} ${type} artifact(s)${dir ? ` under ${dir}/` : ""}, found ${paths.length}: ${paths.join(", ")}`,
         );
       }
     }

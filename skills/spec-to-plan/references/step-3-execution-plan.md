@@ -87,12 +87,28 @@ For each track, state:
 
 ### 6. Create Task Files
 
-Break each track into task files under `plan/tasks/`. Each task file should contain:
+Break each track into `type: Task` files under the bundle's
+`plan/<Plan-id>-<slug>/tasks/`, named `Task-NNN-<slug>.md`. **Frontmatter is the
+machine contract** — the DAG, ownership, and test traces live there, not in prose.
+The body holds the human-facing detail.
 
 ```markdown
-# Task NN: [Title]
-
-Status: [not started | in progress | blocked on Task XX | complete]
+---
+id: Task-002
+title: "FR-002 — greeting + runtime versions"
+type: Task
+status: not_started        # not_started | in_progress | blocked | done
+track: A                   # parallel-track label (A/B/C/S/J/Gate…)
+priority: P0               # P0 | P1 | P2 | P3
+relationships:
+  - target: ix://<org>/<component>/Task-001
+    type: depends_on       # DAG edge — one per upstream task
+  - target: ix://<org>/<component>/FR-002
+    type: references       # requirement(s) this task owns
+  - target: ix://<org>/<component>/TC-004
+    type: verifies         # test case(s) this task is verified by
+---
+# Task-002: FR-002 — greeting + runtime versions
 
 ## Scope
 [What this task delivers]
@@ -100,39 +116,44 @@ Status: [not started | in progress | blocked on Task XX | complete]
 ## Subtasks
 - [ ] **[Subtask name].** [Description with key concerns.]
 
-## Owns
-- [FR/NFR IDs]
-
-## Dependencies
-- [Task IDs this depends on]
-
-## Unblocks
-- [Task IDs or capabilities this enables]
-
 ## Deliverables
 - [Concrete outputs]
 
-## Primary Tests
-- [TC/BC IDs from the test plan]
-
 ## Notes
 - [Implementation guidance, references, risk callouts]
+- [Unblocks: which tasks/capabilities this enables — narrative; the authoritative
+  edges are the `depends_on` relationships on the downstream tasks.]
 ```
+
+**Frontmatter rules:**
+- `relationships.target` MUST be a full `ix://<org>/<component>/<id>` URI; `<org>`
+  and `<component>` come from `spec.md` frontmatter (`org`, `name`).
+- Use only the registered `Task` edge verbs: `depends_on`, `verifies`, `references`.
+- Encode the DAG as `depends_on` edges (not prose). One edge per direct upstream task.
+- Every task carries ≥1 `references` (requirement) and ≥1 `verifies` (test) edge.
+- `status`/`track`/`priority` are flat operational fields (allowed by the schema's
+  `additionalProperties`). Downstream tooling (and the GitHub-issue sync) reads these.
 
 **Task decomposition rules:**
 - Tasks should be scoped to 1-3 agent sessions of work
 - If a task bundles items with different dependencies, split it (e.g., don't bundle "build + scan" if build is done and scan is blocked)
-- Mark blocked tasks with what they're blocked on
-- Mark parallel-ready tasks explicitly so agents know they can start
+- Mark blocked tasks with `status: blocked` and a `depends_on` edge to the blocker
+- Mark parallel-ready tasks (`status: not_started`, no unmet `depends_on`) so agents know they can start
 
-### 7. Write the Task README
+### 7. Write the bundle index and log
 
-Create `plan/tasks/README.md` as an index showing:
-- Completed tasks
-- Each track (critical path, parallel, post-gate)
-- Coordination rules (what to freeze, what not to start early, merge sequencing)
+- **`index.md`** (`type: index`): update the `## Contents` link list so it points at
+  `plan.md` and every `Task-NNN-*.md` just created — one bullet per file with a short
+  description. This is the bundle's table of contents (replaces the old
+  `tasks/README.md`).
+- **`log.md`** (`type: log`): append a dated `## History` entry recording this
+  planning pass (e.g. "Decomposed into 12 tasks across tracks A/B/C/S/J + 3 gates").
+  Use today's real calendar date.
 
-## Output Format (appended to /plan/plan.md)
+Coordination notes (what to freeze, what not to start early, merge sequencing) go in
+the `plan.md` body — see the Output Format below.
+
+## Output Format (appended to plan/<Plan-id>-<slug>/plan.md)
 
 ```markdown
 ## Remaining Work
@@ -166,7 +187,13 @@ Create `plan/tasks/README.md` as an index showing:
 [ASCII timeline showing tracks running concurrently]
 
 ## Task File Mapping
-[Table mapping task files to track items and status]
+[Table mapping Task-NNN files → track → owned requirements → status. The
+authoritative status/deps live in each task's frontmatter; this table is a
+human-readable mirror.]
+
+## Coordination Rules
+[What to freeze, what not to start early, shared-file/shared-state single-writer
+discipline, merge sequencing.]
 ```
 
 ## Common Mistakes to Avoid
