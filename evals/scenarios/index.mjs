@@ -564,7 +564,7 @@ export const SCENARIOS = [
     // (Plan-001/Task-001). Until that release is pinned in default-modules.yaml,
     // the bundle fails `quire validate` on the id pattern.
     id: "EV-027",
-    useCase: "US-005",
+    useCase: "US-008",
     setup(ctx) {
       copySkeleton(
         ctx,
@@ -590,6 +590,124 @@ export const SCENARIOS = [
         },
       },
       files: ["plan/**/index.md", "plan/**/log.md", "plan/**/tasks/*.md"],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // Step-0 multi-plan selection: a project already holds Plan-001; the agent must
+    // start a SECOND, independent plan (Plan-002) without disturbing the first.
+    // Asserts >=2 Plan artifacts and a Plan-002 bundle, all validating.
+    //
+    // REQUIRES spec-artifacts-process schemas that accept mixed-case Plan/Task ids
+    // (see EV-027 note).
+    id: "EV-028",
+    useCase: "US-008",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+      // Seed an existing, valid Plan-001 bundle.
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/plan.md",
+        [
+          "---",
+          "id: Plan-001",
+          'title: "Seed plan"',
+          "type: Plan",
+          "status: active",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# Plan-001: Seed plan",
+          "",
+          "## Scope",
+          "Pre-existing plan in this project.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/index.md",
+        [
+          "---",
+          "type: index",
+          'title: "Plan-001 — Seed plan"',
+          'description: "Contents of the Plan-001 bundle."',
+          'okf_version: "0.1"',
+          "---",
+          "# Plan-001 — Seed plan",
+          "",
+          "## Contents",
+          "",
+          "* [Plan-001: Seed plan](./plan.md) - Plan overview.",
+          "* [Task-001: seed task](./tasks/Task-001-seed.md) - Seed task.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/log.md",
+        [
+          "---",
+          "type: log",
+          'title: "Plan-001 — Update Log"',
+          'description: "Change log for the Plan-001 bundle."',
+          "---",
+          "# Plan-001 — Update Log",
+          "",
+          "## History",
+          "",
+          "* **2026-06-21** — Seed plan created.",
+          "",
+        ].join("\n"),
+      );
+      writeRepoFile(
+        ctx,
+        "plan/Plan-001-seed/tasks/Task-001-seed.md",
+        [
+          "---",
+          "id: Task-001",
+          'title: "seed task"',
+          "type: Task",
+          "status: not_started",
+          "track: A",
+          "priority: P1",
+          "relationships:",
+          "  - target: ix://agent-ix/eval/FR-001",
+          "    type: references",
+          "---",
+          "# Task-001: seed task",
+          "",
+          "## Scope",
+          "Seed task in Plan-001.",
+          "",
+        ].join("\n"),
+      );
+    },
+    prompt:
+      "This project ALREADY has a plan at plan/Plan-001-seed/. Use the spec-to-plan " +
+      "skill to start a NEW, SECOND plan (do not modify Plan-001) for a follow-up " +
+      "effort based on the requirements in spec/. Produce a fresh bundle " +
+      "plan/Plan-002-<slug>/ with a `type: Plan` plan.md, index.md, log.md, and a " +
+      "tasks/ directory of `type: Task` files. Validate all plans with quire so they " +
+      "pass.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 2, dir: "plan" },
+          Task: { min: 2, dir: "plan" },
+        },
+      },
+      files: [
+        "plan/Plan-002-*/plan.md",
+        "plan/Plan-002-*/index.md",
+        "plan/Plan-002-*/log.md",
+      ],
       validate: { globs: ["plan/**/*.md"], shouldPass: true },
     },
   },

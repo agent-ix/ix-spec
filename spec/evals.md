@@ -13,6 +13,8 @@ relationships:
     type: "covers"
   - target: "ix://agent-ix/quoin/US-005"
     type: "covers"
+  - target: "ix://agent-ix/quoin/US-008"
+    type: "covers"
 ---
 
 # quoin Authoring Eval Matrix
@@ -89,7 +91,8 @@ agent can use the commands efficiently to produce valid spec artifacts.
 | EV-024 | US-001         | Add a user story **and** the FR that implements it.                    | Agent authors **both** a `US` and an `FR` artifact (FR traced to the US); all validate. (`artifacts` require)                                                                                                                                                                                                  | success, latency, tool calls, tokens                      |
 | EV-025 | US-001         | Backport a spec from a small source file.                              | Agent authors ≥1 `FR` artifact under `spec/functional/` (not just a `spec.md` table) capturing the code's behavior; all validate.                                                                                                                                                                              | success, latency, tool calls, tokens                      |
 | EV-026 | US-005         | Run a subset spec-review producing per-analysis SpecReview docs.       | Agent runs a `subset` spec-review (integrity + dependency) and authors one **validated** `SpecReview` doc per selected analysis under `spec/reviews/` (Summary + Findings table, Severity enum). (`files` + `validate`)                                                                                        | success, latency, tool calls, tokens, validation attempts |
-| EV-027 | US-005         | Create an implementation plan as a multi-plan bundle via spec-to-plan. | Agent uses spec-to-plan to author a plan bundle `plan/<Plan-id>-<slug>/` — a `type: Plan` plan.md, reserved index.md/log.md, and ≥3 `type: Task` files whose `relationships:` carry the DAG (`depends_on`) + `references`/`verifies`; the whole bundle validates. (`artifacts` require + `files` + `validate`) | success, latency, tool calls, tokens, validation attempts |
+| EV-027 | US-008         | Create an implementation plan as a multi-plan bundle via spec-to-plan. | Agent uses spec-to-plan to author a plan bundle `plan/<Plan-id>-<slug>/` — a `type: Plan` plan.md, reserved index.md/log.md, and ≥3 `type: Task` files whose `relationships:` carry the DAG (`depends_on`) + `references`/`verifies`; the whole bundle validates. (`artifacts` require + `files` + `validate`) | success, latency, tool calls, tokens, validation attempts |
+| EV-028 | US-008         | Start a second, independent plan in a project that already has one.    | Given an existing `plan/Plan-001-*/` bundle, the agent uses spec-to-plan and starts a NEW plan (Step 0 selection), producing a `plan/Plan-002-*/` bundle (`type: Plan` + `type: Task` files) without disturbing Plan-001; both validate. (`artifacts` Plan≥2 + `files` + `validate`)                           | success, latency, tool calls, tokens, validation attempts |
 
 > EV-016..EV-018 and EV-020 extend the original EV-001..EV-015 set (multi-repo,
 > larger spec-set, multi-module, real GitHub subdir install). EV-021..EV-025 are
