@@ -558,11 +558,10 @@ export const SCENARIOS = [
     // type: Plan plan.md, type: Task task files, and the reserved index.md/log.md.
     // The DAG/ownership/test traces live in each Task's `relationships:`
     // (depends_on/references/verifies). This asserts the bundle is authored as
-    // discrete Plan + Task artifacts and validates.
-    //
-    // REQUIRES spec-artifacts-process schemas that accept mixed-case Plan/Task ids
-    // (Plan-001/Task-001). Until that release is pinned in default-modules.yaml,
-    // the bundle fails `quire validate` on the id pattern.
+    // discrete Plan + Task artifacts and validates. The agent chooses Plan/Task ids
+    // valid under the active spec-artifacts-process schema (e.g. PL-001/TSK-001 under
+    // the uppercase-only published schema; Plan-001/Task-001 once the mixed-case
+    // schema PR is pinned in default-modules.yaml).
     id: "EV-027",
     useCase: "US-008",
     setup(ctx) {
@@ -594,12 +593,9 @@ export const SCENARIOS = [
     },
   },
   {
-    // Step-0 multi-plan selection: a project already holds Plan-001; the agent must
+    // Step-0 multi-plan selection: a project already holds a plan; the agent must
     // start a SECOND, independent plan (Plan-002) without disturbing the first.
     // Asserts >=2 Plan artifacts and a Plan-002 bundle, all validating.
-    //
-    // REQUIRES spec-artifacts-process schemas that accept mixed-case Plan/Task ids
-    // (see EV-027 note).
     id: "EV-028",
     useCase: "US-008",
     setup(ctx) {
@@ -615,7 +611,7 @@ export const SCENARIOS = [
         "plan/Plan-001-seed/plan.md",
         [
           "---",
-          "id: Plan-001",
+          "id: PLAN-001",
           'title: "Seed plan"',
           "type: Plan",
           "status: active",
@@ -623,7 +619,7 @@ export const SCENARIOS = [
           "  - target: ix://agent-ix/eval/FR-001",
           "    type: references",
           "---",
-          "# Plan-001: Seed plan",
+          "# PLAN-001: Seed plan",
           "",
           "## Scope",
           "Pre-existing plan in this project.",
@@ -671,7 +667,7 @@ export const SCENARIOS = [
         "plan/Plan-001-seed/tasks/Task-001-seed.md",
         [
           "---",
-          "id: Task-001",
+          "id: TASK-001",
           'title: "seed task"',
           "type: Task",
           "status: not_started",
