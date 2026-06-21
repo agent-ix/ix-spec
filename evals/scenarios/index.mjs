@@ -553,6 +553,46 @@ export const SCENARIOS = [
       validate: { globs: ["spec/reviews/*.md"], shouldPass: true },
     },
   },
+  {
+    // spec-to-plan emits a multi-plan bundle: plan/<Plan-id>-<slug>/ with a
+    // type: Plan plan.md, type: Task task files, and the reserved index.md/log.md.
+    // The DAG/ownership/test traces live in each Task's `relationships:`
+    // (depends_on/references/verifies). This asserts the bundle is authored as
+    // discrete Plan + Task artifacts and validates.
+    //
+    // REQUIRES spec-artifacts-process schemas that accept mixed-case Plan/Task ids
+    // (Plan-001/Task-001). Until that release is pinned in default-modules.yaml,
+    // the bundle fails `quire validate` on the id pattern.
+    id: "EV-027",
+    useCase: "US-005",
+    setup(ctx) {
+      copySkeleton(
+        ctx,
+        "spec-artifacts-iso",
+        "fr.md",
+        "spec/functional/FR-001.md",
+      );
+    },
+    prompt:
+      "Requirements are accepted in spec/. Use the spec-to-plan skill to create a " +
+      "NEW implementation plan as a bundle under plan/ — a directory " +
+      "plan/<Plan-id>-<slug>/ containing a `type: Plan` plan.md, an index.md " +
+      "(`type: index`), a log.md (`type: log`), and a tasks/ directory of " +
+      "`type: Task` files. Decompose into at least 3 tasks and encode the " +
+      "dependencies as `relationships: depends_on` edges in the task frontmatter " +
+      "(plus `references` to the requirement and `verifies` to its test cases). " +
+      "Validate the whole bundle with quire so it passes.",
+    expect: {
+      artifacts: {
+        require: {
+          Plan: { min: 1, dir: "plan" },
+          Task: { min: 3, dir: "plan" },
+        },
+      },
+      files: ["plan/**/index.md", "plan/**/log.md", "plan/**/tasks/*.md"],
+      validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];
