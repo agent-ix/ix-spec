@@ -13,8 +13,7 @@ title: "quoin Master Requirements Specification"
 
 `quoin` SHALL provide a standalone installable CLI that gives a spec-authoring
 agent a catalog-driven authoring contract, a user-extensible spec-module store,
-and launch points for governed review/matrix/planning workflows — without
-requiring the broader `ix` umbrella CLI.
+and launch points for governed review/matrix/planning workflows
 
 ## Scope
 
