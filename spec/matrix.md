@@ -56,6 +56,8 @@ Coverage is mapped requirement → test as `file :: "test name"`:
 | FR-021      | ✅ Covered | `flows.test.ts` :: "resolves when ix-flow exits 0; builds id/json/target args"; :: "matrix runs the flow and propagates a non-zero exit code"; :: "defaults exit code to 1 when ix-flow is killed by a signal (null code)"; :: "rejects when ix-flow cannot be spawned (PATH has no ix-flow)"; `cli.test.ts` :: "review with --target/--json/--id runs the flow (ix-flow exit 0)"                                               |
 | FR-022      | ✅ Covered | `update.test.ts` :: "delegates to runSelfUpdate with quoin's package coordinates" (asserts packageName `@agent-ix/quoin`, currentVersion, header "quoin update", registry undefined → ambient config, check false); :: "passes --check through"; :: "passes a custom --registry through"                                                                                                                                        |
 
+| FR-023 | ✅ Covered | `cli.test.ts` :: "falls back to IX_HOME when --config-root is omitted, and prints 'unknown' for a versionless module"; `catalog.test.ts` :: "includes QUOIN_MODULE_PATHS entries and installed module dirs"; `flows.test.ts` :: "resolves when ix-flow exits 0; builds id/json/target args" (IX_SPEC_WORKFLOWS_ROOT) |
+
 ## Non-Functional Requirements
 
 | Requirement | Coverage   | Test / Evidence                                                                                                                                                                                                                                                              |
@@ -88,8 +90,27 @@ The agent-facing eval set (EV-001…EV-020) is defined in `spec/evals.md`
 real agent through this CLI + the `/spec-*` skills and records real metrics from
 the Claude Code transcript. This unit-test matrix does not duplicate that table.
 
+## Integration Tests
+
+The integration tests cover the two live-git boundaries `quoin` owns. Both are
+REAL (live git) and currently **spec-ahead-of-code**: the deterministic
+network-git tests they describe do not yet exist in `tests/`, and the same
+boundaries are exercised non-deterministically by the agent-pty evals.
+
+| Integration Test | Coverage              | Evidence / Related evals                                                                                                                                                                                                 |
+| ---------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| IT-001           | ⚠️ Spec-ahead-of-code | Default-module reconcile from pinned git tags. Unit tests use path-source fixtures (`index.test.ts`) and the evals seed modules into `evals/.seed-cache/`; no deterministic live first-run-then-offline test exists yet. |
+| IT-002           | ⚠️ Spec-ahead-of-code | `github://` plugin install. Unit tests cover path sources only (`plugins.test.ts`); live GitHub install is exercised at the eval layer (EV-003/EV-009/EV-010/EV-020).                                                    |
+
 ## Backsync Notes
 
+- **Spec overhaul (2026-06-21):** the functional and non-functional requirements
+  are now discrete artifact files under `spec/functional/` and
+  `spec/non-functional/`, replacing the requirement tables formerly embedded in
+  `spec.md`. FR-001…FR-022 and NFR-001…NFR-008 keep their IDs and semantics
+  (unchanged test mappings above); FR-023 (runtime configuration surface), a
+  stakeholder layer (StR-001…StR-006), and an integration-test layer
+  (IT-001/IT-002) were added. `spec.md` is now the master-requirements index.
 - Requirements were renumbered and expanded in the spec overhaul to be a
   faithful, atomic backport of `src/` (`cli`, `catalog`, `write`, `plugins`,
   `modules`, `flows`). The prior coarse FR-001…FR-011 set is superseded by the

@@ -25,6 +25,16 @@ This matrix defines the minimum agent-facing eval set for spec creation and
 maintenance. Unit tests prove command behavior; these evals measure whether an
 agent can use the commands efficiently to produce valid spec artifacts.
 
+These evals are also `quoin`'s real end-to-end coverage layer: each scenario runs
+the real `quoin` CLI and a real `quire validate`. They therefore exercise the
+same external boundaries as the integration tests in `spec/integration/`, with an
+agent in the loop. The two integration tests
+([IT-001](./integration/IT-001-default-module-reconcile.md),
+[IT-002](./integration/IT-002-github-plugin-install.md)) name the live-git
+boundaries that warrant a deterministic test in addition to this agent-driven
+coverage; the metric-capture requirement for this matrix is
+[NFR-006](./non-functional/NFR-006-eval-metric-capture.md).
+
 > **Runner status (2026-06-15):** the **agent-pty-driven** harness is built and lives
 > in `evals/` (`node evals/run.mjs`, or `make evals` / `make evals-all`). It drives
 > the real agent (Claude) through this CLI + the `/spec-*` skills via `agent-pty`

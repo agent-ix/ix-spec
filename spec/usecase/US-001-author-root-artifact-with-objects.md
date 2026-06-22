@@ -11,6 +11,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-017"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-003"
+    type: "traces_to"
 ---
 
 # [US-001] Author a root artifact with supporting objects

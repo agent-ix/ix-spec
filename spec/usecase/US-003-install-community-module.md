@@ -9,6 +9,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-019"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-002"
+    type: "traces_to"
 ---
 
 # [US-003] Install and use a community spec module
@@ -34,9 +36,9 @@ quoin write . --types custom-object
 
 The installed module should participate in the same authoring and validation
 flow as the default modules. `quoin` maps the source argument to a typed
-`ts-plugin-kit` source and hands it off; the `package:`/npm source is not yet
-supported and is rejected by `ts-plugin-kit` with an unsupported-source error at
-install time.
+`ts-plugin-kit` source and hands off the install; `path` and GitHub (repository
+and monorepo-subdir) sources install today, and the `package:`/npm mapping is in
+place ready for when `ts-plugin-kit` adds npm install support.
 
 ## Dependencies
 

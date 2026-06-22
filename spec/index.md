@@ -9,9 +9,13 @@ okf_version: "0.1"
 
 ## Contents
 
-- [Usecase](./usecase/index.md) - Usecase artifacts.
-- [Matrix-002: quoin Authoring Eval Matrix](./evals.md)
+- [Spec](./spec.md) - Master requirements specification (index of all classes).
+- [Stakeholder](./stakeholder/index.md) - Stakeholder requirements (StR).
+- [Usecase](./usecase/index.md) - User stories (US).
+- [Functional](./functional/index.md) - Functional requirements (FR).
+- [Non-Functional](./non-functional/index.md) - Non-functional requirements (NFR).
+- [Integration](./integration/index.md) - Integration tests (IT).
 - [Matrix-001: quoin Test Matrix](./matrix.md)
+- [Matrix-002: quoin Authoring Eval Matrix](./evals.md)
 - [Plan-001: quoin Implementation Plan](./plan.md)
 - [Review-001: quoin Spec Review](./review.md)
-- [Spec](./spec.md)
