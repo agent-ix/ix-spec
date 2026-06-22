@@ -5,167 +5,205 @@ org: agent-ix
 component_type: cli
 implementation_language: typescript
 title: "quoin Master Requirements Specification"
+standards_alignment:
+  - iso-iec-ieee-29148
+relationships:
+  - target: "ix://agent-ix/ix-cli-core"
+    type: "depends_on"
+  - target: "ix://agent-ix/ts-plugin-kit"
+    type: "depends_on"
 ---
 
 # Master Requirements Specification
 
 ## Purpose
 
-`quoin` SHALL provide a standalone installable CLI that gives a spec-authoring
-agent a catalog-driven authoring contract, a user-extensible spec-module store,
-and launch points for governed review/matrix/planning workflows
+`quoin` provides a standalone, installable CLI that gives a spec-authoring agent
+everything it needs to start spec work: a catalog-driven authoring contract, a
+user-extensible spec-module store, and launch points for governed
+review/matrix/planning workflows. It runs on its own, so adopting spec-driven
+development requires only this one tool on `PATH`.
+
+This document is the top-level requirements artifact for the repository. It states
+the scope and intent, indexes the requirement classes, and records how they trace
+to one another. The authoritative requirements live as discrete files under
+`spec/stakeholder/`, `spec/usecase/`, `spec/functional/`, `spec/non-functional/`,
+and `spec/integration/`; this document indexes them.
 
 ## Scope
 
 ### In Scope
 
-- The `quoin` command surface: argument parsing, `version`/help, `catalog`
-  list/show/validate, `write` authoring packs, `plugin`
-  install/list/remove/ensure-defaults, the `review`/`matrix`/`to-plan`
-  workflow launchers, and the `update` self-update command.
-- Assembly of a Filament catalog from module roots (`QUOIN_MODULE_PATHS` plus
-  the installed module store) and the authoring contract it exposes (skeletons,
-  schemas, module roots).
-- The committed default Filament module set (`default-modules.yaml`) and its
-  lazy, idempotent reconciliation into `~/.ix/filament/modules`, plus
-  user/community plugin install records in `~/.ix/filament/registry.json`.
-- Construction of the `quire validate` command for authored spec files.
+This specification governs:
 
-### Out of Scope
+- The `quoin` command surface: argument parsing; `version` and help; `catalog`
+  list/show/validate; `write` authoring packs; `plugin`
+  install/list/remove/ensure-defaults; the `review`/`matrix`/`to-plan` workflow
+  launchers; and the `update` self-update command.
+- Assembly of a Filament catalog from module roots (`QUOIN_MODULE_PATHS` and the
+  installed module store) and the authoring contract it exposes — skeletons,
+  schemas, and module roots.
+- The committed default module set (`default-modules.yaml`) and its lazy,
+  idempotent installation into `~/.ix/filament/modules`, plus user and community
+  plugin records in `~/.ix/filament/registry.json`.
+- Construction of the `quire validate` command an agent runs over authored spec
+  files.
 
-- Workflow lifecycle control (resume/advance/gate/status), owned by `ix-flow`
-  after a run is launched.
-- Frontmatter-driven validation of authored spec files, owned by `quire`;
-  `quoin` constructs the validation command and `quire` executes it.
-- Install/registry/reconcile mechanics, owned by `@agent-ix/ts-plugin-kit`;
-  `quoin` maps CLI source arguments to typed sources and delegates.
+### Delegated Responsibilities
+
+`quoin` collaborates with three external pieces and works with each as follows:
+
+- **`ix-flow`** owns workflow lifecycle (resume, advance, gate, status) once a run
+  is launched. `quoin` starts the run and hands control to `ix-flow`.
+- **`quire`** owns frontmatter-driven validation of authored files. `quoin`
+  constructs the scoped `quire validate` command and the agent runs it; both read
+  the same shared module store, so the authoring contract matches the validation
+  rules.
+- **`@agent-ix/ts-plugin-kit`** owns install, registry, and reconcile mechanics.
+  `quoin` maps CLI source arguments to typed sources and delegates the install.
+- **`@agent-ix/ix-cli-core`** owns the runtime context, config-root resolution,
+  and the npm-backed self-update. `quoin` builds on it and delegates the `update`
+  command to its self-update primitive.
 
 ## System Overview
 
-`quoin` is a single `main(argv)` dispatcher built on
-`@agent-ix/ix-cli-core`. It parses a leading command (and, for `catalog` and
-`plugin`, a subcommand), resolves a config root, configures the shared runtime
-context, and dispatches to the catalog, authoring, plugin, workflow, or
-self-update surface.
-It assembles a Filament catalog from module roots, authors nothing itself —
-instead returning the local skeletons, schemas, and a `quire validate` command
-that the calling agent uses as its authoring contract. It installs
-user/community modules through `@agent-ix/ts-plugin-kit` and hands lifecycle
-control of review/matrix/planning workflows to `ix-flow`.
+`quoin` is a single `main(argv)` dispatcher built on `@agent-ix/ix-cli-core`. It
+parses a leading command (and, for `catalog` and `plugin`, a subcommand), resolves
+a config root, configures the shared runtime context, and dispatches to the
+catalog, authoring, plugin, workflow, or self-update surface.
 
-It does not vendor the default modules; the committed `default-modules.yaml`
-declares them as pinned `git-subdir` sources reconciled on first catalog access
-into the shared `~/.ix/filament/modules` store also read by quire-rs, so
-authoring and validation see an identical catalog.
+It assembles a Filament catalog from module roots and returns the local
+skeletons, schemas, and a scoped `quire validate` command that the calling agent
+uses as its authoring contract. It installs user and community modules through
+`@agent-ix/ts-plugin-kit`, and it launches review/matrix/planning workflows and
+hands their lifecycle to `ix-flow`.
+
+`quoin` declares its default module set in the committed `default-modules.yaml` as
+pinned `git-subdir` sources and auto-installs that set on first catalog access
+into the shared `~/.ix/filament/modules` store that `quire` also reads — so
+authoring and validation see one identical catalog, and repeated work stays local.
 
 ## Requirements Architecture
 
-The requirement classes that make up this specification — Functional
-Requirements (FR), Non-Functional Requirements (NFR), and User Stories (US) —
-and how they trace to one another are listed below. Functional and
-Non-Functional Requirements are enumerated in the Requirements table; the User
-Stories that drive them are listed under Use Cases and authored in
-`spec/usecase/`.
+Requirements are decomposed into the ISO/IEC/IEEE 29148 classes below. Each
+requirement is a discrete file in its class directory and traces to its
+neighbours: stakeholder needs (StR) drive user stories (US), which drive
+functional requirements (FR); non-functional requirements (NFR) constrain the FRs;
+and integration tests (IT) verify the boundaries `quoin` owns. This section is the
+index; the files are authoritative.
 
-### Functional Requirements — CLI Framework
+### Stakeholder Requirements
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                           | Verification |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-001 | The CLI SHALL parse a leading command and (for `catalog`/`plugin`) a subcommand, `--flag=value` and `--flag value` long flags, `-x` short boolean flags, and bare positionals, accumulating repeated `--types` and `--target` flags into ordered lists.                                               | Test         |
-| FR-002 | The CLI SHALL print its package version (read from `package.json`) for the `version` command, `--version`, or `-v`, and SHALL fail if the package version is missing or non-string.                                                                                                                   | Test         |
-| FR-003 | The CLI SHALL print root usage when invoked with no command, and command-scoped help for `--help`/`-h` on `write`, `catalog`, `plugin`, `update`, and the spec-flow commands, falling back to root usage for unrecognized commands.                                                                   | Test         |
-| FR-004 | The CLI SHALL resolve a config root from `--config-root` (defaulting to `~/.ix` via `IX_HOME`), export it to `IX_HOME`, and configure the shared `ix-cli-core` runtime context with namespace `ix` and project config root `<cwd>/.ix`, disabling project config when `--no-project-config` is given. | Test         |
-| FR-005 | The CLI SHALL reject an unknown command or an unknown `catalog`/`plugin` subcommand by throwing an error that includes usage, and SHALL exit non-zero.                                                                                                                                                | Test         |
+- [StR-001](./stakeholder/StR-001-standalone-cli.md) — run spec work from a standalone CLI.
+- [StR-002](./stakeholder/StR-002-extensible-vocabulary.md) — extend the vocabulary with community modules.
+- [StR-003](./stakeholder/StR-003-shared-catalog.md) — authoring and validation share one catalog.
+- [StR-004](./stakeholder/StR-004-governed-workflows.md) — review/matrix/planning run as governed workflows.
+- [StR-005](./stakeholder/StR-005-offline-reproducible.md) — authoring stays offline-safe and reproducible.
+- [StR-006](./stakeholder/StR-006-current-via-self-update.md) — keep quoin current with one command.
 
-### Functional Requirements — Catalog
+### User Stories
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                                                                                             | Verification |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-006 | The catalog loader SHALL treat a candidate path as a module root when it directly contains `manifest.yaml`, or when one of its immediate child directories contains `manifest.yaml`; non-directory and unresolvable candidates SHALL be skipped.                                                                                                                        | Test         |
-| FR-007 | The catalog loader SHALL assemble module roots in order: `QUOIN_MODULE_PATHS` (colon-separated) first, then every module directory under `~/.ix/filament/modules`; the latter is the shared module store read by quire-rs.                                                                                                                                              | Test         |
-| FR-008 | The catalog loader SHALL ignore duplicate resolved module roots and duplicate module names on a first-wins basis, so a `QUOIN_MODULE_PATHS` module overrides an installed module of the same name.                                                                                                                                                                      | Test         |
-| FR-009 | For each module the loader SHALL read `name` (defaulting to the directory basename), optional `version`, and the `artifact_types`/`object_types` entries (ignoring malformed entries); artifact entries SHALL resolve `frontmatter_schema_ref` to a schema path, and every type SHALL resolve a skeleton from `skeletons/<Type>.md` with a lowercase-filename fallback. | Test         |
-| FR-010 | Catalog type lookup SHALL be case-insensitive, so `FR` and `fr` resolve to the same entry.                                                                                                                                                                                                                                                                              | Test         |
-| FR-011 | `catalog list` SHALL print one `name@version root` line per module (or the full catalog as `--json`), and `catalog show <type>` SHALL print the entry's kind/name/module/root (or the entry as `--json`) and error when the type is unknown or omitted.                                                                                                                 | Test         |
-| FR-012 | The loader SHALL flag any type name declared as the same kind by more than one module as a duplicate, and `catalog validate` SHALL exit non-zero emitting `{ok:false,duplicates}` on stderr when duplicates exist, otherwise report the module count (text or `--json`).                                                                                                | Test         |
+- [US-001](./usecase/US-001-author-root-artifact-with-objects.md) — author a root artifact with supporting objects.
+- [US-002](./usecase/US-002-discover-authoring-contract.md) — discover an authoring contract before editing.
+- [US-003](./usecase/US-003-install-community-module.md) — install and use a community spec module.
+- [US-004](./usecase/US-004-validate-changed-spec-files.md) — validate changed spec files.
+- [US-005](./usecase/US-005-start-gated-spec-workflow.md) — start a gated spec workflow.
+- [US-006](./usecase/US-006-detect-conflicting-type-definitions.md) — detect conflicting type definitions across modules.
+- [US-007](./usecase/US-007-review-into-specreview-docs.md) — review a spec into validated review docs.
+- [US-008](./usecase/US-008-create-implementation-plan.md) — create an implementation plan from accepted requirements.
 
-### Functional Requirements — Authoring
+### Functional Requirements
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                               | Verification |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-013 | `quoin write <repo_dir> --types <type[,type...]>` SHALL require at least one type and a `repo_dir` that exists and is a directory, SHALL split type lists on commas (trimming and dropping empties), and SHALL error with the sorted list of available types when a requested type is not in the catalog. | Test         |
-| FR-014 | For each resolved type `write` SHALL emit an authoring contract — name, kind, module name, module root, and any skeleton and schema paths — rendered as text (or `--json`), marking a type with neither skeleton nor schema as "manifest only".                                                           | Test         |
-| FR-015 | `write` SHALL emit a Quire validation command `quire validate --scope <shell-quoted repo_root> "spec/**/*.md"` scoped to the resolved repo root, shell-quoting paths that need it.                                                                                                                        | Test         |
+**CLI framework**
 
-### Functional Requirements — Module Store & Plugins
+- [FR-001](./functional/FR-001-parse-command-line.md) — parse the command line into command, flags, and positionals.
+- [FR-002](./functional/FR-002-print-package-version.md) — report the installed package version.
+- [FR-003](./functional/FR-003-print-usage-and-help.md) — print usage and command-scoped help.
+- [FR-004](./functional/FR-004-resolve-config-root.md) — resolve the config root and configure the runtime context.
+- [FR-005](./functional/FR-005-reject-unknown-commands.md) — reject unknown commands and subcommands.
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                                                                                                                           | Verification |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-016 | The CLI SHALL ship `default-modules.yaml` as the committed default module set, validated as a `ts-plugin-kit` marketplace manifest, declaring each module as a `git-subdir` source pinned to the tag its Python wheel is built from where a release tag exists (a module without a release tag MAY pin to its default branch).                                                                        | Test         |
-| FR-017 | The CLI SHALL lazily reconcile the default module set into `~/.ix/filament/modules` on first `catalog`/`write` access (idempotently, with no git once installed), and SHALL expose `plugin ensure-defaults` as an explicit entry point that performs the install and reports the resulting registry for external tools (e.g. `quire validate`).                                                       | Test         |
-| FR-018 | The CLI SHALL map plugin source arguments to typed `ts-plugin-kit` sources: `path:<dir>` → `path`, `github:<owner>/<repo>[@<ref>]` → `github`, `github:<owner>/<repo>//<subdir>[@<ref>]` → `git-subdir`, `package:<pkg>[@<ver>]` → `npm`, and a bare argument → `path`. The `npm` source is not yet supported and `ts-plugin-kit` rejects it at install time.                                         | Test         |
-| FR-019 | The CLI SHALL maintain user/community plugin records in `~/.ix/filament/registry.json` and materialize modules (copy) under `~/.ix/filament/modules` via `ts-plugin-kit`, reading each module's name from its `manifest.yaml` (root or single nested dir); `plugin list` SHALL print the registry's plugins and `plugin remove <name>` SHALL delete the module directory and drop its registry entry. | Test         |
+**Catalog**
 
-### Functional Requirements — Workflows
+- [FR-006](./functional/FR-006-locate-module-roots.md) — locate a module root from a candidate path.
+- [FR-007](./functional/FR-007-assemble-module-roots.md) — assemble module roots in a defined order.
+- [FR-008](./functional/FR-008-deduplicate-modules.md) — deduplicate module roots and names first-wins.
+- [FR-009](./functional/FR-009-read-module-manifest.md) — read each module manifest into catalog entries.
+- [FR-010](./functional/FR-010-case-insensitive-type-lookup.md) — look up catalog types case-insensitively.
+- [FR-011](./functional/FR-011-list-and-show-catalog.md) — list the catalog and show a single type.
+- [FR-012](./functional/FR-012-detect-duplicate-types.md) — detect duplicate type definitions and validate the catalog.
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                                                               | Verification |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-020 | The CLI SHALL expose the `review`, `matrix`, and `to-plan` workflow launchers, resolving each workflow's skill path across `IX_SPEC_WORKFLOWS_ROOT`, the packaged skills, a sibling `ix-spec-workflows` checkout, and `~/.ix/plugins`, and erroring when no candidate contains the skill.                                                 | Test         |
-| FR-021 | On launch the CLI SHALL spawn `ix-flow run <flow> --path <skill> --config-root <home> --state-dir <home>/flows` with optional `--id`/`--json`/`--target` arguments, propagate ix-flow's exit code (defaulting to 1 on signal), surface spawn errors, and hand all subsequent lifecycle control (resume/advance/gate/status) to `ix-flow`. | Test         |
+**Authoring**
 
-### Functional Requirements — Self-Update
+- [FR-013](./functional/FR-013-resolve-requested-types.md) — resolve the requested types for an authoring pack.
+- [FR-014](./functional/FR-014-emit-authoring-contract.md) — emit an authoring contract per resolved type.
+- [FR-015](./functional/FR-015-emit-quire-validate-command.md) — emit a scoped Quire validation command.
 
-| ID     | Requirement                                                                                                                                                                                                                                                                                                                                                                                        | Verification |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| FR-022 | The CLI SHALL expose an `update` command that upgrades quoin to the latest published `@agent-ix/quoin` by delegating to `ix-cli-core`'s `runSelfUpdate` (npm view → compare to the running version → `npm install -g`), supporting `--check` (report availability without installing) and `--registry <url>` (force a registry); with no `--registry` the ambient npm config resolves the package. | Test         |
+**Module store and plugins**
+
+- [FR-016](./functional/FR-016-default-modules-schema.md) — default module set manifest schema (`object: data_schema`).
+- [FR-017](./functional/FR-017-reconcile-default-modules.md) — reconcile the default module set into the shared store.
+- [FR-018](./functional/FR-018-map-plugin-sources.md) — map plugin source arguments to typed sources.
+- [FR-019](./functional/FR-019-manage-plugin-registry.md) — install, list, and remove plugins through the registry.
+
+**Workflows**
+
+- [FR-020](./functional/FR-020-resolve-workflow-skills.md) — expose workflow launchers and resolve their skills.
+- [FR-021](./functional/FR-021-launch-ix-flow-runs.md) — launch workflow runs through ix-flow.
+
+**Self-update**
+
+- [FR-022](./functional/FR-022-self-update.md) — upgrade quoin to the latest published release.
+
+**Configuration**
+
+- [FR-023](./functional/FR-023-runtime-configuration.md) — quoin runtime configuration surface (`object: configuration`).
 
 ### Non-Functional Requirements
 
-| ID      | Requirement                                                                                                                                                                                                                                                                                                                            | Verification |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| NFR-001 | Default-module reconciliation SHALL be idempotent and perform no network or git work once each module is installed and pinned, so repeated `catalog`/`write` invocations stay offline-safe.                                                                                                                                            | Test         |
-| NFR-002 | Catalog assembly SHALL be deterministic for a given set of module roots: stable root ordering, first-wins dedup, and sorted duplicate-module lists.                                                                                                                                                                                    | Test         |
-| NFR-003 | Command, argument, and lookup failures SHALL surface as thrown errors or non-zero exit codes with actionable messages (available types, usage text, source diagnostics) rather than silent or partial output.                                                                                                                          | Test         |
-| NFR-004 | `quoin` SHALL run standalone: its only runtime dependencies are `@agent-ix/ix-cli-core`, `@agent-ix/ts-plugin-kit`, and a YAML parser; `ix-flow` and `quire` are invoked as external processes, not linked.                                                                                                                            | Review       |
-| NFR-005 | Workflow definitions SHOULD reference catalog-defined artifact/object types rather than redefining the doc/object type vocabulary.                                                                                                                                                                                                     | Review       |
-| NFR-006 | The agent-facing eval set SHALL record latency, token usage, tool-call count, validation attempts, and repeated context fetches per scenario.                                                                                                                                                                                          | Review       |
-| NFR-007 | The external tools `ix-flow` and `quire` SHALL be invoked by name from `PATH` and are not version-pinned (a known limitation); `ix-flow` unavailability or a non-zero exit SHALL surface as a non-zero `quoin` exit, and the `quire` validation command SHALL be emitted for the calling agent to run rather than executed by `quoin`. | Test         |
-| NFR-008 | A candidate module path without a `manifest.yaml` SHALL be skipped during catalog assembly, but a present-but-unparseable `manifest.yaml` SHALL abort assembly (strict) rather than be silently dropped, so a corrupt installed module is surfaced rather than hidden.                                                                 | Review       |
+- [NFR-001](./non-functional/NFR-001-idempotent-offline-reconcile.md) — default-module reconciliation is idempotent and offline-safe.
+- [NFR-002](./non-functional/NFR-002-deterministic-catalog.md) — catalog assembly is deterministic.
+- [NFR-003](./non-functional/NFR-003-actionable-errors.md) — failures surface as actionable errors.
+- [NFR-004](./non-functional/NFR-004-standalone-dependencies.md) — quoin runs as a standalone package.
+- [NFR-005](./non-functional/NFR-005-catalog-driven-workflows.md) — workflows reference catalog-defined types.
+- [NFR-006](./non-functional/NFR-006-eval-metric-capture.md) — the agent eval set captures efficiency metrics.
+- [NFR-007](./non-functional/NFR-007-external-tool-invocation.md) — external tools are invoked by name and surface their failures.
+- [NFR-008](./non-functional/NFR-008-strict-manifest-parsing.md) — corrupt manifests abort assembly rather than drop silently.
 
-### Use Cases
+### Integration Tests
 
-| ID     | Summary                                             |
-| ------ | --------------------------------------------------- |
-| US-001 | Author a root artifact with supporting objects.     |
-| US-002 | Discover an authoring contract before editing.      |
-| US-003 | Install and use a community spec module.            |
-| US-004 | Validate changed spec files.                        |
-| US-005 | Start a gated spec workflow.                        |
-| US-006 | Detect conflicting type definitions across modules. |
+- [IT-001](./integration/IT-001-default-module-reconcile.md) — default module set reconciles from pinned git tags, then serves offline.
+- [IT-002](./integration/IT-002-github-plugin-install.md) — community plugin installs from a GitHub source into the catalog.
 
-## Evals
+### Verification Layers
 
-The minimum agent-facing eval set is defined in `spec/evals.md` (Matrix-002) and
-implemented by the agent-pty-driven harness in `evals/`. Evals SHALL match the
-use cases above and record the metrics required by NFR-006.
+Three layers verify this specification, each named in the requirements above:
+
+- **Unit tests** — deterministic command and module behaviour, mapped requirement
+  to test in [matrix.md](./matrix.md) (`make test`, 100% coverage).
+- **Agent evals** — the agent-pty matrix [TM-002](./evals.md) drives the real
+  agent through `quoin` + `quire` end to end and records efficiency metrics
+  (NFR-006).
+- **Integration tests** — the two live-git boundaries `quoin` owns
+  (`spec/integration/`).
 
 ## Module Store
 
-`quoin` does not vendor the default `spec-artifacts-*` / `spec-objects-*`
-modules. The committed `default-modules.yaml` declares the default set as pinned
-`git-subdir` sources; `ensureDefaultModules()` lazily reconciles that set into
-`~/.ix/filament/modules/<name>/` on first catalog access (triggered from
-`catalog` and `write`, and on demand via `quoin plugin ensure-defaults` — the
-explicit entry point external tools such as `quire validate` shell out to for
-lazy init). The plugin registry lives at `~/.ix/filament/registry.json`. The
-same `~/.ix/filament/modules` directory is the shared module store read by
-quire-rs, so installs and validation see an identical catalog.
+`quoin` declares its default `spec-artifacts-*` and `spec-objects-*` modules in
+the committed `default-modules.yaml` as pinned `git-subdir` sources, and installs
+that set on first catalog access into `~/.ix/filament/modules/<name>/` — lazily,
+idempotently, and (once pinned and installed) entirely offline. The install is
+triggered by the `catalog` and `write` commands and on demand via
+`quoin plugin ensure-defaults`, the explicit entry point external tools such as
+`quire validate` use to bootstrap the set. User and community plugins are recorded
+in `~/.ix/filament/registry.json` and materialized into the same store. Because
+that store is the one `quire` reads, installs and validation see an identical
+catalog.
 
 ## References
 
 - ISO/IEC/IEEE 29148 — Requirements engineering.
-- `@agent-ix/ix-cli-core` — runtime context/config root.
+- `@agent-ix/ix-cli-core` — runtime context, config root, and self-update.
 - `@agent-ix/ts-plugin-kit` — marketplace install, reconcile, and registry
-  primitives for the default set and user/community plugins.
+  primitives for the default set and for user and community plugins.
 - `ix-flow` — workflow lifecycle (resume/advance/gate/status) after launch.
 - `quire` — frontmatter-driven validation over authored spec files.

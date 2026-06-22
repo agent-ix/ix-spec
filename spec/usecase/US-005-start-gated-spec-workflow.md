@@ -7,6 +7,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-021"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-004"
+    type: "traces_to"
 ---
 
 # [US-005] Start a gated spec workflow

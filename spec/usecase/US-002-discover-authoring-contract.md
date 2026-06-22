@@ -7,6 +7,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-013"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-003"
+    type: "traces_to"
 ---
 
 # [US-002] Discover an authoring contract before editing

@@ -7,6 +7,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-021"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-004"
+    type: "traces_to"
 ---
 
 # [US-007] Review a spec into validated per-analysis review docs
@@ -61,10 +63,14 @@ an ix-flow gate versus prose discipline alone.
 
 ## Constraints (Contextual)
 
-- The review must not silently overwrite human-authored requirements artifacts.
-- `SpecReview` is distinct from the freeform `Review` type and does not change it.
+- The review preserves human-authored requirements artifacts, writing its findings
+  into separate `SpecReview` docs.
+- `SpecReview` is its own type, separate from the freeform `Review` type, which it
+  leaves unchanged.
 
 ## Dependencies
 
-- **Upstream**: [FR-020](ix://agent-ix/quoin/FR-020), [FR-021](ix://agent-ix/quoin/FR-021); spec-artifacts-process [FR-002](ix://agent-ix/spec-artifacts-process/spec/functional/FR-002) (SpecReview archetype)
+- **Upstream**: [FR-020](../functional/FR-020-resolve-workflow-skills.md),
+  [FR-021](../functional/FR-021-launch-ix-flow-runs.md); spec-artifacts-process
+  `ix://agent-ix/spec-artifacts-process/FR-002` (SpecReview archetype)
 - **Downstream**: matrix and planning workflows that consume accepted reviews

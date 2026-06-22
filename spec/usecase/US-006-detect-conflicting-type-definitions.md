@@ -7,6 +7,8 @@ relationships:
     type: "traces_to"
   - target: "ix://agent-ix/quoin/FR-012"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-003"
+    type: "traces_to"
 ---
 
 # [US-006] Detect conflicting type definitions across modules

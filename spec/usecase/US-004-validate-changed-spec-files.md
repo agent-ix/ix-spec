@@ -5,6 +5,8 @@ type: US
 relationships:
   - target: "ix://agent-ix/quoin/FR-015"
     type: "traces_to"
+  - target: "ix://agent-ix/quoin/StR-003"
+    type: "traces_to"
 ---
 
 # [US-004] Validate changed spec files
