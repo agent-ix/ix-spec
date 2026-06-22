@@ -90,6 +90,7 @@ function ixSpec(ctx, args, env) {
  *   artifacts?: {require?: {[TYPE]: {min?, dir?}}, absent?: string[]},
  *   flow?: [{id, defName}], cliRejects?: string[],
  *   plugin?: {name, present}, resolvesTo?: {type, moduleNameIncludes},
+ *   fileContains?: [{glob, includes?: string[], excludes?: string[]}],
  *   sentinel?: "complete"|"failed"
  * }
  * @returns { ok, failures, validation, matchedFiles, checks }
@@ -165,6 +166,35 @@ export function assertExpectations(
           `expected no ${type} artifact but found ${paths.length}: ${paths.join(", ")}`,
         );
       }
+    }
+  }
+
+  // Content assertions: the first file matching `glob` must match every `includes`
+  // regex and no `excludes` regex (case-insensitive). Used to assert a SpecReview's
+  // Verdict (PASS/CONDITIONAL/FAIL) and that specific findings were recorded.
+  for (const fc of expect.fileContains ?? []) {
+    const { glob, includes = [], excludes = [] } = fc;
+    const hits = matchFiles(scope, glob);
+    const text = hits.length ? readFileSync(join(scope, hits[0]), "utf8") : "";
+    const missing = includes.filter((p) => !new RegExp(p, "i").test(text));
+    const unexpected = excludes.filter((p) => new RegExp(p, "i").test(text));
+    const ok =
+      hits.length > 0 && missing.length === 0 && unexpected.length === 0;
+    checks[`fileContains:${glob}`] = {
+      ok,
+      file: hits[0] ?? null,
+      missing,
+      unexpected,
+    };
+    if (!ok) {
+      if (hits.length === 0)
+        failures.push(`fileContains: no file matched ${glob}`);
+      if (missing.length)
+        failures.push(`fileContains ${glob}: missing ${missing.join(", ")}`);
+      if (unexpected.length)
+        failures.push(
+          `fileContains ${glob}: unexpected ${unexpected.join(", ")}`,
+        );
     }
   }
 

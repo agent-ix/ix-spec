@@ -1,0 +1,95 @@
+# Step 6: SpecReview Artifact
+
+**Goal**: Emit the findings from Steps 1–5 as a single **quire-validated `SpecReview`**
+document with a Verdict, at `reviews/YY-MM-DD-<slug>.md`.
+
+## Fetch the template, then author (guardrail)
+
+The `SpecReview` archetype lives in `spec-artifacts-process`. Fetch its skeleton first, then
+author, then validate (the ecosystem direct-render-then-validate model):
+
+```
+quoin write --types SpecReview
+```
+
+If `quoin write` is unavailable in the working tree, read the skeleton directly from
+`~/.ix/filament/modules/spec-artifacts-process/skeletons/SpecReview.md`.
+
+## Frontmatter
+
+```yaml
+---
+id: SR-001                      # ^[A-Z]{2,4}-[0-9]+$ — SR- default is fine; bump if SR-001 exists
+title: "Gap analysis — <Plan-id> <slug>"
+type: SpecReview
+analysis: gap-analysis          # the dedicated analysis value
+scope: "plan/<Plan-id>-<slug>/, spec/matrix.md"
+review_set: subset
+relationships:
+  - { target: "ix://<org>/<component>/<Plan-id>",       type: reviews }
+  - { target: "ix://<org>/<component>/<TestMatrix-id>", type: references }
+---
+```
+
+`<org>`/`<component>` come from `spec/spec.md` (`org`, `name`); the `<Plan-id>` and
+`<TestMatrix-id>` from Step 1.
+
+## Body
+
+`## Summary` and `## Findings` are **required and validated** by `quire validate`; the others
+are extra sections (allowed).
+
+```markdown
+## Summary
+
+<1–2 sentences: what plan/matrix/code was audited and the headline result.>
+
+## Verdict
+
+**PASS | CONDITIONAL | FAIL** — <one line justifying the gate, per the verdict rule>.
+
+## Findings
+
+| ID      | Severity | Summary                                          | Refs               |
+| ------- | -------- | ------------------------------------------------ | ------------------ |
+| FND-001 | high     | Task-007 still in_progress (P0, critical path)   | Task-007, FR-004   |
+| FND-002 | high     | Matrix TC-012 has no backing tagged test         | TC-012, FR-006     |
+| FND-003 | medium   | `cli.ts::--force` flag has no owning requirement | cli.ts::--force    |
+
+## Coverage
+
+- Tasks done: X / Y
+- Matrix Test Cases backed by tagged test: X / Y
+- Untraced behaviors / stubs: N
+- Semantic review: ran over N requirements | skipped
+```
+
+### Findings table contract (validated)
+
+- Headers EXACTLY: `ID | Severity | Summary | Refs`.
+- `ID` matches `^FND-\d+$`; ≥1 row.
+- `Severity` ∈ `low | medium | high`.
+- A clean audit still records one row: `FND-001 | low | No gaps found | -`.
+
+## Verdict rule
+
+- **FAIL** — any incomplete/blocked task, any unbacked matrix Test Case, or any `high` finding.
+- **CONDITIONAL** — only `medium`/`low` findings.
+- **PASS** — no gaps (single `No gaps found` row).
+
+## Validate
+
+```
+quire validate --scope <project_root> "reviews/**/*.md"
+```
+
+Fix any validation error (frontmatter pattern, `analysis` enum, findings headers/ids/severity)
+before reporting completion. Then tell the user the artifact path and the Verdict.
+
+## Notes
+
+- File name: `reviews/<YYYY-MM-DD>-<short-slug>.md` (today's real date; slug from the plan,
+  e.g. `2026-06-22-plan-002-packaging`).
+- `reviews/` is **repo root** for this skill (deliberate); validation is path-agnostic.
+- One run → one SpecReview doc (the `analysis: gap-analysis` lens), matching the one-doc-per-
+  analysis model used by `quoin:spec-review`.
