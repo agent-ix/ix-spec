@@ -28,6 +28,264 @@ import {
   writeRepoFile,
 } from "../lib/fixtures.mjs";
 
+// --- Shared fixture for the gap-analysis scenarios (EV-030..EV-033) -----------
+// Seeds a PLAN-001 bundle + Test Matrix + code/tests with configurable gaps so each
+// scenario exercises a different happy/sad branch of the gap-analysis skill:
+//   taskDone  - TASK-002 status: true=done, false=not_started          (Step 2 gap)
+//   tc2       - matrix TC-002 backing test:
+//                 "real"   = tagged test with a real assertion          (no gap)
+//                 "hollow" = tagged test that asserts nothing — Step 3 passes on the
+//                            tag, only the optional Step 5 (semantic) catches it
+//                 "none"   = no tagged test                             (Step 3 gap)
+//   untraced  - extra source fn with no owning requirement             (Step 4 gap):
+//                 false | "purge" (destructive→high) | "listCodes" (read-only→medium)
+function seedGapBundle(ctx, { taskDone, tc2, untraced }) {
+  // A real FR whose intent matches the code/tests, so the only gaps are the ones
+  // each scenario injects (a generic skeleton FR would itself read as a spec↔code
+  // mismatch and pollute the happy path).
+  writeRepoFile(
+    ctx,
+    "spec/functional/FR-001.md",
+    [
+      "---",
+      "id: FR-001",
+      'title: "Shorten and resolve URLs"',
+      "type: FR",
+      "relationships:",
+      "  - target: ix://agent-ix/eval/US-001",
+      "    type: implements",
+      "---",
+      "# FR-001: Shorten and resolve URLs",
+      "",
+      "## Description",
+      "",
+      "The system SHALL generate a short code for a long URL and resolve a short " +
+        "code back to the original URL.",
+      "",
+      "## Acceptance Criteria",
+      "",
+      "| ID | Criteria | Verification |",
+      "| --- | --- | --- |",
+      "| FR-001-AC-1 | shorten(url) returns a 6-character code and stores the mapping | Test |",
+      "| FR-001-AC-2 | resolve(code) returns the original URL for a stored code | Test |",
+      "",
+    ].join("\n"),
+  );
+  writeRepoFile(
+    ctx,
+    "spec/spec.md",
+    [
+      "---",
+      "id: SPEC-001",
+      'title: "URL shortener"',
+      "type: master-requirements",
+      "org: agent-ix",
+      "name: eval",
+      "---",
+      "# URL shortener",
+      "",
+      "A small service that shortens URLs and resolves them back.",
+      "",
+    ].join("\n"),
+  );
+  // Matrix claims BOTH TCs complete (✅); whether that is true depends on `tc2`.
+  writeRepoFile(
+    ctx,
+    "spec/matrix.md",
+    [
+      "---",
+      "id: TM-001",
+      'title: "URL shortener Test Matrix"',
+      "type: TestMatrix",
+      "---",
+      "# URL shortener Test Matrix",
+      "",
+      "## Test Case Summary",
+      "",
+      "| Test ID | Title | Type | Priority | Traces To | Status |",
+      "| ------- | ----- | ---- | -------- | --------- | ------ |",
+      "| TC-001 | shorten returns a code | Unit | P0 | FR-001-AC-1 | ✅ |",
+      "| TC-002 | resolve round-trips a code | Unit | P0 | FR-001-AC-2 | ✅ |",
+      "",
+    ].join("\n"),
+  );
+  writeRepoFile(
+    ctx,
+    "plan/PLAN-001-core/plan.md",
+    [
+      "---",
+      "id: PLAN-001",
+      'title: "Core plan"',
+      "type: Plan",
+      "status: active",
+      "relationships:",
+      "  - target: ix://agent-ix/eval/FR-001",
+      "    type: references",
+      "---",
+      "# PLAN-001: Core plan",
+      "",
+      "## Scope",
+      "Implement and test the URL shortener (FR-001).",
+      "",
+    ].join("\n"),
+  );
+  writeRepoFile(
+    ctx,
+    "plan/PLAN-001-core/index.md",
+    [
+      "---",
+      "type: index",
+      'title: "PLAN-001 — Core plan"',
+      'description: "Contents of the PLAN-001 bundle."',
+      'okf_version: "0.1"',
+      "---",
+      "# PLAN-001 — Core plan",
+      "",
+      "## Contents",
+      "",
+      "* [PLAN-001: Core plan](./plan.md) - Plan overview.",
+      "* [TASK-001](./tasks/TASK-001-impl.md) - shorten/resolve impl.",
+      "* [TASK-002](./tasks/TASK-002-tests.md) - tests.",
+      "",
+    ].join("\n"),
+  );
+  writeRepoFile(
+    ctx,
+    "plan/PLAN-001-core/log.md",
+    [
+      "---",
+      "type: log",
+      'title: "PLAN-001 — Update Log"',
+      'description: "Change log for the PLAN-001 bundle."',
+      "---",
+      "# PLAN-001 — Update Log",
+      "",
+      "## History",
+      "",
+      "* **2026-06-21** — Plan created covering FR-001.",
+      "",
+    ].join("\n"),
+  );
+  const task = (id, title, status, tc) =>
+    [
+      "---",
+      `id: ${id}`,
+      `title: "${title}"`,
+      "type: Task",
+      `status: ${status}`,
+      "track: A",
+      "priority: P0",
+      "relationships:",
+      "  - target: ix://agent-ix/eval/FR-001",
+      "    type: references",
+      `  - target: ix://agent-ix/eval/${tc}`,
+      "    type: verifies",
+      "---",
+      `# ${id}: ${title}`,
+      "",
+      "## Scope",
+      `${title}.`,
+      "",
+    ].join("\n");
+  writeRepoFile(
+    ctx,
+    "plan/PLAN-001-core/tasks/TASK-001-impl.md",
+    task("TASK-001", "shorten/resolve implementation", "done", "TC-001"),
+  );
+  writeRepoFile(
+    ctx,
+    "plan/PLAN-001-core/tasks/TASK-002-tests.md",
+    task(
+      "TASK-002",
+      "shorten/resolve tests",
+      taskDone ? "done" : "not_started",
+      "TC-002",
+    ),
+  );
+  const src = [
+    "export function shorten(url, store) {",
+    "  let h = 0;",
+    "  for (const c of url) h = (h * 31 + c.charCodeAt(0)) | 0;",
+    "  const code = Math.abs(h).toString(36).slice(0, 6);",
+    "  store.set(code, url);",
+    "  return code;",
+    "}",
+    "export function resolve(code, store) {",
+    "  if (!store.has(code)) throw new Error('unknown code');",
+    "  return store.get(code);",
+    "}",
+  ];
+  if (untraced === "purge") {
+    src.push(
+      "// Not covered by any requirement (FR-001 says nothing about deletion).",
+      "export function purge(store) {",
+      "  store.clear();",
+      "}",
+    );
+  } else if (untraced === "listCodes") {
+    src.push(
+      "// Not covered by any requirement (read-only enumeration API).",
+      "export function listCodes(store) {",
+      "  return [...store.keys()];",
+      "}",
+    );
+  }
+  src.push("");
+  writeRepoFile(ctx, "src/shorten.mjs", src.join("\n"));
+  const tests = [
+    "// Trace: FR-001-AC-1 / TC-001",
+    "import { shorten, resolve } from '../src/shorten.mjs';",
+    "test('shorten returns a 6-char code', () => {",
+    "  const store = new Map();",
+    "  expect(shorten('https://x.test', store)).toHaveLength(6);",
+    "});",
+  ];
+  if (tc2 === "real") {
+    tests.push(
+      "// Trace: FR-001-AC-2 / TC-002",
+      "test('resolve round-trips a stored code', () => {",
+      "  const store = new Map();",
+      "  const code = shorten('https://y.test', store);",
+      "  expect(resolve(code, store)).toBe('https://y.test');",
+      "});",
+    );
+  } else if (tc2 === "hollow") {
+    tests.push(
+      "// Trace: FR-001-AC-2 / TC-002  (hollow: tagged but asserts nothing about resolve)",
+      "test('resolve works', () => {",
+      "  expect(true).toBe(true);",
+      "});",
+    );
+  }
+  tests.push("");
+  writeRepoFile(ctx, "tests/shorten.test.mjs", tests.join("\n"));
+}
+
+// Both gap-analysis guardrails: reference quoin for the template + validate with quire.
+const GAP_AGENT_RAN = [
+  {
+    pattern: "quoin\\s+write\\b[\\s\\S]*[Ss]pec[Rr]eview",
+    desc: "fetch the SpecReview template from quoin (quoin write --types SpecReview)",
+  },
+  { pattern: "quire\\s+validate\\b", desc: "validate the review with quire" },
+];
+// Shared task prompt; `semantic` toggles the optional Step 5 (intent↔test↔code).
+const gapPrompt = (semantic) =>
+  "Use the gap-analysis skill to verify the plan at plan/PLAN-001-core/ against " +
+  "spec/matrix.md and the code in src/ and tests/. " +
+  (semantic
+    ? "When the skill offers the optional semantic review (intent↔test↔code), RUN it. "
+    : "Do NOT run the optional semantic review. ") +
+  "Fetch the SpecReview template from quoin first with `quoin write --types SpecReview`, " +
+  "then author ONE review to reviews/<today>-gap-analysis.md with `type: SpecReview` and " +
+  "`analysis: gap-analysis` frontmatter, a `## Summary`, a `## Verdict` " +
+  "(PASS / CONDITIONAL / FAIL), and a `## Findings` table (columns ID | Severity | " +
+  "Summary | Refs, FND-NNN ids, Severity one of low/medium/high). Record every gap you " +
+  "find. Validate it with quire so it passes.";
+// Verdict assertion: the word right under the `## Verdict` heading (bold or plain).
+// `word` may be an alternation, e.g. "(PASS|CONDITIONAL)".
+const verdict = (word) => `## Verdict[\\s\\S]{0,40}\\b${word}\\b`;
+
 export const SCENARIOS = [
   {
     id: "EV-001",
@@ -832,6 +1090,129 @@ export const SCENARIOS = [
       files: ["plan/PLAN-001-core/tasks/*.md"],
       absentFiles: ["plan/PLAN-002-*/plan.md", "plan/Plan-002-*/plan.md"],
       validate: { globs: ["plan/**/*.md"], shouldPass: true },
+    },
+  },
+  {
+    // gap-analysis verification gate: given a plan bundle, a Test Matrix, and
+    // code/tests that contain DELIBERATE gaps (an incomplete task, a matrix TC with
+    // no backing tagged test, and an untraced function), the agent runs the
+    // gap-analysis skill and emits ONE validated SpecReview (analysis: gap-analysis)
+    // to reviews/ with a Verdict + Findings table. The two `agentRan` guardrails
+    // assert the durable behaviors: reference quoin for the template + validate with
+    // quire. Semantic review (Step 5) is explicitly declined to keep the run cheap.
+    //
+    // REQUIRES spec-artifacts-process v0.4.0 — the feature bump that adds
+    // `gap-analysis` to the SpecReview `analysis` enum (shipped alongside this skill).
+    // Until v0.4.0 is tagged + pinned in default-modules.yaml, the seed reconciles the
+    // published v0.3.0 module (enum lacks `gap-analysis`), so `quire validate` rejects
+    // the doc and this eval is RED — the same release-coupling EV-026 documents for the
+    // SpecReview archetype itself. Proven GREEN locally (sonnet, 1/1) by temporarily
+    // sourcing the module from the local working tree (`source.type: path`) before the
+    // tag exists; the committed pin stays at the released v0.3.0.
+    id: "EV-030",
+    useCase: "US-005",
+    setup(ctx) {
+      seedGapBundle(ctx, { taskDone: false, tc2: "none", untraced: "purge" });
+    },
+    prompt: gapPrompt(false),
+    expect: {
+      agentRan: GAP_AGENT_RAN,
+      files: ["reviews/*.md"],
+      artifacts: { require: { SpecReview: { min: 1, dir: "reviews" } } },
+      validate: { globs: ["reviews/*.md"], shouldPass: true },
+      // FAIL verdict; the incomplete task + unbacked matrix TC are named.
+      fileContains: [
+        {
+          glob: "reviews/*.md",
+          includes: [verdict("FAIL"), "TASK-002", "TC-002"],
+        },
+      ],
+    },
+  },
+  {
+    // EV-031 — HAPPY path: every task done, both matrix TCs backed by real tagged
+    // tests, no untraced code, semantic review declined → Verdict PASS with the single
+    // "no gaps" finding. Proves the PASS branch + that a clean review still validates.
+    // Shares the EV-030 v0.4.0 release-coupling (RED in CI until v0.4.0 is pinned).
+    id: "EV-031",
+    useCase: "US-005",
+    setup(ctx) {
+      seedGapBundle(ctx, { taskDone: true, tc2: "real", untraced: false });
+    },
+    prompt: gapPrompt(false),
+    expect: {
+      agentRan: GAP_AGENT_RAN,
+      files: ["reviews/*.md"],
+      artifacts: { require: { SpecReview: { min: 1, dir: "reviews" } } },
+      validate: { globs: ["reviews/*.md"], shouldPass: true },
+      // Clean plan → a non-blocking verdict (PASS or CONDITIONAL), never FAIL.
+      // (A diligent agent may still note low-severity nuances, so PASS isn't
+      // guaranteed; the happy signal is "no blocking gaps".)
+      fileContains: [
+        {
+          glob: "reviews/*.md",
+          includes: [verdict("(PASS|CONDITIONAL)")],
+          excludes: [verdict("FAIL")],
+        },
+      ],
+    },
+  },
+  {
+    // EV-032 — SAD (medium-only) → Verdict CONDITIONAL: plan done and matrix fully
+    // backed, but the source has an untraced read-only `listCodes` API with no owning
+    // requirement (Step 4). Isolates the reverse-gap path + the CONDITIONAL gate.
+    id: "EV-032",
+    useCase: "US-005",
+    setup(ctx) {
+      seedGapBundle(ctx, {
+        taskDone: true,
+        tc2: "real",
+        untraced: "listCodes",
+      });
+    },
+    prompt: gapPrompt(false),
+    expect: {
+      agentRan: GAP_AGENT_RAN,
+      files: ["reviews/*.md"],
+      artifacts: { require: { SpecReview: { min: 1, dir: "reviews" } } },
+      validate: { globs: ["reviews/*.md"], shouldPass: true },
+      // The untraced listCodes is flagged (medium); verdict is not a blocking FAIL.
+      fileContains: [
+        {
+          glob: "reviews/*.md",
+          includes: ["listCodes"],
+          excludes: [verdict("FAIL")],
+        },
+      ],
+    },
+  },
+  {
+    // EV-033 — OPTIONAL semantic review (Step 5): plan done, matrix TC-002 is backed
+    // by a tagged test so Step 3 passes — but that test is HOLLOW (asserts nothing
+    // about resolve). Only the semantic review (which the prompt opts into) catches it.
+    // The TC-002 finding is the signal that Step 5 actually ran (Steps 2-4 are clean).
+    id: "EV-033",
+    useCase: "US-005",
+    setup(ctx) {
+      seedGapBundle(ctx, { taskDone: true, tc2: "hollow", untraced: false });
+    },
+    prompt: gapPrompt(true),
+    expect: {
+      agentRan: GAP_AGENT_RAN,
+      files: ["reviews/*.md"],
+      artifacts: { require: { SpecReview: { min: 1, dir: "reviews" } } },
+      validate: { globs: ["reviews/*.md"], shouldPass: true },
+      // Semantic review surfaces the hollow TC-002 test; the review is not clean.
+      fileContains: [
+        {
+          glob: "reviews/*.md",
+          includes: [
+            "TC-002",
+            "(hollow|assert|exercise|does not test|resolve)",
+          ],
+          excludes: ["No gaps found"],
+        },
+      ],
     },
   },
 ];
