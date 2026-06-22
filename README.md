@@ -66,7 +66,6 @@ as the guide. `/gap-analysis` will optionally perform a _semantic_ comparison of
 > /gap-analysis
 ```
 
-
 ## What's included
 
 The default module set defines the spec archetypes and domain-object vocabulary.
