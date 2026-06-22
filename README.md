@@ -17,6 +17,56 @@ workflows agents need to write and validate specs directly as Markdown.
 
 > **Why:** AI agents write code fast but drift from vague intent. Quoin makes the spec the source of truth — your agent authors a validated, traceable spec first, then plans and builds against it.
 
+## How
+
+In Claude Code, Codex, or the coding agent of your choice:
+
+#### 1. Ideate & Specify
+
+Ideate, then pass your idea to `/specify`. A `specification` containing `user stories`, `functional requirements`,
+`stakeholder requirements`, `non-functional requirements`, and other artifacts will be created.
+
+```
+> /specify an electron app for tracking spice production
+```
+
+#### 2. Spec Review
+
+Use `/spec-review` for agent-assisted review. Multiple analysis tasks will run in parallel and output `Reviews`
+with `Findings` and suggested fixes.
+
+```
+> /spec-review review the specs for the spice production tracker.
+```
+
+#### 3. Convert to plans
+
+Build the test `traceability matrix` and `plan`. These skills will break the work down into a `plan`
+with multiple `tasks`.
+
+```
+> /spec-matrix /spec-to-plan prep the spice tracking app for coding
+```
+
+#### 4. Implement!
+
+Call `/implement-plan` to trigger your coding agent to begin work on the plan.
+
+```
+> /implement-plan build the spice tracking app
+```
+
+#### 5. Gap review
+
+`/gap-analysis` validates that the `UserStory` and `Functional Requirements` are implemented and tested using the `traceability matrix`
+as the guide. `/gap-analysis` will optionally perform a _semantic_ comparison of `spec`, `code`, and `tests` to ensure the
+`plan` is faithfully implemented.
+
+```
+> /gap-analysis
+```
+
+
 ## What's included
 
 The default module set defines the spec archetypes and domain-object vocabulary.
