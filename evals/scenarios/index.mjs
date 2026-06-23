@@ -1296,6 +1296,82 @@ export const SCENARIOS = [
       },
     },
   },
+  {
+    // FR-044 project Ubiquitous-Language HAPPY path. The agent authors an FR
+    // using a project-specific term AND defines that term in a `domain` object's
+    // `## Ubiquitous Language`; `--strict` passes only because the harvested
+    // term suppresses the otherwise-vague `provide a <term>` (validates the
+    // harvest+inject chain end-to-end through a live agent). Uses the DDD UL
+    // form (a released archetype) so the eval needs only the FR-044 engine.
+    id: "EV-042",
+    useCase: "US-001",
+    prompt:
+      "Author one Functional Requirement at spec/functional/FR-100.md whose " +
+      "Description says exactly: 'The gateway shall provide a Sprocket to each " +
+      "connected client.' 'Sprocket' is a term specific to THIS project, so the " +
+      "EARS grammar check reads `provide a Sprocket` as a vague response unless " +
+      "the project defines 'Sprocket'. Define it: author a `domain` object at " +
+      "spec/objects/gateway-domain.md (use `quoin write --types domain` for the " +
+      "skeleton) with a `## Bounded Context` section and a `## Ubiquitous " +
+      "Language` section containing the bullet `- **Sprocket** — <a " +
+      'definition>`. Then run `quire validate --scope . "spec/**/*.md" ' +
+      "--summary` and confirm the requirement is grammar-clean.",
+    expect: {
+      files: ["spec/functional/FR-100.md", "spec/objects/gateway-domain.md"],
+      validate: { globs: ["spec/**/*.md"], strict: true, shouldPass: true },
+    },
+  },
+  {
+    // FR-044 project Ubiquitous-Language SAD/repair path: a seeded FR trips the
+    // grammar check on a project term. The correct fix is to DEFINE the term in
+    // a `domain` object's `## Ubiquitous Language` — NOT to reword the
+    // requirement. After the agent adds the definition, `--strict` passes.
+    id: "EV-043",
+    useCase: "US-004",
+    prompt:
+      "spec/functional/FR-001.md trips the EARS requirement-grammar check: " +
+      '`quire validate --scope . "spec/functional/FR-001.md" --summary` flags ' +
+      "'Sprocket' as a vague response. 'Sprocket' is a real project term, NOT " +
+      "vague. Resolve the finding by DEFINING 'Sprocket' for the project — " +
+      "author a `domain` object at spec/objects/gateway-domain.md (use `quoin " +
+      "write --types domain`) with a `## Bounded Context` section and a `## " +
+      "Ubiquitous Language` section containing `- **Sprocket** — <a " +
+      "definition>`. Do NOT change FR-001's wording. Re-run until the summary " +
+      "reports it grammar-clean.",
+    setup(ctx) {
+      writeRepoFile(
+        ctx,
+        "spec/functional/FR-001.md",
+        [
+          "---",
+          "id: FR-001",
+          'title: "Deliver a Sprocket"',
+          "type: FR",
+          "---",
+          "# [FR-001] Deliver a Sprocket",
+          "",
+          "## Description",
+          "",
+          "The gateway shall provide a Sprocket to each connected client.",
+          "",
+          "## Acceptance Criteria",
+          "",
+          "| ID | Criteria | Verification |",
+          "|----|----------|--------------|",
+          "| FR-001-AC-1 | A connected client receives a Sprocket | Test |",
+          "",
+          "## Dependencies",
+          "",
+          "- **Upstream**: none",
+          "- **Downstream**: none",
+        ].join("\n"),
+      );
+    },
+    expect: {
+      files: ["spec/objects/gateway-domain.md"],
+      validate: { globs: ["spec/**/*.md"], strict: true, shouldPass: true },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];
