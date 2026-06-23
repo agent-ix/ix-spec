@@ -1215,6 +1215,163 @@ export const SCENARIOS = [
       ],
     },
   },
+  {
+    // EARS requirement-grammar (quire-rs FR-042): author EARS-clean from the
+    // start. The `--strict` validate asserts the authored FR is BOTH
+    // structurally valid AND grammar-clean — exercising the EARS skeleton
+    // guidance + `/specify`.
+    id: "EV-040",
+    useCase: "US-001",
+    prompt:
+      "Author one Functional Requirement at spec/functional/FR-100.md for this " +
+      "feature: 'the gateway streams agent responses to connected clients and " +
+      "retransmits unacknowledged frames'. Write each requirement statement to " +
+      "follow EARS — one `shall` per statement, a named subject, a concrete " +
+      "response verb (not support/handle/manage/provide), and a canonical " +
+      "`When …` / `While …` / `If … then …` / `Where …` trigger when " +
+      "conditional. Then run " +
+      '`quire validate --scope . "spec/**/*.md" --summary` and revise until the ' +
+      "summary reports the document grammar-clean.",
+    expect: {
+      files: ["spec/functional/FR-100.md"],
+      validate: {
+        globs: ["spec/functional/FR-100.md"],
+        strict: true,
+        shouldPass: true,
+      },
+    },
+  },
+  {
+    // EARS repair loop (mirrors EV-008 but for the grammar check): a
+    // structurally-valid FR with three EARS defects (non-singular + vague
+    // response + non-canonical trigger). The agent reads the `[ears:…]`
+    // warnings and rewrites the Description until `--strict` passes.
+    id: "EV-041",
+    useCase: "US-004",
+    prompt:
+      "The requirement statement in spec/functional/FR-001.md trips the EARS " +
+      "requirement-grammar check. Run " +
+      '`quire validate --scope . "spec/functional/FR-001.md" --summary`, read the ' +
+      "`[ears:…]` warnings, and rewrite the Description so every statement is " +
+      "EARS-clean — one `shall`, a named subject, a concrete response, and a " +
+      "canonical trigger instead of `On …`. Re-run until the summary reports it " +
+      "grammar-clean. Do not change the Acceptance Criteria or Dependencies.",
+    setup(ctx) {
+      writeRepoFile(
+        ctx,
+        "spec/functional/FR-001.md",
+        [
+          "---",
+          "id: FR-001",
+          'title: "Stream agent responses to the client"',
+          "type: FR",
+          "---",
+          "# [FR-001] Stream agent responses to the client",
+          "",
+          "## Description",
+          "",
+          "On connection, the gateway shall support streaming responses and shall also",
+          "buffer partial frames until the client acknowledges them.",
+          "",
+          "## Acceptance Criteria",
+          "",
+          "| ID | Criteria | Verification |",
+          "|----|----------|--------------|",
+          "| FR-001-AC-1 | A connected client receives streamed frames in order | Test |",
+          "| FR-001-AC-2 | Unacknowledged frames are retransmitted on timeout | Test |",
+          "",
+          "## Dependencies",
+          "",
+          "- **Upstream**: none",
+          "- **Downstream**: none",
+        ].join("\n"),
+      );
+    },
+    expect: {
+      files: ["spec/functional/FR-001.md"],
+      validate: {
+        globs: ["spec/functional/FR-001.md"],
+        strict: true,
+        shouldPass: true,
+      },
+    },
+  },
+  {
+    // FR-044 project Ubiquitous-Language HAPPY path. The agent authors an FR
+    // using a project-specific term AND defines that term in a `domain` object's
+    // `## Ubiquitous Language`; `--strict` passes only because the harvested
+    // term suppresses the otherwise-vague `provide a <term>` (validates the
+    // harvest+inject chain end-to-end through a live agent). Uses the DDD UL
+    // form (a released archetype) so the eval needs only the FR-044 engine.
+    id: "EV-042",
+    useCase: "US-001",
+    prompt:
+      "Author one Functional Requirement at spec/functional/FR-100.md whose " +
+      "Description says exactly: 'The gateway shall provide a Sprocket to each " +
+      "connected client.' 'Sprocket' is a term specific to THIS project, so the " +
+      "EARS grammar check reads `provide a Sprocket` as a vague response unless " +
+      "the project defines 'Sprocket'. Define it: author a `domain` object at " +
+      "spec/objects/gateway-domain.md (use `quoin write --types domain` for the " +
+      "skeleton) with a `## Bounded Context` section and a `## Ubiquitous " +
+      "Language` section containing the bullet `- **Sprocket** — <a " +
+      'definition>`. Then run `quire validate --scope . "spec/**/*.md" ' +
+      "--summary` and confirm the requirement is grammar-clean.",
+    expect: {
+      files: ["spec/functional/FR-100.md", "spec/objects/gateway-domain.md"],
+      validate: { globs: ["spec/**/*.md"], strict: true, shouldPass: true },
+    },
+  },
+  {
+    // FR-044 project Ubiquitous-Language SAD/repair path: a seeded FR trips the
+    // grammar check on a project term. The correct fix is to DEFINE the term in
+    // a `domain` object's `## Ubiquitous Language` — NOT to reword the
+    // requirement. After the agent adds the definition, `--strict` passes.
+    id: "EV-043",
+    useCase: "US-004",
+    prompt:
+      "spec/functional/FR-001.md trips the EARS requirement-grammar check: " +
+      '`quire validate --scope . "spec/functional/FR-001.md" --summary` flags ' +
+      "'Sprocket' as a vague response. 'Sprocket' is a real project term, NOT " +
+      "vague. Resolve the finding by DEFINING 'Sprocket' for the project — " +
+      "author a `domain` object at spec/objects/gateway-domain.md (use `quoin " +
+      "write --types domain`) with a `## Bounded Context` section and a `## " +
+      "Ubiquitous Language` section containing `- **Sprocket** — <a " +
+      "definition>`. Do NOT change FR-001's wording. Re-run until the summary " +
+      "reports it grammar-clean.",
+    setup(ctx) {
+      writeRepoFile(
+        ctx,
+        "spec/functional/FR-001.md",
+        [
+          "---",
+          "id: FR-001",
+          'title: "Deliver a Sprocket"',
+          "type: FR",
+          "---",
+          "# [FR-001] Deliver a Sprocket",
+          "",
+          "## Description",
+          "",
+          "The gateway shall provide a Sprocket to each connected client.",
+          "",
+          "## Acceptance Criteria",
+          "",
+          "| ID | Criteria | Verification |",
+          "|----|----------|--------------|",
+          "| FR-001-AC-1 | A connected client receives a Sprocket | Test |",
+          "",
+          "## Dependencies",
+          "",
+          "- **Upstream**: none",
+          "- **Downstream**: none",
+        ].join("\n"),
+      );
+    },
+    expect: {
+      files: ["spec/objects/gateway-domain.md"],
+      validate: { globs: ["spec/**/*.md"], strict: true, shouldPass: true },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];

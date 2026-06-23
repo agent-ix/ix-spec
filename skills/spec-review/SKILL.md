@@ -17,10 +17,10 @@ Before reviewing, present these options to the user and let them choose:
 
 - **base** — the **Checklist** only: ID formats, US/FR/TC quality, and the six coverage
   rules. No analysis skills.
-- **all** — `base` plus all six analyses below.
-- **subset** — `base` plus the analyses the user picks from the six below.
+- **all** — `base` plus all seven analyses below.
+- **subset** — `base` plus the analyses the user picks from the seven below.
 
-The six analyses:
+The seven analyses:
 
 | Analysis | Skill |
 | --- | --- |
@@ -30,6 +30,7 @@ The six analyses:
 | evidence | `spec-evidence-analysis` |
 | risk-complexity | `spec-risk-complexity-analysis` |
 | scope-boundary | `spec-scope-boundary-analysis` |
+| ears-conformance | `spec-ears-analysis` |
 
 ## Process
 

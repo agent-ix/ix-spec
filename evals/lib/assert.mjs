@@ -200,8 +200,14 @@ export function assertExpectations(
 
   let validation = null;
   if (expect.validate) {
-    const { globs, shouldPass = true } = expect.validate;
-    const r = spawnSync(quireBin, ["validate", "--scope", scope, ...globs], {
+    const { globs, shouldPass = true, strict = false } = expect.validate;
+    // `strict: true` adds `--strict`, which escalates advisory warnings —
+    // including EARS requirement-grammar findings (FR-042) — to a failing
+    // exit. So `{ strict: true, shouldPass: true }` asserts the docs are both
+    // structurally valid AND grammar-clean.
+    const validateArgs = ["validate", "--scope", scope, ...globs];
+    if (strict) validateArgs.push("--strict");
+    const r = spawnSync(quireBin, validateArgs, {
       cwd: scope,
       encoding: "utf8",
       env,
