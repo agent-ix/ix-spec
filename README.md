@@ -105,14 +105,6 @@ The default module set defines the spec archetypes and domain-object vocabulary.
   - **`spec-risk-complexity-analysis`** — technical risk and volatility before tasking
   - **`spec-security-analysis`** — applicable security standards and compliance traceability
 
-### Agent Workflows
-
-Multi-agent workflows that fan out, run lenses in parallel, and synthesize results:
-
-- **`review`** — parallel review lenses → dedupe → sync
-- **`matrix`** — coverage analysis and Test Matrix construction
-- **`to-plan`** — requirements → dependency-aware TDD plan
-
 ## Install
 
 Installing quoin into Claude is **two steps**: the CLI (from public npm) and the plugin
