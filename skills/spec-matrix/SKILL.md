@@ -16,6 +16,29 @@ Use this skill to create the requirements Test Matrix and ensure comprehensive c
 5.  State Transition: Test all valid state transitions (if applicable).
 6.  Edge Case: Identify and test extreme/unusual scenarios.
 
+## EARS precondition (atomic, mappable requirements)
+
+Coverage (Rule 1) is only meaningful when each requirement states **one**
+obligation — a statement packing two `shall` clauses cannot map cleanly to one
+Acceptance Criterion, so its matrix row is ambiguous. Before building the
+matrix, run the EARS requirement-grammar check:
+
+```bash
+quire validate --scope . "spec/**/*.md" --summary
+```
+
+Treat these `[ears:…]` findings as **un-mappable requirements to fix first**,
+not coverage you can claim:
+
+-   `non-singular` — split the statement into one requirement per `shall`, then
+    map each to its own AC/TC.
+-   `unclassifiable` / `missing-subject` — the obligation is unclear; clarify the
+    requirement before authoring a TC against it.
+
+Do not mark the matrix ✅ Complete while non-singular or unclassifiable
+requirements remain — the coverage they appear to have is illusory. (The check
+is advisory; this skill treats it as a quality gate for the matrix.)
+
 ## Process
 
 1.  Initialize:

@@ -1215,6 +1215,87 @@ export const SCENARIOS = [
       ],
     },
   },
+  {
+    // EARS requirement-grammar (quire-rs FR-042): author EARS-clean from the
+    // start. The `--strict` validate asserts the authored FR is BOTH
+    // structurally valid AND grammar-clean — exercising the EARS skeleton
+    // guidance + `/specify`.
+    id: "EV-040",
+    useCase: "US-001",
+    prompt:
+      "Author one Functional Requirement at spec/functional/FR-100.md for this " +
+      "feature: 'the gateway streams agent responses to connected clients and " +
+      "retransmits unacknowledged frames'. Write each requirement statement to " +
+      "follow EARS — one `shall` per statement, a named subject, a concrete " +
+      "response verb (not support/handle/manage/provide), and a canonical " +
+      "`When …` / `While …` / `If … then …` / `Where …` trigger when " +
+      "conditional. Then run " +
+      '`quire validate --scope . "spec/**/*.md" --summary` and revise until the ' +
+      "summary reports the document grammar-clean.",
+    expect: {
+      files: ["spec/functional/FR-100.md"],
+      validate: {
+        globs: ["spec/functional/FR-100.md"],
+        strict: true,
+        shouldPass: true,
+      },
+    },
+  },
+  {
+    // EARS repair loop (mirrors EV-008 but for the grammar check): a
+    // structurally-valid FR with three EARS defects (non-singular + vague
+    // response + non-canonical trigger). The agent reads the `[ears:…]`
+    // warnings and rewrites the Description until `--strict` passes.
+    id: "EV-041",
+    useCase: "US-004",
+    prompt:
+      "The requirement statement in spec/functional/FR-001.md trips the EARS " +
+      "requirement-grammar check. Run " +
+      '`quire validate --scope . "spec/functional/FR-001.md" --summary`, read the ' +
+      "`[ears:…]` warnings, and rewrite the Description so every statement is " +
+      "EARS-clean — one `shall`, a named subject, a concrete response, and a " +
+      "canonical trigger instead of `On …`. Re-run until the summary reports it " +
+      "grammar-clean. Do not change the Acceptance Criteria or Dependencies.",
+    setup(ctx) {
+      writeRepoFile(
+        ctx,
+        "spec/functional/FR-001.md",
+        [
+          "---",
+          "id: FR-001",
+          'title: "Stream agent responses to the client"',
+          "type: FR",
+          "---",
+          "# [FR-001] Stream agent responses to the client",
+          "",
+          "## Description",
+          "",
+          "On connection, the gateway shall support streaming responses and shall also",
+          "buffer partial frames until the client acknowledges them.",
+          "",
+          "## Acceptance Criteria",
+          "",
+          "| ID | Criteria | Verification |",
+          "|----|----------|--------------|",
+          "| FR-001-AC-1 | A connected client receives streamed frames in order | Test |",
+          "| FR-001-AC-2 | Unacknowledged frames are retransmitted on timeout | Test |",
+          "",
+          "## Dependencies",
+          "",
+          "- **Upstream**: none",
+          "- **Downstream**: none",
+        ].join("\n"),
+      );
+    },
+    expect: {
+      files: ["spec/functional/FR-001.md"],
+      validate: {
+        globs: ["spec/functional/FR-001.md"],
+        strict: true,
+        shouldPass: true,
+      },
+    },
+  },
 ];
 
 export const CANARY_IDS = ["EV-001", "EV-008"];
