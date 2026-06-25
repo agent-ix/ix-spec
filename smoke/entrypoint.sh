@@ -104,4 +104,16 @@ timeout 180 claude -p "Reply with the single word: ok" \
   || echo "   note: claude print-turn exited non-zero (init event still captured for assertions)"
 
 # ======================================================================
-/smoke/assert.sh "$STREAM"
+/smoke/assert.sh "$STREAM"; claude_rc=$?
+
+# ======================================================================
+# Stage 3 — the additional coding agents (Codex / opencode / GitHub Copilot).
+# Filesystem-install depth: each agent's documented install path runs and the
+# bundle's skills must land on disk. See smoke/agents.sh.
+/smoke/agents.sh; agents_rc=$?
+
+echo
+echo "=================================================================="
+echo " Summary:  Claude Code stage rc=$claude_rc   other-agents stage rc=$agents_rc"
+echo "=================================================================="
+[ "$claude_rc" -eq 0 ] && [ "$agents_rc" -eq 0 ]

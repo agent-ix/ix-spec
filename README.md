@@ -107,9 +107,10 @@ The default module set defines the spec archetypes and domain-object vocabulary.
 
 ## Install
 
-Installing quoin into Claude is **two steps**: the CLI (from public npm) and the plugin
-that adds the [skills](#agent-skills) and [workflows](#agent-workflows) to Claude Code. No Anthropic API
-key is required — your Claude subscription is used.
+Installing quoin is **two steps**: the CLI (from public npm) and a plugin that adds the
+[skills](#agent-skills) and workflows to your coding agent. The same skill bundle installs
+into **Claude Code, OpenAI Codex, opencode, and GitHub Copilot** — pick your agent below. No
+Anthropic API key is required — your existing agent subscription is used.
 
 **1. Install the CLIs** (`quoin` plus `ix-flow`, which runs the workflow lifecycle commands):
 
@@ -117,15 +118,64 @@ key is required — your Claude subscription is used.
 npm install -g @agent-ix/quoin@latest @agent-ix/ix-flow@latest
 ```
 
-**2. Add the plugin to Claude Code** (run these inside Claude Code):
+**2. Add the plugin to your coding agent:**
+
+<details>
+<summary><b>Claude Code</b></summary>
+
+Run these inside Claude Code:
 
 ```text
 /plugin marketplace add agent-ix/quoin
 /plugin install quoin@quoin
 ```
 
-That registers quoin's spec-authoring skills and workflows so you can drive them by asking
-the agent.
+</details>
+
+<details>
+<summary><b>OpenAI Codex</b></summary>
+
+```bash
+codex plugin marketplace add agent-ix/quoin
+codex plugin add quoin
+```
+
+Or browse and install quoin from the `/plugins` menu inside the Codex TUI.
+
+</details>
+
+<details>
+<summary><b>opencode</b></summary>
+
+Install the skills with the GitHub CLI (requires `gh` ≥ 2.90.0). `--all` installs
+the whole bundle; `--scope user` makes it available in every repo:
+
+```bash
+gh skill install agent-ix/quoin --all --scope user --agent opencode
+```
+
+</details>
+
+<details>
+<summary><b>GitHub Copilot</b></summary>
+
+With the Copilot CLI:
+
+```bash
+copilot plugin marketplace add agent-ix/quoin
+copilot plugin install quoin@quoin
+```
+
+Or install the skills with the GitHub CLI (requires `gh` ≥ 2.90.0):
+
+```bash
+gh skill install agent-ix/quoin --all --scope user --agent github-copilot
+```
+
+</details>
+
+Either way, that registers quoin's spec-authoring skills and workflows so you can drive them
+by asking the agent.
 
 ## Usage
 

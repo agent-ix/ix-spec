@@ -16,3 +16,4 @@ description: "Index of artifacts in this directory."
 - [US-006: Detect conflicting type definitions across modules](./US-006-detect-conflicting-type-definitions.md)
 - [US-007: Review a spec into validated per-analysis review docs](./US-007-review-into-specreview-docs.md)
 - [US-008: Create an implementation plan from accepted requirements](./US-008-create-implementation-plan.md)
+- [US-009: Install quoin in the coding agent of my choice](./US-009-install-in-any-coding-agent.md)
