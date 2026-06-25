@@ -63,3 +63,10 @@ This skill produces or updates a **plan bundle** at `<project_root>/plan/<Plan-i
 
 Validate the bundle with:
 `quire validate --scope <project_root> "plan/**/*.md"`
+
+## Open in the review cockpit
+
+After the bundle validates, run `filament open <plan-bundle>/plan.md` to open the
+plan in the running filament-ide cockpit (it fires the `filament-ide://` deep link
+and prints a clickable link as a fallback). Skip silently if the `filament`
+command is not installed.

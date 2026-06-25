@@ -63,7 +63,13 @@ Run only the steps the request needs; stop after IT.
    FRs; an FR/NFR/IT links back to the US/FR it serves).
 5. Run `quire validate <glob> [glob2 ...]` over the changed spec scope and fix
    every error before continuing.
-6. **Stop at IT.** Then ask the user whether to build the test matrix
+6. **Open in the review cockpit.** After validation passes, run
+   `filament open <primary-artifact>` to open the authored artifact in the running
+   filament-ide cockpit (it fires the `filament-ide://` deep link and prints a
+   clickable link as a fallback). Use the main artifact you created — the
+   new/edited `FR-XXX.md`, or `spec/spec.md` when starting a spec. Skip silently if
+   the `filament` command is not installed.
+7. **Stop at IT.** Then ask the user whether to build the test matrix
    (`spec-matrix`) and run review (`spec-review`) — unless they already requested
    them. Only run those on confirmation.
 
