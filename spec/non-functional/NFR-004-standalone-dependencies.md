@@ -8,7 +8,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [NFR-004] quoin runs as a standalone package
+# NFR-004: quoin runs as a standalone package
 
 ## Statement
 

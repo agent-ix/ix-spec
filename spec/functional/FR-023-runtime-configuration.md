@@ -12,7 +12,7 @@ relationships:
     type: "specifies"
 ---
 
-# [FR-023] quoin runtime configuration surface
+# FR-023: quoin runtime configuration surface
 
 ## Description
 

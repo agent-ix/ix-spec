@@ -8,7 +8,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-005] Workflows reference catalog-defined types
+# NFR-005: Workflows reference catalog-defined types
 
 ## Statement
 

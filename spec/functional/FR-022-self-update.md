@@ -9,7 +9,7 @@ relationships:
     type: "references"
 ---
 
-# [FR-022] Upgrade quoin to the latest published release
+# FR-022: Upgrade quoin to the latest published release
 
 ## Description
 

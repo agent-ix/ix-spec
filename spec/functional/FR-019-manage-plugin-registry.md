@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-019] Install, list, and remove plugins through the registry
+# FR-019: Install, list, and remove plugins through the registry
 
 ## Description
 

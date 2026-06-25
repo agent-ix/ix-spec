@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-007] Assemble module roots in a defined order
+# FR-007: Assemble module roots in a defined order
 
 ## Description
 

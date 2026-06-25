@@ -11,7 +11,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-007] Review a spec into validated per-analysis review docs
+# US-007: Review a spec into validated per-analysis review docs
 
 ## Story
 
@@ -36,19 +36,19 @@ recorded, validated doc.
 
 These examples clarify expectations; they are illustrative, not verification criteria.
 
-### [US-007-EX-1] Subset review yields one validated doc per analysis
+### US-007-EX-1: Subset review yields one validated doc per analysis
 
 - **Given** a spec directory and a choice of `subset` with `integrity` and `dependency`
 - **When** the author runs the review
 - **Then** `spec/reviews/integrity.md` and `spec/reviews/dependency.md` are authored as `SpecReview` artifacts and pass `quire validate`
 
-### [US-007-EX-2] Coverage gate blocks an incomplete review
+### US-007-EX-2: Coverage gate blocks an incomplete review
 
 - **Given** a `subset` of two analyses but only one rendered doc
 - **When** the author tries to accept the review
 - **Then** acceptance is blocked, naming the missing analysis, until its doc exists
 
-### [US-007-EX-3] Out-of-set severity is rejected
+### US-007-EX-3: Out-of-set severity is rejected
 
 - **Given** a findings row whose `Severity` is `catastrophic`
 - **When** the doc is validated

@@ -9,7 +9,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-004] Validate changed spec files
+# US-004: Validate changed spec files
 
 ## Story
 

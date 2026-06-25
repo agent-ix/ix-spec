@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-014] Emit an authoring contract per resolved type
+# FR-014: Emit an authoring contract per resolved type
 
 ## Description
 

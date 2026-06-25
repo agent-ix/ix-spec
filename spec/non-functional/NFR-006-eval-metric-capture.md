@@ -8,7 +8,7 @@ relationships:
     type: "references"
 ---
 
-# [NFR-006] The agent eval set captures efficiency metrics
+# NFR-006: The agent eval set captures efficiency metrics
 
 ## Statement
 

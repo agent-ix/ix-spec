@@ -7,7 +7,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [FR-002] Report the installed package version
+# FR-002: Report the installed package version
 
 ## Description
 

@@ -8,7 +8,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-001] Default-module reconciliation is idempotent and offline-safe
+# NFR-001: Default-module reconciliation is idempotent and offline-safe
 
 ## Statement
 

@@ -11,7 +11,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-006] Detect conflicting type definitions across modules
+# US-006: Detect conflicting type definitions across modules
 
 ## Story
 
@@ -42,13 +42,13 @@ can remove or re-scope a module before continuing.
 These examples clarify expectations; they are illustrative, not verification
 criteria.
 
-### [US-006-EX-1] Clean catalog validates
+### US-006-EX-1: Clean catalog validates
 
 - **Given** a catalog whose type names are each declared by a single module
 - **When** the user runs `quoin catalog validate`
 - **Then** the command succeeds and reports the number of modules
 
-### [US-006-EX-2] Conflicting types are surfaced
+### US-006-EX-2: Conflicting types are surfaced
 
 - **Given** two installed modules that both declare an object type named `domain`
 - **When** the user runs `quoin catalog validate`

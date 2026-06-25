@@ -12,7 +12,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-007] External tools are invoked by name and surface their failures
+# NFR-007: External tools are invoked by name and surface their failures
 
 ## Statement
 

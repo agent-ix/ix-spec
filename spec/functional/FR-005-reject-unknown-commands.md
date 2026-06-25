@@ -9,7 +9,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [FR-005] Reject unknown commands and subcommands
+# FR-005: Reject unknown commands and subcommands
 
 ## Description
 

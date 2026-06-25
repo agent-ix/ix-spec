@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-013] Resolve the requested types for an authoring pack
+# FR-013: Resolve the requested types for an authoring pack
 
 ## Description
 

@@ -8,7 +8,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-009] Skills are authored once and consumed by every supported agent
+# NFR-009: Skills are authored once and consumed by every supported agent
 
 ## Statement
 

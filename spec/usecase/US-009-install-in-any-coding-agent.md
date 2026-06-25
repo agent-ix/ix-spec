@@ -7,7 +7,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-009] Install quoin in the coding agent of my choice
+# US-009: Install quoin in the coding agent of my choice
 
 ## Story
 
@@ -34,13 +34,13 @@ agent's own plugin/skill mechanism.
 These examples clarify the adopter's expectations. They are illustrative only —
 not test cases and not verification criteria.
 
-### [US-009-EX-1] Install from Codex
+### US-009-EX-1: Install from Codex
 
 - **Given** a developer working in OpenAI Codex
 - **When** they add the quoin marketplace and install the plugin
 - **Then** quoin's skills appear in Codex without any per-agent re-authoring
 
-### [US-009-EX-2] Install from opencode or Copilot
+### US-009-EX-2: Install from opencode or Copilot
 
 - **Given** a developer working in opencode or GitHub Copilot
 - **When** they install quoin's skills for their agent (e.g. `gh skill install`

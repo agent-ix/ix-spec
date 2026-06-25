@@ -9,7 +9,7 @@ relationships:
     type: "verifies"
 ---
 
-# [IT-002] Community plugin installs from a GitHub source into the catalog
+# IT-002: Community plugin installs from a GitHub source into the catalog
 
 ## Objective
 

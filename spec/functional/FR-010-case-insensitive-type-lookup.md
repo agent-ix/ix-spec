@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-010] Look up catalog types case-insensitively
+# FR-010: Look up catalog types case-insensitively
 
 ## Description
 

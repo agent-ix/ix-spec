@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-015] Emit a scoped Quire validation command
+# FR-015: Emit a scoped Quire validation command
 
 ## Description
 
