@@ -1,0 +1,16 @@
+{
+  "name": "quoin",
+  "owner": {
+    "name": "Agent IX"
+  },
+  "metadata": {
+    "description": "Spec authoring, review, matrix, and planning skills + workflows for Agent IX."
+  },
+  "plugins": [
+    {
+      "name": "quoin",
+      "source": "./",
+      "description": "Spec authoring, review, matrix, and planning skills for Agent IX."
+    }
+  ]
+}

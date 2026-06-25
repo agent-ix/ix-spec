@@ -10,6 +10,9 @@
     "skills/",
     "bin/",
     ".claude-plugin/",
+    ".codex-plugin/",
+    ".agents/",
+    ".github/plugin/",
     "LICENSE",
     "README.md"
   ],
