@@ -16,3 +16,4 @@ description: "Index of non-functional requirements (NFR) for quoin."
 - [NFR-006: The agent eval set captures efficiency metrics](./NFR-006-eval-metric-capture.md)
 - [NFR-007: External tools are invoked by name and surface their failures](./NFR-007-external-tool-invocation.md)
 - [NFR-008: Corrupt manifests abort assembly rather than drop silently](./NFR-008-strict-manifest-parsing.md)
+- [NFR-009: Skills are authored once and consumed by every supported agent](./NFR-009-single-source-skills-across-agents.md)
