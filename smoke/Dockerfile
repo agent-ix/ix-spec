@@ -11,11 +11,23 @@
 FROM node:24-bookworm-slim
 
 ARG CLAUDE_VERSION=latest
+ARG CODEX_VERSION=latest
 
+# Base tools + the GitHub CLI from GitHub's official apt repo (>= 2.90 for
+# `gh skill`, which installs the opencode/Copilot skill bundles). Claude Code
+# and the Codex CLI are installed globally; opencode and Copilot need no host
+# CLI here — their install path is `gh skill install`.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git jq ca-certificates \
+ && apt-get install -y --no-install-recommends git jq ca-certificates wget \
+ && mkdir -p -m 755 /etc/apt/keyrings \
+ && wget -nv -O/tmp/ghkey.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+ && cat /tmp/ghkey.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null \
+ && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+ && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends gh \
  && rm -rf /var/lib/apt/lists/* \
- && npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION}
+ && npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} @openai/codex@${CODEX_VERSION}
 
 # Per-package identity consumed by the generic entrypoint/assert scripts.
 ENV PKG=@agent-ix/quoin \
@@ -26,6 +38,6 @@ ENV PKG=@agent-ix/quoin \
     HOME=/root
 
 COPY . /smoke
-RUN chmod +x /smoke/entrypoint.sh /smoke/assert.sh /smoke/run.sh
+RUN chmod +x /smoke/entrypoint.sh /smoke/assert.sh /smoke/agents.sh /smoke/run.sh
 
 ENTRYPOINT ["/smoke/entrypoint.sh"]
