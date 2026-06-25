@@ -11,7 +11,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-002] Discover an authoring contract before editing
+# US-002: Discover an authoring contract before editing
 
 ## Story
 

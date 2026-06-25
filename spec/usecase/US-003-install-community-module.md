@@ -13,7 +13,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-003] Install and use a community spec module
+# US-003: Install and use a community spec module
 
 ## Story
 

@@ -9,7 +9,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-008] Create an implementation plan from accepted requirements
+# US-008: Create an implementation plan from accepted requirements
 
 ## Story
 
@@ -37,21 +37,21 @@ later requirements rather than specifying them.
 These examples clarify the planner's expectations. They are illustrative only —
 not test cases and not verification criteria.
 
-### [US-008-EX-1] Start a new plan
+### US-008-EX-1: Start a new plan
 
 - **Given** a spec with accepted requirements and no existing plan
 - **When** the planner runs the planning workflow
 - **Then** a new plan is created as a self-describing bundle (its overview, a task
   per unit of work with dependencies between them, and its own index and change log)
 
-### [US-008-EX-2] Continue or branch into a second plan
+### US-008-EX-2: Continue or branch into a second plan
 
 - **Given** a project that already has one plan
 - **When** the planner runs the planning workflow again
 - **Then** they are offered the existing plan to continue, or can start a second,
   independent plan without disturbing the first
 
-### [US-008-EX-3] Dependencies and traceability are captured
+### US-008-EX-3: Dependencies and traceability are captured
 
 - **Given** requirements with ordering and verification needs
 - **When** the planner decomposes them into tasks

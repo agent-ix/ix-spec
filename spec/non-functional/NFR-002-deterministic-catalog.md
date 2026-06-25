@@ -10,7 +10,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-002] Catalog assembly is deterministic
+# NFR-002: Catalog assembly is deterministic
 
 ## Statement
 

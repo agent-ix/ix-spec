@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-009] Read each module manifest into catalog entries
+# FR-009: Read each module manifest into catalog entries
 
 ## Description
 

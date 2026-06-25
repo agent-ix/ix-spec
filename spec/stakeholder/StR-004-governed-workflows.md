@@ -9,7 +9,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-004] Review, matrix, and planning run as governed workflows
+# StR-004: Review, matrix, and planning run as governed workflows
 
 ## Stakeholder Need
 

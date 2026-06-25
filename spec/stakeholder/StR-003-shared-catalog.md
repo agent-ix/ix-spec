@@ -11,7 +11,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-003] Authoring and validation share one consistent catalog
+# StR-003: Authoring and validation share one consistent catalog
 
 ## Stakeholder Need
 

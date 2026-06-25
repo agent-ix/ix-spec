@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-008] Deduplicate module roots and names first-wins
+# FR-008: Deduplicate module roots and names first-wins
 
 ## Description
 

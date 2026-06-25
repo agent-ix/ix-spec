@@ -9,7 +9,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-002] Authors extend the spec vocabulary with community modules
+# StR-002: Authors extend the spec vocabulary with community modules
 
 ## Stakeholder Need
 

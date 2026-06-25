@@ -10,7 +10,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-016] Default module set manifest schema
+# FR-016: Default module set manifest schema
 
 ## Description
 

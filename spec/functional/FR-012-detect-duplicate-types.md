@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-012] Detect duplicate type definitions and validate the catalog
+# FR-012: Detect duplicate type definitions and validate the catalog
 
 ## Description
 

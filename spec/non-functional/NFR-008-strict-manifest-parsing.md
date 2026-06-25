@@ -10,7 +10,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-008] Corrupt manifests abort assembly rather than drop silently
+# NFR-008: Corrupt manifests abort assembly rather than drop silently
 
 ## Statement
 

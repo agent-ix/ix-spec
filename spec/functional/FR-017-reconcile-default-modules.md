@@ -11,7 +11,7 @@ relationships:
     type: "references"
 ---
 
-# [FR-017] Reconcile the default module set into the shared store
+# FR-017: Reconcile the default module set into the shared store
 
 ## Description
 

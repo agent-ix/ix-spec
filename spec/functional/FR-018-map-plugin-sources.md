@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-018] Map plugin source arguments to typed sources
+# FR-018: Map plugin source arguments to typed sources
 
 ## Description
 

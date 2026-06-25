@@ -11,7 +11,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-005] Start a gated spec workflow
+# US-005: Start a gated spec workflow
 
 ## Story
 

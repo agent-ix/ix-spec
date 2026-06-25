@@ -7,7 +7,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [FR-004] Resolve the config root and configure the runtime context
+# FR-004: Resolve the config root and configure the runtime context
 
 ## Description
 

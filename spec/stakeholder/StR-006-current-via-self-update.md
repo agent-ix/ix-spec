@@ -7,7 +7,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-006] Operators keep quoin current with one command
+# StR-006: Operators keep quoin current with one command
 
 ## Stakeholder Need
 

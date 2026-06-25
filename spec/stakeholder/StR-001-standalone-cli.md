@@ -11,7 +11,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-001] Authors run spec work from a standalone CLI
+# StR-001: Authors run spec work from a standalone CLI
 
 ## Stakeholder Need
 

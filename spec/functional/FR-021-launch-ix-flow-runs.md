@@ -11,7 +11,7 @@ relationships:
     type: "references"
 ---
 
-# [FR-021] Launch workflow runs through ix-flow
+# FR-021: Launch workflow runs through ix-flow
 
 ## Description
 

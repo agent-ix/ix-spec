@@ -15,7 +15,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [US-001] Author a root artifact with supporting objects
+# US-001: Author a root artifact with supporting objects
 
 ## Story
 

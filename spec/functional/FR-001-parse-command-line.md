@@ -7,7 +7,7 @@ relationships:
     type: "traces_to"
 ---
 
-# [FR-001] Parse the command line into command, flags, and positionals
+# FR-001: Parse the command line into command, flags, and positionals
 
 ## Description
 

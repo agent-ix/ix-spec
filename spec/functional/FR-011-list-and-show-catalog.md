@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-011] List the catalog and show a single type
+# FR-011: List the catalog and show a single type
 
 ## Description
 

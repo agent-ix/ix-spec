@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-020] Expose workflow launchers and resolve their skills
+# FR-020: Expose workflow launchers and resolve their skills
 
 ## Description
 

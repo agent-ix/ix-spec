@@ -11,7 +11,7 @@ relationships:
     type: "satisfied_by"
 ---
 
-# [StR-005] Authoring stays offline-safe and reproducible
+# StR-005: Authoring stays offline-safe and reproducible
 
 ## Stakeholder Need
 

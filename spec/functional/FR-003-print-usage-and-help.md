@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-003] Print usage and command-scoped help
+# FR-003: Print usage and command-scoped help
 
 ## Description
 

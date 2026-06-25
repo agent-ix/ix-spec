@@ -12,7 +12,7 @@ relationships:
     type: "constrains"
 ---
 
-# [NFR-003] Failures surface as actionable errors
+# NFR-003: Failures surface as actionable errors
 
 ## Statement
 

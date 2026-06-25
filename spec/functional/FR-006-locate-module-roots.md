@@ -9,7 +9,7 @@ relationships:
     type: "implements"
 ---
 
-# [FR-006] Locate a module root from a candidate path
+# FR-006: Locate a module root from a candidate path
 
 ## Description
 
