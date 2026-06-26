@@ -42,6 +42,21 @@ file under the matching directory:
 > If a request asks for functional requirements and you produced only table rows
 > in `spec.md`, the request is **not done** — create the `FR-XXX.md` files.
 
+## Writing good requirements
+
+The templates and Quire enforce *shape*; you supply the *judgment*. Author it well
+here so `spec-review` has less to send back. Three principles — full guidance with
+examples in [references/writing-good-requirements.md](references/writing-good-requirements.md):
+
+- **Scope: tight beats broad.** Prefer a narrow spec that fully defines its slice over
+  a sprawling, vague one. Treat `spec.md` §2.2 Out of Scope as first-class — decide
+  your non-goals deliberately; an empty Out-of-Scope is a smell.
+- **User stories: INVEST + no solution-prescribing.** Describe the user need with a
+  real "so that …"; let the FRs pick the mechanism.
+- **Acceptance criteria: cover the unhappy paths, be concrete.** Author happy/error/edge
+  and negative cases up front, in measurable terms ("returns HTTP 422 within 200ms",
+  not "handles errors gracefully").
+
 ## Process
 
 Run only the steps the request needs; stop after IT.
@@ -56,9 +71,12 @@ Run only the steps the request needs; stop after IT.
    - `spec.md` — **REQUIRED when starting a new spec**: the
      `type: master-requirements` root/index at `spec/spec.md`, authored from
      `assets/spec-template.md` (or `assets/app-spec-template.md` for an
-     application). Then → StR → US →
+     application); keep scope tight and fill Out of Scope deliberately
+     (see [references/writing-good-requirements.md](references/writing-good-requirements.md)).
+     Then → StR → US (INVEST, no solution-prescribing — same reference) →
      **derive FR from US** (see [references/us-to-fr.md](references/us-to-fr.md))
-     → FR → NFR → IT (see [references/integration-tests.md](references/integration-tests.md)).
+     → FR (cover unhappy paths, measurable ACs — same reference)
+     → NFR → IT (see [references/integration-tests.md](references/integration-tests.md)).
 4. Keep traceability in frontmatter `relationships:` (e.g. a US `traces_to` its
    FRs; an FR/NFR/IT links back to the US/FR it serves).
 5. Run `quire validate <glob> [glob2 ...]` over the changed spec scope and fix
@@ -74,6 +92,9 @@ each with an Acceptance Criteria table (the `fr.md` skeleton enforces the shape)
 
 - Derive FRs from the driving user story — see
   [references/us-to-fr.md](references/us-to-fr.md).
+- Make the ACs count: cover happy/error/edge and negative cases in concrete,
+  measurable terms — see
+  [references/writing-good-requirements.md](references/writing-good-requirements.md).
 - A behavioral FR has no `object:` field. A **domain-typed** FR carries
   `object: <type>` (e.g. `entity`, `event`, `api_endpoint`, `process`,
   `configuration`) and uses that type's structural template. Look up the
