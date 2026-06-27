@@ -29,11 +29,13 @@ REPEATS ?= 1
 
 .PHONY: evals
 evals:
-	node evals/run.mjs --canary --model $(MODEL) --repeats $(REPEATS)
+	pnpm --dir ../cli-agent-evals run build
+	node ../cli-agent-evals/bin/cli-evals.js run --suite ./cli-agent-evals.config.mjs --canary --agent claude --model $(MODEL) --repeats $(REPEATS)
 
 .PHONY: evals-all
 evals-all:
-	node evals/run.mjs --all --model $(MODEL) --repeats $(REPEATS)
+	pnpm --dir ../cli-agent-evals run build
+	node ../cli-agent-evals/bin/cli-evals.js run --suite ./cli-agent-evals.config.mjs --all --agent claude --model $(MODEL) --repeats $(REPEATS)
 
 # Community install smoke test (clean-room Docker: public npm + agent plugins).
 # Verifies an outside developer can `npm i -g @agent-ix/quoin` and install the
