@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@agent-ix/ix-cli-core':
-        specifier: '>=0.10.5'
-        version: 0.10.5(@oclif/core@4.11.4)
+        specifier: '>=0.11.0'
+        version: 0.11.0(@oclif/core@4.11.4)
       '@agent-ix/ts-plugin-kit':
         specifier: '>=0.1.3'
         version: 0.1.3
@@ -63,8 +63,8 @@ importers:
 
 packages:
 
-  '@agent-ix/ix-cli-core@0.10.5':
-    resolution: {integrity: sha512-Twe+we1yy7rcXAaZQd3mOVi/gfPc34BTmw8dLLjsUqiNdGp0tPYASi5kKcqkN4q6OEw0CPbPBpw9SVFaNXyS+A==}
+  '@agent-ix/ix-cli-core@0.11.0':
+    resolution: {integrity: sha512-/QKQIxIroscYIzEEf8HO4xX+WtDIKjyWTarWwiCZOH252K3VFqWrPmTbric9cjZyoAWZUSZ43Dj1As/TmsDqbA==}
     peerDependencies:
       '@oclif/core': '>=4.11.4'
 
@@ -1677,7 +1677,7 @@ packages:
 
 snapshots:
 
-  '@agent-ix/ix-cli-core@0.10.5(@oclif/core@4.11.4)':
+  '@agent-ix/ix-cli-core@0.11.0(@oclif/core@4.11.4)':
     dependencies:
       '@agent-ix/ix-ui-cli': 0.4.10
       '@agent-ix/ts-plugin-kit': 0.1.3
