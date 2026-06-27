@@ -37,3 +37,6 @@ tmp/
 __pycache__/
 *.pyc
 *.egg-info/
+
+# Spec artifacts (quire-managed, not prettier-formatted)
+spec/
