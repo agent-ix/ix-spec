@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { packageVersion, resolveVersion } from "../src/cli";
@@ -12,12 +14,12 @@ describe("resolveVersion", () => {
     );
   });
 
-  it("falls back to package.json when no version is baked in", () => {
-    // Under vitest __QUOIN_VERSION__ is "", so packageVersion() takes the
-    // fallback path and reads a real string from package.json.
-    const version = resolveVersion("");
-    expect(typeof version).toBe("string");
-    expect(version.length).toBeGreaterThan(0);
-    expect(packageVersion()).toBe(version);
+  it("falls back to the package.json version when nothing is baked in", () => {
+    const pkg = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ) as { version: string };
+    // Under vitest __QUOIN_VERSION__ is "", so the fallback reads package.json.
+    expect(resolveVersion("")).toBe(pkg.version);
+    expect(packageVersion()).toBe(pkg.version);
   });
 });
