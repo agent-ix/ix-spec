@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { configureRuntimeContext, runSelfUpdate } from "@agent-ix/ix-cli-core";
+import {
+  configureRuntimeContext,
+  maybeOfferUpdate,
+  runSelfUpdate,
+} from "@agent-ix/ix-cli-core";
 
 import { findCatalogEntry, ixHome, loadCatalog } from "./catalog.js";
 import { ensureDefaultModules } from "./modules.js";
@@ -133,9 +137,11 @@ Supported install sources:
   github:<owner>/<repo>             Clone a GitHub repository (manifest at root)
   github:<owner>/<repo>@<ref>       Pin to a tag, branch, or sha
   github:<owner>/<repo>//<subdir>   Manifest in a monorepo subdirectory (@<ref> ok)
+  package:<name>                    Install a module from an npm package (manifest at root)
+  package:<name>@<version>          Pin to an npm version
 
 Usage:
-  quoin plugin install <path:...|github:...>
+  quoin plugin install <path:...|github:...|package:...>
   quoin plugin list
   quoin plugin remove <name>
   quoin plugin ensure-defaults
@@ -144,6 +150,7 @@ Examples:
   quoin plugin install path:../spec-objects-custom
   quoin plugin install github:agent-ix/spec-objects-custom
   quoin plugin install github:agent-ix/spec-objects-security//spec_objects_security@v0.1.1
+  quoin plugin install package:@agent-ix/spec-objects-security@0.4.0
   quoin plugin list
   quoin plugin ensure-defaults
 `;
@@ -215,6 +222,15 @@ export async function main(argv: string[]): Promise<void> {
     projectConfigRoot: `${process.cwd()}/.ix`,
     projectConfigEnabled: parsed.flags["no-project-config"] !== true,
   });
+
+  // Nudge toward a newer published quoin (throttled, interactive-only, silent in
+  // CI / under --json / for the update command itself). Never blocks or throws.
+  if (parsed.command !== "update" && parsed.flags.json !== true) {
+    await maybeOfferUpdate({
+      packageName: "@agent-ix/quoin",
+      currentVersion: packageVersion(),
+    });
+  }
 
   if (parsed.command === "update") return runUpdate(parsed);
   if (parsed.command === "catalog") return runCatalog(parsed);
