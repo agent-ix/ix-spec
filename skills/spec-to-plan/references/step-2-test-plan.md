@@ -37,3 +37,7 @@
 ### Verification (NFRs)
 - [ ] **verify_response_time** (NFR-001): Run load test to ensure p95 < 200ms.
 ```
+
+This is the **single** TC enumeration for the bundle. Downstream sections reference TC
+ids only via the Step 3 **Task File Mapping** table — do not re-list them per track or in
+track exit-criteria.
