@@ -75,4 +75,14 @@ relationships:
 ### Cross-cutting constraints
 - `NFR-001` applies to [which code paths].
 - `NFR-002` applies to [which merge points].
+
+### The seams (optional)
+One short paragraph grounding the plan in the existing code — the concrete files,
+functions, or boundaries each track attaches to (e.g. "FR-021 widens the write guard in
+`authorize.ts`; FR-022 reuses the existing `chokidar-change-source.ts`"). Keep it to a
+few sentences; omit if the spec is greenfield.
 ```
+
+This is the **single** dependency-graph representation for the bundle. Step 3 references
+it — it does not re-emit a "Remaining Dependency Graph" or a separate "Execution Tracks"
+section.

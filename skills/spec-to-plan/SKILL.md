@@ -50,8 +50,11 @@ All steps required!
 This skill produces or updates a **plan bundle** at `<project_root>/plan/<Plan-id>-<slug>/`:
 
 -   `plan.md` (`type: Plan`): The central living document — requirements summary,
-    dependency graph, execution tracks, quality gates, and test plan. Frontmatter
-    `relationships:` trace (`references`) the requirements the plan covers.
+    dependency graph, execution tracks, quality gates, and test plan. It is an
+    **orchestration overview, not a mirror of the bundle**: ownership, the DAG, and test
+    traces are authoritative in the task frontmatter, so `plan.md` states each fact once
+    (see `references/step-3-execution-plan.md`). Frontmatter `relationships:` trace
+    (`references`) the requirements the plan covers.
 -   `tasks/Task-NNN-<slug>.md` (`type: Task`): One file per task. Frontmatter carries
     the machine contract — `status`, `track`, `priority`, and `relationships:` edges
     (`depends_on` for the DAG, `references` for requirement ownership, `verifies` for

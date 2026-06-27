@@ -64,7 +64,8 @@ A gate is a checkpoint where you validate a fundamental assumption before invest
 - Before starting optimization work (confirm correctness first)
 - Before starting dependent work that would need rework if the gate fails
 
-**Gate format:**
+**Gate format** (this is the thinking format; in `plan.md` the gate is rendered
+**once**, as a one-liner inline in its track — see Output Format below):
 ```markdown
 #### Gate: [Name]
 - **Measures:** [What you're validating]
@@ -155,41 +156,46 @@ the `plan.md` body — see the Output Format below.
 
 ## Output Format (appended to plan/<Plan-id>-<slug>/plan.md)
 
+`plan.md` is an **orchestration overview, not a mirror of the bundle.** Ownership, the
+DAG, and test traces are authoritative in **task frontmatter** (`references`,
+`depends_on`, `verifies`). State each fact **once**: the requirement checklist in
+Requirements Summary (Step 1), the dependency *reasons* in the Dependency Graph (Step 1),
+the TC enumeration in the Test Plan (Step 2), and the per-task row in the Task File
+Mapping below. Step 3 appends only the sections below — it does **not** re-emit the
+dependency graph, add a separate "Execution Tracks" section, restate any task's
+`## Scope`, or re-list TC ids per track.
+
 ```markdown
 ## Remaining Work
 
-### Remaining Dependency Graph
-[Text DAG or ASCII diagram showing what depends on what]
+Describe the tracks **once**, here. One line per item: title, difficulty (optional
+size estimate), and a *behavioral* exit criterion. The item's scope and subtasks live
+in its task file — do not repeat them. Do not list TC ids here; they live in the Test
+Plan and the Task File Mapping.
 
 ### Track A: Critical Path (serial)
-#### A1: [First step]
-- **Scope:** ...
-- **Difficulty:** Easy | Medium | Hard
-- **Estimated new code:** ~NNN lines
-- **Exit criteria:** ...
-
-#### A2: [Second step]
-...
-
-#### Gate: [Quality checkpoint]
-- **Measures:** ...
-- **Pass criteria:** ...
+- **A1 = Task-NNN** [title] — [Easy|Medium|Hard], ~NNN lines; exit: [behavioral outcome, e.g. "converges with no acknowledged loss"].
+- **A2 = Task-NNN** [title] — [difficulty]; exit: [behavioral outcome].
+- **Gate = Task-NNN** [name] — measures [what]; pass: [threshold]. (State each gate once, here in its track — never also in a separate section.)
 
 ### Track B: Parallel (independent agent, can start now)
-#### B1: [Parallel item]
-...
+- **B1 = Task-NNN** [title] — [difficulty]; exit: [behavioral outcome].
 
 ### Track C: Post-Gate
-#### C1: [Gated item]
-...
+- **C1 = Task-NNN** [title] — [difficulty]; exit: [behavioral outcome].
 
 ## Parallel Execution Summary
-[ASCII timeline showing tracks running concurrently]
+[ASCII timeline showing the tracks running concurrently.]
 
 ## Task File Mapping
-[Table mapping Task-NNN files → track → owned requirements → status. The
-authoritative status/deps live in each task's frontmatter; this table is a
-human-readable mirror.]
+
+The single per-task table — the only place that enumerates per-task ownership and
+verification. It is a human-readable mirror of the task frontmatter, which stays
+authoritative for status and edges.
+
+| Task     | Track | Owns (references) | Verified by (verifies) | Status      |
+| -------- | ----- | ----------------- | ---------------------- | ----------- |
+| Task-NNN | A     | FR-00X            | TC-0XX…TC-0XX          | not_started |
 
 ## Coordination Rules
 [What to freeze, what not to start early, shared-file/shared-state single-writer
@@ -198,6 +204,13 @@ discipline, merge sequencing.]
 
 ## Common Mistakes to Avoid
 
+- **Mirroring frontmatter in prose.** `plan.md` is an orchestration overview; ownership,
+  the DAG, and test traces are authoritative in task frontmatter (`references`,
+  `depends_on`, `verifies`). State each fact once — requirement checklist (Requirements
+  Summary), dependency reasons (Dependency Graph), TC enumeration (Test Plan), per-task
+  row (Task File Mapping). Do not add a second "Execution Tracks" section, re-emit the
+  dependency graph, re-list TC ids in track exit-criteria, restate a task's `## Scope`,
+  or describe a gate twice.
 - **Bundling done + remaining work in one task.** If build is done but scan isn't, they're separate tasks even if they were originally planned together.
 - **Missing shared dependencies.** If two items need the same algorithm, extract it as a deliverable — don't let two parallel workers implement it independently.
 - **No gates.** If the whole system's value depends on one unproven property (e.g., recall quality), measure it before building everything around it.

@@ -821,6 +821,12 @@ export const SCENARIOS = [
     // valid under the active spec-artifacts-process schema (e.g. PL-001/TSK-001 under
     // the uppercase-only published schema; Plan-001/Task-001 once the mixed-case
     // schema PR is pinned in default-modules.yaml).
+    //
+    // Also asserts the LEAN plan shape (spec-to-plan/references/step-3): plan.md is an
+    // orchestration overview, not a mirror of the bundle — the per-task matrix lives in
+    // a single "Task File Mapping" table, and tracks are described once under "Remaining
+    // Work", so there is NO separate "Execution Tracks" section re-stating them. This
+    // `fileContains` locks in the duplication removal the slim-template change made.
     id: "EV-027",
     useCase: "US-008",
     setup(ctx) {
@@ -849,6 +855,15 @@ export const SCENARIOS = [
       },
       files: ["plan/**/index.md", "plan/**/log.md", "plan/**/tasks/*.md"],
       validate: { globs: ["plan/**/*.md"], shouldPass: true },
+      // Lean plan shape: a single per-task "Task File Mapping" table is present, and
+      // tracks are NOT also re-stated in a separate "Execution Tracks" section.
+      fileContains: [
+        {
+          glob: "plan/**/plan.md",
+          includes: ["## +Task File Mapping"],
+          excludes: ["## +Execution Tracks"],
+        },
+      ],
     },
   },
   {
