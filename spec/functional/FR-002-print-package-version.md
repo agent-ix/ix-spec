@@ -11,10 +11,13 @@ relationships:
 
 ## Description
 
-The CLI SHALL print its own package version — read from the package's
-`package.json` — in response to the `version` command, the `--version` flag, or
-the `-v` flag, and SHALL raise an error when the package version is missing or
-not a string.
+The CLI SHALL print its own version in response to the `version` command, the
+`--version` flag, or the `-v` flag. The version SHALL be the value baked at build
+time from `git describe` — a bare tag for a clean release (e.g. `0.5.2`), a
+drift-revealing suffix otherwise (e.g. `0.5.1-3-gabc123-dirty`) — and SHALL fall
+back to the package's `package.json` `version` field when no build-time value is
+present (dev, test, or no-git builds), raising an error when that fallback version
+is missing or not a string.
 
 ## Inputs
 
@@ -27,19 +30,22 @@ not a string.
 
 ## Behavior
 
-- The CLI SHALL resolve its `package.json` relative to the installed package and
-  read the `version` field.
-- The CLI SHALL print that version and return before any other dispatch.
-- The CLI SHALL raise an explicit error when the `version` field is absent or is
-  not a string.
+- The CLI SHALL prefer the build-time baked version (`git describe --tags --dirty`,
+  leading `v` stripped) when it is a non-empty string.
+- The CLI SHALL otherwise resolve its `package.json` relative to the installed
+  package and read the `version` field.
+- The CLI SHALL print the resolved version and return before any other dispatch.
+- The CLI SHALL raise an explicit error when, on the fallback path, the `version`
+  field is absent or is not a string.
 
 ## Acceptance Criteria
 
-| ID          | Criteria                                                        | Verification                        |
-| ----------- | --------------------------------------------------------------- | ----------------------------------- |
-| FR-002-AC-1 | `version`, `--version`, and `-v` each print the package version | Test (cli.test.ts, scripts.test.ts) |
-| FR-002-AC-2 | The reported value is a non-empty string                        | Test (cli.test.ts)                  |
-| FR-002-AC-3 | A missing or non-string version field raises an error           | Test (cli-version-missing.test.ts)  |
+| ID          | Criteria                                                                                              | Verification                        |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| FR-002-AC-1 | `version`, `--version`, and `-v` each print the package version                                       | Test (cli.test.ts, scripts.test.ts) |
+| FR-002-AC-2 | The reported value is a non-empty string                                                              | Test (cli.test.ts)                  |
+| FR-002-AC-3 | A missing or non-string version field raises an error                                                 | Test (cli-version-missing.test.ts)  |
+| FR-002-AC-4 | A non-empty baked version is reported verbatim; an empty one falls back to the `package.json` version | Test (version.test.ts)              |
 
 ## Dependencies
 
