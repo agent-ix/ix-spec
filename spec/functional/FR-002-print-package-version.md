@@ -14,7 +14,7 @@ relationships:
 The CLI SHALL print its own version in response to the `version` command, the
 `--version` flag, or the `-v` flag. The version SHALL be the value baked at build
 time from `git describe` — a bare tag for a clean release (e.g. `0.5.2`), a
-drift-revealing suffix otherwise (e.g. `0.5.1-3-gabc123-dirty`) — and SHALL fall
+commits-ahead suffix otherwise (e.g. `0.5.1-3-gabc123`) — and SHALL fall
 back to the package's `package.json` `version` field when no build-time value is
 present (dev, test, or no-git builds), raising an error when that fallback version
 is missing or not a string.
@@ -30,8 +30,10 @@ is missing or not a string.
 
 ## Behavior
 
-- The CLI SHALL prefer the build-time baked version (`git describe --tags --dirty`,
-  leading `v` stripped) when it is a non-empty string.
+- The CLI SHALL prefer the build-time baked version (`git describe --tags`, leading
+  `v` stripped) when it is a non-empty string. It SHALL NOT use `--dirty`, since the
+  release pipeline stamps `package.json` before building and would otherwise mislabel
+  a clean release as `-dirty`.
 - The CLI SHALL otherwise resolve its `package.json` relative to the installed
   package and read the `version` field.
 - The CLI SHALL print the resolved version and return before any other dispatch.

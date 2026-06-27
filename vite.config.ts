@@ -6,13 +6,15 @@ import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 // Truthful version baked into the bundle at build time. `git describe` yields the
-// bare tag on a clean release commit (e.g. v0.5.2) and a drift-revealing string
-// otherwise (e.g. v0.5.1-3-gabc123-dirty); we strip the leading `v`. Only computed
-// for `vite build` — under vitest (serve) it stays "" so packageVersion() exercises
-// its package.json fallback. Empty on a no-git build (e.g. tarball) too.
+// bare tag when HEAD is exactly a release tag (e.g. v0.5.4) and a commits-ahead
+// string otherwise (e.g. v0.5.3-2-gabc123); we strip the leading `v`. We do NOT
+// pass `--dirty`: the release pipeline stamps package.json before building, which
+// would dirty the tree and mislabel a clean release as `-dirty`. Only computed for
+// `vite build` — under vitest (serve) it stays "" so packageVersion() exercises its
+// package.json fallback. Empty on a no-git build (e.g. tarball) too.
 function gitVersion(): string {
   try {
-    return execSync("git describe --tags --dirty --always", {
+    return execSync("git describe --tags --always", {
       encoding: "utf8",
     })
       .trim()
