@@ -21,6 +21,12 @@ interface ParsedArgs {
   flags: Record<string, string | boolean | string[]>;
 }
 
+// quoin is published to the public npm registry (see package.json
+// publishConfig.registry). `update` defaults here so it resolves the package
+// from public npm regardless of the ambient npm config; override with
+// --registry for local-dev snapshots (e.g. http://npm.ix/).
+const DEFAULT_UPDATE_REGISTRY = "https://registry.npmjs.org/";
+
 const USAGE = `quoin
 
 Spec workflow and catalog CLI for Agent IX.
@@ -156,10 +162,9 @@ Usage:
 Flags:
   --check               Report whether an update is available; do not install.
   --registry <url>      Force an npm registry to query/install from. Defaults
-                        to your npm config (the registry @agent-ix resolves to,
-                        i.e. however quoin was installed). Pass
-                        https://registry.npmjs.org/ for public npm, or
-                        http://npm.ix/ for local dev snapshots.
+                        to the public npm registry
+                        (https://registry.npmjs.org/), where @agent-ix/quoin is
+                        published. Pass http://npm.ix/ for local dev snapshots.
 
 Examples:
   quoin update
@@ -225,7 +230,13 @@ export async function main(argv: string[]): Promise<void> {
   throw new Error(`unknown command ${parsed.command}\n\n${USAGE}`);
 }
 
-export function packageVersion(): string {
+// Baked at build time from `git describe` (see vite.config.ts). A bare semver
+// means a clean tagged release; a `-<n>-g<sha>` / `-dirty` suffix means the build
+// is ahead of / diverges from its tag. Empty for dev/test/no-git builds, which
+// fall back to package.json.
+declare const __QUOIN_VERSION__: string;
+
+function readPackageJsonVersion(): string {
   const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
   const packageJson = JSON.parse(
     readFileSync(join(packageRoot, "package.json"), "utf8"),
@@ -234,6 +245,17 @@ export function packageVersion(): string {
     throw new Error("package.json version is missing");
   }
   return packageJson.version;
+}
+
+// Prefer the build-time baked version (truthful about drift); fall back to
+// package.json when it is absent (dev/test builds, or a no-git build).
+export function resolveVersion(baked: string): string {
+  if (baked) return baked;
+  return readPackageJsonVersion();
+}
+
+export function packageVersion(): string {
+  return resolveVersion(__QUOIN_VERSION__);
 }
 
 function helpFor(parsed: ParsedArgs): string {
@@ -270,9 +292,10 @@ async function runUpdate(parsed: ParsedArgs): Promise<void> {
     packageName: "@agent-ix/quoin",
     currentVersion: packageVersion(),
     header: "quoin update",
-    // undefined → ambient npm config (the registry @agent-ix resolves to).
-    // Override for local dev with --registry http://npm.ix/.
-    registry: stringFlag(parsed, "registry"),
+    // Default to public npm (where @agent-ix/quoin is published) so update
+    // works regardless of the ambient npm config. Override for local dev with
+    // --registry http://npm.ix/.
+    registry: stringFlag(parsed, "registry") ?? DEFAULT_UPDATE_REGISTRY,
     check: parsed.flags.check === true,
   });
 }

@@ -1,0 +1,38 @@
+name: Release Drift
+
+# Guards against source drift: code merged to main that never gets released, so the
+# published @agent-ix/quoin silently lags its source. Fails while main's src/ is ahead
+# of the latest release tag. Self-healing — it re-evaluates on tag push (goes green once
+# you tag the release) and daily, so it never gets stuck red on an old commit.
+
+on:
+  push:
+    branches: [main]
+    tags: ["*.*.*"]
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history + tags so `git describe` works
+      - name: Fail if src/ changed since the latest release tag
+        run: |
+          set -euo pipefail
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "No release tags yet; nothing to compare against."
+            exit 0
+          fi
+          if git diff --quiet "$LAST_TAG"..HEAD -- src; then
+            echo "✅ No src/ changes since $LAST_TAG — main is released."
+          else
+            echo "::error::src/ has changed since $LAST_TAG. Tag a release (vX.Y.Z) so the published package matches main."
+            echo "Changed since $LAST_TAG:"
+            git diff --name-only "$LAST_TAG"..HEAD -- src
+            exit 1
+          fi

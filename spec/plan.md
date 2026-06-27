@@ -19,3 +19,4 @@ type: Plan
 | Task-007 | Add use cases for authoring, validation, plugins, and workflows. | Done   |
 | Task-008 | Add an eval matrix with latency/token/tool-call metrics.         | Done   |
 | Task-009 | Build executable eval harness and fixture repos.                 | Done   |
+| Task-010 | Default `update` to public npm (FR-022) when no `--registry`.    | Done   |
