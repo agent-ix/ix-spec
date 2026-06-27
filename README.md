@@ -212,10 +212,50 @@ The technical specification for this library was itself authored with the `spec-
 
 ### Evals
 
-Eval scenarios live in [spec/evals.md](spec/evals.md) and run via the agent-pty-driven
-harness in `evals/` (`make evals` / `make evals-all`). The harness profiles a **real** agent
-running the skills/workflows and records token/tool/latency metrics from the Claude Code
-transcript. Unit tests cover the mechanical CLI behavior; see [evals/README.md](evals/README.md).
+Eval scenarios live in [spec/evals.md](spec/evals.md) and run through the shared
+[`@agent-ix/cli-agent-evals`](../cli-agent-evals) toolkit. The suite definition is
+[`cli-agent-evals.config.mjs`](cli-agent-evals.config.mjs); quoin-specific fixtures,
+module seeding, prompts, and assertions remain under [`evals/`](evals/).
+
+Live runs profile a **real** agent running the skills/workflows and record token,
+tool, and latency metrics from the available transcript. Unit tests cover the
+mechanical CLI behavior.
+
+```bash
+make evals
+make evals-all
+node ../cli-agent-evals/bin/cli-evals.js run \
+  --suite ./cli-agent-evals.config.mjs \
+  --canary \
+  --agent claude \
+  --model sonnet
+```
+
+Agent plugin setup for authoring/running evals from an agent:
+
+```bash
+claude plugin marketplace add agent-ix/cli-agent-evals
+claude plugin install cli-agent-evals
+
+codex plugin marketplace add agent-ix/cli-agent-evals
+codex plugin add cli-agent-evals
+
+gh skill install agent-ix/cli-agent-evals --all --scope user --agent opencode
+gh skill install agent-ix/cli-agent-evals --all --scope user --agent github-copilot
+```
+
+Minimal integration pattern:
+
+```js
+import { defineSuite } from "../cli-agent-evals/dist/index.js";
+import { SCENARIOS } from "./evals/scenarios/index.mjs";
+
+export default defineSuite({
+  name: "quoin",
+  rootDir: import.meta.dirname,
+  scenarios: SCENARIOS,
+});
+```
 
 ## About
 
