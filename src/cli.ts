@@ -247,9 +247,8 @@ export async function main(argv: string[]): Promise<void> {
 }
 
 // Baked at build time from `git describe` (see vite.config.ts). A bare semver
-// means a clean tagged release; a `-<n>-g<sha>` / `-dirty` suffix means the build
-// is ahead of / diverges from its tag. Empty for dev/test/no-git builds, which
-// fall back to package.json.
+// means a clean tagged release; a `-<n>-g<sha>` suffix means the build is ahead of
+// its tag. Empty for dev/test/no-git builds, which fall back to package.json.
 declare const __QUOIN_VERSION__: string;
 
 function readPackageJsonVersion(): string {
