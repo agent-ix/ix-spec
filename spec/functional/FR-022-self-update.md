@@ -18,7 +18,8 @@ published `@agent-ix/quoin` by delegating to `ix-cli-core`'s self-update
 (querying the registry, comparing against the running version, and installing
 globally), supporting a `--check` mode that reports availability without
 installing and a `--registry <url>` option that selects the registry; with no
-`--registry`, the ambient npm configuration resolves the package.
+`--registry`, the command defaults to the public npm registry
+(`https://registry.npmjs.org/`), where `@agent-ix/quoin` is published.
 
 ## Inputs
 
@@ -34,16 +35,16 @@ installing and a `--registry <url>` option that selects the registry; with no
   package coordinates and the running version (see
   [FR-002](./FR-002-print-package-version.md)).
 - The CLI SHALL report availability without installing when `--check` is given.
-- The CLI SHALL pass a `--registry` value through, and SHALL otherwise let the
-  ambient npm configuration resolve the package.
+- The CLI SHALL pass a `--registry` value through, and SHALL otherwise default to
+  the public npm registry (`https://registry.npmjs.org/`).
 
 ## Acceptance Criteria
 
-| ID          | Criteria                                                                                                         | Verification          |
-| ----------- | ---------------------------------------------------------------------------------------------------------------- | --------------------- |
-| FR-022-AC-1 | `update` delegates to the self-update with `@agent-ix/quoin`, the running version, and the `quoin update` header | Test (update.test.ts) |
-| FR-022-AC-2 | `--check` is passed through to report availability without installing                                            | Test (update.test.ts) |
-| FR-022-AC-3 | `--registry <url>` is passed through, and its absence leaves resolution to the ambient npm config                | Test (update.test.ts) |
+| ID          | Criteria                                                                                                              | Verification          |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| FR-022-AC-1 | `update` delegates to the self-update with `@agent-ix/quoin`, the running version, and the `quoin update` header      | Test (update.test.ts) |
+| FR-022-AC-2 | `--check` is passed through to report availability without installing                                                 | Test (update.test.ts) |
+| FR-022-AC-3 | `--registry <url>` is passed through; its absence defaults to the public npm registry (`https://registry.npmjs.org/`) | Test (update.test.ts) |
 
 ## Dependencies
 

@@ -24,9 +24,17 @@ describe("quoin update", () => {
       packageName: "@agent-ix/quoin",
       currentVersion: packageVersion(),
       header: "quoin update",
-      registry: undefined,
+      registry: "https://registry.npmjs.org/",
       check: false,
     });
+  });
+
+  it("defaults the registry to public npm when no --registry is given", async () => {
+    runSelfUpdate.mockClear();
+    await main(["update"]);
+    expect(runSelfUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ registry: "https://registry.npmjs.org/" }),
+    );
   });
 
   it("passes --check through", async () => {
