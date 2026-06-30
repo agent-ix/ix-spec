@@ -6,11 +6,6 @@ name: Release Drift
 # you tag the release) and daily, so it never gets stuck red on an old commit.
 
 on:
-  push:
-    branches: [main]
-    tags: ["*.*.*"]
-  schedule:
-    - cron: "0 13 * * *"
   workflow_dispatch:
 
 jobs:

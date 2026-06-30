@@ -9,9 +9,6 @@ name: install-smoke
 # access to this repo) — without it they skip, not fail.
 
 on:
-  pull_request:
-  push:
-    tags: ["*.*.*"]
   workflow_dispatch:
 
 permissions:
